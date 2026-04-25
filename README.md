@@ -15,5 +15,5 @@
 ## Team
 - **DevOps:** Osama & waleed
 - **Mobile:** Yousry
-- **Backend:** Mngy & Eyad & menna
+- **Backend:** Mongy & Eyad & menna
 - **Web:** Howaida & Belal & mahmoud 
