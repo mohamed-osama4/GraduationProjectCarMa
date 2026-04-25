@@ -1,0 +1,53 @@
+name: graduation_project
+description: "A new Flutter project."
+
+publish_to: 'none'
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+
+dependencies:
+  flutter_localization: ^0.3.3
+  flutter_svg: ^2.2.1
+  lottie: ^2.2.0
+  google_fonts: ^6.1.0
+  flutter:
+    sdk: flutter
+
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+  flutter_lints: ^5.0.0
+
+
+flutter:
+
+
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/lotties/
+
+  
+  fonts:
+    - family: Mystery Quest
+      fonts:
+        - asset: assets/fonts/MysteryQuest-Regular.ttf
+  #         style: italic
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf
+        - asset: assets/fonts/Inter-VariableFont_opsz,wght.ttf
+  #         weight: 700
+  #
