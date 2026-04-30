@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using CarMaintenance.Services;
 using CarMaintenance.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CarMaintenance.Controllers
 {
@@ -15,6 +16,7 @@ namespace CarMaintenance.Controllers
             _aiService = aiService;
         }
 
+        [Authorize]
         [HttpPost("chat")]
         public async Task<IActionResult> Chat([FromBody] ChatRequest request)
         {
