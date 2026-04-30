@@ -2,12 +2,15 @@ using CarMaintenance.Common;
 using CarMaintenance.DTOs;
 using CarMaintenance.Models;
 using CarMaintenance.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarMaintenance.Controllers
 {
     [ApiController]
     [Route("api/orders")]
+
+    [Authorize(Roles = "admin,technician")]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _service;
@@ -39,6 +42,8 @@ namespace CarMaintenance.Controllers
             return Ok(ApiResponse<Order>.SuccessResponse(order));
         }
 
+    
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
         {
