@@ -12,7 +12,9 @@ namespace CarServiceAPI.Controllers
             var users = new List<User>
             {
                 new User { Id = 1, Name = "Menna", Email = "menna@gmail.com", Password = "1234", Role = "customer" },
-                new User { Id = 2, Name = "Ahmed", Email = "ahmed@gmail.com", Password = "5678", Role = "technician" }
+                new User { Id = 2, Name = "Ahmed", Email = "ahmed@gmail.com", Password = "5678", Role = "technician" },
+                new User { Id = 3, Name = "Abdelrahman", Email = "Elmongy@gmail.com", Password = "1122", Role = "admin" }
+
             };
 
             var user = users.FirstOrDefault(u => u.Email == request.Email);
