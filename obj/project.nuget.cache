@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "m5Zy9ya5F50=",
+  "dgSpecHash": "o8meF53dhT0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\abdoe\\Downloads\\car-maintenance-backend-main\\car-maintenance-backend-main (1)\\car-maintenance-backend-main\\GraduationProjectCarMa\\backend_api\\CarMaintenance.csproj",
+  "projectFilePath": "D:\\New folder (3)\\GraduationProjectCarMa\\backend_api\\CarMaintenance.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\abdoe\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\abdoe\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.0\\microsoft.aspnetcore.authentication.jwtbearer.8.0.0.nupkg.sha512",

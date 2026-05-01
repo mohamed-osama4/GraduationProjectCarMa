@@ -3085,11 +3085,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\abdoe\\Downloads\\car-maintenance-backend-main\\car-maintenance-backend-main (1)\\car-maintenance-backend-main\\GraduationProjectCarMa\\backend_api\\CarMaintenance.csproj",
+      "projectUniqueName": "D:\\New folder (3)\\GraduationProjectCarMa\\backend_api\\CarMaintenance.csproj",
       "projectName": "CarMaintenance",
-      "projectPath": "C:\\Users\\abdoe\\Downloads\\car-maintenance-backend-main\\car-maintenance-backend-main (1)\\car-maintenance-backend-main\\GraduationProjectCarMa\\backend_api\\CarMaintenance.csproj",
+      "projectPath": "D:\\New folder (3)\\GraduationProjectCarMa\\backend_api\\CarMaintenance.csproj",
       "packagesPath": "C:\\Users\\abdoe\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\abdoe\\Downloads\\car-maintenance-backend-main\\car-maintenance-backend-main (1)\\car-maintenance-backend-main\\GraduationProjectCarMa\\backend_api\\obj\\",
+      "outputPath": "D:\\New folder (3)\\GraduationProjectCarMa\\backend_api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\abdoe\\AppData\\Roaming\\NuGet\\NuGet.Config",
