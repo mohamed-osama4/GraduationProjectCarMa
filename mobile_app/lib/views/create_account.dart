@@ -146,6 +146,7 @@ class _CreateAccountState extends State<CreateAccount> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           physics: const BouncingScrollPhysics(),
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),

@@ -218,6 +218,7 @@ class _RequestServicePageState extends State<RequestServicePage> {
           children: [
             Expanded(
               child: SingleChildScrollView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.all(24),
                 child: Column(
