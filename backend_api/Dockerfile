@@ -8,7 +8,7 @@ COPY . .
 RUN dotnet publish "CarMaintenance.csproj" -c Release -o /app/publish
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-jammy AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-bookworm-slim AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
