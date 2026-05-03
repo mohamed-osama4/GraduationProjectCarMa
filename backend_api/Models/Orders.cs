@@ -18,6 +18,9 @@ namespace CarMaintenance.Models
         public int ServiceId { get; set; }
 
         [Required]
+        public decimal Price { get; set; }
+
+        [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public OrderStatus OrderStatus { get; set; } = OrderStatus.New;
 
@@ -30,5 +33,11 @@ namespace CarMaintenance.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; }
+        
+        [Required]
+         public string PaymentMethod { get; set; } = "Cash";
+
+
+        public ICollection<Notification>? Notifications { get; set; }
     }
 }

@@ -1,31 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using CarMaintenance.Data;
+using CarMaintenance.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using CarMaintenance.Models.DTOs;
 
-namespace CarServiceAPI.Controllers
+namespace CarMaintenance.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
-        {
-            var users = new List<User>
-            {
-                new User { Id = 1, Name = "Menna", Email = "menna@gmail.com", Password = "1234", Role = "customer" },
-                new User { Id = 2, Name = "Ahmed", Email = "ahmed@gmail.com", Password = "5678", Role = "technician" },
-                new User { Id = 3, Name = "Abdelrahman", Email = "Elmongy@gmail.com", Password = "1122", Role = "admin" }
-            };
+        private readonly AppDbContext _context;
 
-            var user = users.FirstOrDefault(u => u.Email == request.Email);
+        public AuthController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequest request)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email);
 
             if (user == null)
                 return Unauthorized(new { message = "User not found" });
 
-            if (user.Password != request.Password)
+            if (user.PasswordHash != request.Password)
                 return Unauthorized(new { message = "Wrong password" });
 
             var token = GenerateJwtToken(user);
@@ -44,12 +49,53 @@ namespace CarServiceAPI.Controllers
             });
         }
 
-        
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterRequest request)
+        {
+            var exists = await _context.Users
+                .AnyAsync(u => u.Email == request.Email);
+
+            if (exists)
+                return BadRequest(new { message = "Email already exists" });
+
+            var user = new User
+            {
+                Name = request.Name,
+                Email = request.Email,
+                PhoneNumber = request.PhoneNumber,
+                PasswordHash = request.Password,
+                Role = request.Role ?? "customer"
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "User registered successfully",
+                userId = user.Id
+            });
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "User deleted successfully" });
+        }
+
         private string GenerateJwtToken(User user)
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.Email),
+new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role)
             };
 
@@ -77,12 +123,12 @@ namespace CarServiceAPI.Controllers
         public string Password { get; set; } = string.Empty;
     }
 
-    public class User
+    public class RegisterRequest
     {
-        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string? Role { get; set; }
     }
 }

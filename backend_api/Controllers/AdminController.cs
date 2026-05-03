@@ -1,128 +1,145 @@
 using Microsoft.AspNetCore.Mvc;
 using CarMaintenance.Models;
+using CarMaintenance.Data;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
-using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/admin")]
-
-
 [Authorize(Roles = "admin")]
 public class AdminController : ControllerBase
 {
-    /// <summary>
-    /// Get the admin dashboard data including stats, latest requests, technicians, and notifications.
-    /// </summary>
-    [HttpGet("/admin")]
-    [ProducesResponseType(typeof(ApiResponse<object>), 200)]
-    [SwaggerOperation(
-        Summary = "Get Admin Dashboard",
-        Description = "Returns the full admin dashboard data including revenue stats, latest service requests, technician info, and notifications."
-    )]
-    public IActionResult GetDashboard()
+    private readonly AppDbContext _context;
+
+    public AdminController(AppDbContext context)
     {
+        _context = context;
+    }
+
+    // 📊 DASHBOARD (REAL DATABASE)
+    [HttpGet("dashboard")]
+    [SwaggerOperation(Summary = "Get Admin Dashboard")]
+    public async Task<IActionResult> GetDashboard()
+    {
+        var totalUsers = await _context.Users.CountAsync();
+        var totalOrders = await _context.Orders.CountAsync();
+
+        var today = DateTime.UtcNow.Date;
+
+        var todayOrders = await _context.Orders
+            .Where(o => o.CreatedAt.Date == today)
+            .CountAsync();
+
+        var activeOrders = await _context.Orders
+            .Where(o => o.OrderStatus == OrderStatus.New ||
+                        o.OrderStatus == OrderStatus.InProgress)
+            .CountAsync();
+
+        var pendingOrders = await _context.Orders
+            .Where(o => o.OrderStatus == OrderStatus.New)
+            .CountAsync();
+
+        var totalRevenue = await _context.Orders
+            .Where(o => o.OrderStatus == OrderStatus.Completed)
+            .SumAsync(o => o.Price);
+
+        var latestRequests = await _context.Orders
+            .OrderByDescending(o => o.CreatedAt)
+            .Take(5)
+            .Select(o => new
+            {
+                o.Id,
+                o.Address,
+                o.PhoneNumber,
+                o.Price,
+                o.OrderStatus,
+                o.CreatedAt
+            })
+            .ToListAsync();
+
         var data = new
         {
             stats = new
             {
-                totalRevenue = 45320,
-                totalOrders = 34,
-                todayOrders = 89,
-                activeOrders = 47,
-                pendingOrders = 23,
-                totalRequests = 1247
+                totalUsers,
+                totalOrders,
+                todayOrders,
+                activeOrders,
+                pendingOrders,
+                totalRevenue
             },
 
-            latestRequests = new List<object>
-            {
-                new {
-                    orderNumber="#12849",
-                    customerName = " محمد أحمد علي",
-                    service = "تغيير الزيت ",
-                    customerRate=4.8,
-                    price = 350,
-                    address="القاهرة , مدينة نصر , شارع عباس العقاد 45",
-                    status = "pending",
-                    date = "2026-03-31",
-                    phoneNumber=01012345678
-                }
-            },
-
-            technicians = new List<object>
-            {
-                new {
-                    name = "محمد أحمد",
-                    rating = 4.8,
-                    completedJobs = 145,
-                    status = "available"
-                }
-            },
-
-            notifications = new List<object>
-            {
-                new {
-                    id = 1,
-                    title = "طلب طوارئ جديد",
-                    description = "طلب طوارئ في الجيزة",
-                    time = "منذ دقيقتين",
-                    type = "urgent",
-                    color = "red",
-                    icon = "alert"
-                }
-            }
+            latestRequests
         };
 
-        return Ok(new ApiResponse<object>(
-            true,
-            "Dashboard loaded successfully",
-            data
-        ));
+        return Ok(data);
     }
 
-    [HttpGet("notifications")]
-    public IActionResult GetNotifications()
+    // 🔎 GLOBAL SEARCH (Search Bar)
+    [HttpGet("search")]
+    public async Task<IActionResult> GlobalSearch(string keyword)
     {
-        var notifications = new List<string>
-        {
-            "New order received",
-            "Technician assigned",
-            "Order completed"
-        };
+        if (string.IsNullOrWhiteSpace(keyword))
+            return BadRequest(new { message = "keyword is required" });
 
-        return Ok(new ApiResponse<List<string>>(
-            true,
-            "Notifications fetched",
-            notifications
-        ));
-    }
-
-    [HttpGet("/searchOrders")]
-    public IActionResult Search([FromQuery] string? query)
-    {
-        var orders = new List<object>
-        {
-            new { Id = 1, CustomerName = "Ahmed", Service = "Oil Change", Price = 350, Status = "pending" },
-            new { Id = 2, CustomerName = "Ali", Service = "Battery Change", Price = 500, Status = "completed" }
-        };
-
-        if (string.IsNullOrWhiteSpace(query))
-            return Ok(orders);
-
-        var result = orders
-            .Where(o =>
+        var users = await _context.Users
+            .Where(u => u.Name.Contains(keyword) || u.Email.Contains(keyword))
+            .Select(u => new
             {
-                var name = o.GetType().GetProperty("CustomerName")?.GetValue(o)?.ToString() ?? "";
-                var service = o.GetType().GetProperty("Service")?.GetValue(o)?.ToString() ?? "";
-                return name.ToLower().Contains(query.ToLower())
-                    || service.ToLower().Contains(query.ToLower());
+                u.Id,
+                u.Name,
+                u.Email,
+                Type = "user"
             })
-            .ToList();
+            .ToListAsync();
 
-        return Ok(new ApiResponse<object>(
-            true,
-            "Search completed",
-            result
-        ));
+        var orders = await _context.Orders
+            .Where(o => o.PhoneNumber.Contains(keyword) || o.Address.Contains(keyword))
+            .Select(o => new
+            {
+                o.Id,
+                o.PhoneNumber,
+                o.Address,
+                Type = "order"
+            })
+            .ToListAsync();
+
+        return Ok(new { users, orders });
+    }
+
+    //  NOTIFICATIONS (DB VERSION)
+    [HttpGet("notifications")]
+    public async Task<IActionResult> GetNotifications()
+    {
+        var notifications = await _context.Notifications
+            .OrderByDescending(n => n.CreatedAt)
+            .Take(10)
+            .ToListAsync();
+
+        return Ok(notifications);
+    }
+
+    //  ACCOUNT INFO
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMyAccount()
+    {
+        var email = User.FindFirst(ClaimTypes.Name)?.Value;
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+        if (user == null)
+            return NotFound();
+
+        return Ok(new
+        {
+            user.Id,
+            user.Name,
+            user.Email,
+            user.PhoneNumber,
+            user.Role
+        });
     }
 }

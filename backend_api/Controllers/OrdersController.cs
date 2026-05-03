@@ -1,86 +1,72 @@
-using CarMaintenance.Common;
-using CarMaintenance.DTOs;
-using CarMaintenance.Models;
-using CarMaintenance.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using CarMaintenance.Data;
+using CarMaintenance.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using CarMaintenance.Hubs;
+using CarMaintenance.DTOs;
+
 
 namespace CarMaintenance.Controllers
 {
     [ApiController]
     [Route("api/orders")]
-
-    [Authorize(Roles = "admin,technician")]
     public class OrdersController : ControllerBase
     {
-        private readonly IOrderService _service;
+        private readonly AppDbContext _context;
+        private readonly IHubContext<NotificationHub> _hub;
 
-        public OrdersController(IOrderService service)
+        public OrdersController(AppDbContext context)
         {
-            _service = service;
+            _context = context;
         }
 
+        // ================= GET ALL ORDERS =================
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAll()
         {
-            var orders = await _service.GetAllAsync();
-
-            return Ok(ApiResponse<List<Order>>.SuccessResponse(
-                orders,
-                "Orders fetched successfully"
-            ));
+            var orders = await _context.Orders.ToListAsync();
+            return Ok(orders);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var order = await _service.GetByIdAsync(id);
-
-            if (order == null)
-                return NotFound(ApiResponse<object>.FailResponse("Order not found"));
-
-            return Ok(ApiResponse<Order>.SuccessResponse(order));
-        }
-
-    
-        [AllowAnonymous]
+        // ================= CREATE ORDER + NOTIFICATION =================
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
+public async Task<IActionResult> Create(CreateOrderDto dto)
+{
+        var service = await _context.Services.FindAsync(dto.ServiceId);
+if (service == null)
+        return BadRequest("Service not found");
+    var order = new Order
+    {
+       UserId = dto.UserId,
+    ServiceId = dto.ServiceId,
+    Address = dto.Address,
+    PhoneNumber = dto.PhoneNumber,
+
+    Price = service.Price, 
+    };
+
+    _context.Orders.Add(order);
+    await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        message = "Order created",
+        order
+    });
+}
+
+        // ================= NOTIFICATIONS =================
+        [HttpGet("/api/notifications")]
+        public async Task<IActionResult> GetNotifications()
         {
-            var order = await _service.CreateAsync(dto);
+            var data = await _context.Notifications
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
 
-            return Ok(ApiResponse<Order>.SuccessResponse(
-                order,
-                "Order created successfully"
-            ));
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateOrderStatusDto dto)
-        {
-            var order = await _service.UpdateStatusAsync(id, dto);
-
-            if (order == null)
-                return NotFound(ApiResponse<object>.FailResponse("Order not found"));
-
-            return Ok(ApiResponse<Order>.SuccessResponse(
-                order,
-                "Order updated successfully"
-            ));
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Cancel(int id)
-        {
-            var order = await _service.CancelAsync(id);
-
-            if (order == null)
-                return NotFound(ApiResponse<object>.FailResponse("Order not found"));
-
-            return Ok(ApiResponse<object>.SuccessResponse(
-                order,
-                "Order canceled successfully"
-            ));
+            return Ok(data);
         }
     }
 }
