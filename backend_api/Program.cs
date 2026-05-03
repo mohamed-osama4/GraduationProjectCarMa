@@ -76,8 +76,7 @@ builder.Services.AddSwaggerGen(options =>
 // DB Context
 // ======================
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=CarMaintenance.db")
-);
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ======================
 // JWT

@@ -8,9 +8,14 @@ namespace CarMaintenance.Data
         public AppDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            
 
-            optionsBuilder.UseSqlite("Data Source=CarMaintenance.db");
+            optionsBuilder.UseNpgsql(
+                "Host=ep-late-tooth-alwxtxke-pooler.c-3.eu-central-1.aws.neon.tech;" +
+                "Database=CarMa-DB;" +
+                "Username=neondb_owner;" +
+                "Password=npg_9kDOBGRdHb6C;" +
+                "SSL Mode=Require;Trust Server Certificate=true"
+            );
 
             return new AppDbContext(optionsBuilder.Options);
         }
