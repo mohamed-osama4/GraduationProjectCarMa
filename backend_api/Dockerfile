@@ -1,8 +1,8 @@
-# مرحلة البناء - بنستخدم الـ SDK العادي
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# مرحلة البناء - هنستخدم SDK 8.0 عشان يتوافق مع الكود الجديد
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# بننسخ ملف المشروع من مكانه المظبوط (لأننا جوه فولدر backend_api)
+# بننسخ ملف المشروع (تأكد إن المسار صح)
 COPY ["CarMaintenance.csproj", "./"]
 RUN dotnet restore "CarMaintenance.csproj"
 
@@ -10,12 +10,12 @@ RUN dotnet restore "CarMaintenance.csproj"
 COPY . .
 RUN dotnet publish "CarMaintenance.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# المرحلة النهائية - الـ Runtime النضيف
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-bookworm-slim AS final
+# المرحلة النهائية - الـ Runtime المستقر 8.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# السطر الجوكر اللي هيمنع الـ Error 139 للأبد إن شاء الله
+# السطر اللي بيحل مشاكل الـ Memory في Render
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
 EXPOSE 8080
