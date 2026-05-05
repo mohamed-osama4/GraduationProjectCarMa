@@ -18,98 +18,96 @@ public class AdminController : ControllerBase
         _context = context;
     }
 
-    //  DASHBOARD (REAL DATABASE)
     [HttpGet("dashboard")]
-    [SwaggerOperation(Summary = "Get Admin Dashboard")]
+    [SwaggerOperation(Summary = "Get Admin Dashboard Data")]
     public async Task<IActionResult> GetDashboard()
     {
-        var totalUsers = await _context.Users.CountAsync();
-        var totalOrders = await _context.Orders.CountAsync();
-
         var today = DateTime.UtcNow.Date;
 
-        var todayOrders = await _context.Orders
-            .Where(o => o.CreatedAt.Date == today)
-            .CountAsync();
+        var stats = new
+        {
+            totalOrders = await _context.Orders.CountAsync(),
+            pendingOrders = await _context.Orders.CountAsync(o => o.OrderStatus == OrderStatus.Pending),
+            inProgressOrders = await _context.Orders.CountAsync(o => o.OrderStatus == OrderStatus.InProgress),
+            completedToday = await _context.Orders.CountAsync(o => o.OrderStatus == OrderStatus.Completed && o.CreatedAt.Date == today),
+            totalTechs = await _context.Users.CountAsync(u => u.Role == "Technician"),
+            todayRevenue = await _context.Orders
+                .Where(o => o.OrderStatus == OrderStatus.Completed && o.CreatedAt.Date == today)
+                .SumAsync(o => o.Price)
+        };
 
-        var activeOrders = await _context.Orders
-            .Where(o => o.OrderStatus == OrderStatus.New ||
-                        o.OrderStatus == OrderStatus.InProgress)
-            .CountAsync();
-
-        var pendingOrders = await _context.Orders
-            .Where(o => o.OrderStatus == OrderStatus.New)
-            .CountAsync();
-
-        var totalRevenue = await _context.Orders
-            .Where(o => o.OrderStatus == OrderStatus.Completed)
-            .SumAsync(o => o.Price);
-
-        var latestRequests = await _context.Orders
+        var requestsNeedingApproval = await _context.Orders
+            .Include(o => o.Service) 
+            .Include(o => o.User)    
+            .Where(o => o.OrderStatus == OrderStatus.Pending)
             .OrderByDescending(o => o.CreatedAt)
-            .Take(5)
-            .Select(o => new
-            {
+            .Take(4)
+            .Select(o => new {
                 o.Id,
+                ServiceName = o.Service != null ? o.Service.Name : "صيانة عامة",
+                CustomerName = o.User != null ? o.User.Name : "عميل غير معروف",
                 o.Address,
                 o.PhoneNumber,
                 o.Price,
-                o.OrderStatus,
                 o.CreatedAt
             })
             .ToListAsync();
 
-        var data = new
-        {
-            stats = new
-            {
-                totalUsers,
-                totalOrders,
-                todayOrders,
-                activeOrders,
-                pendingOrders,
-                totalRevenue
-            },
+        var technicians = await _context.Users
+            .Where(u => u.Role == "Technician")
+            .Take(5)
+            .Select(u => new {
+                u.Name,
+                Specialization = "فني صيانة معتمد", 
+                Rating = 4.8
+            })
+            .ToListAsync();
 
-            latestRequests
-        };
+        var currentOrders = await _context.Orders
+            .Include(o => o.Service)
+            .Include(o => o.User)
+            .Where(o => o.OrderStatus == OrderStatus.InProgress || o.OrderStatus == OrderStatus.Accepted)
+            .OrderByDescending(o => o.CreatedAt)
+            .Take(5)
+            .Select(o => new {
+                o.Id,
+                ServiceName  = o.Service.Name,
+                CustomerName =o.User.Name ,
+                o.Address,
+                o.PhoneNumber,
+                o.Price,
+                Status = o.OrderStatus.ToString(),
+                o.CreatedAt
+            })
+            .ToListAsync();
 
-        return Ok(data);
+        return Ok(new {
+            stats,
+            requestsNeedingApproval,
+            technicians,
+            currentOrders
+        });
     }
 
-    //  GLOBAL SEARCH (Search Bar)
     [HttpGet("search")]
     public async Task<IActionResult> GlobalSearch(string keyword)
     {
         if (string.IsNullOrWhiteSpace(keyword))
-            return BadRequest(new { message = "keyword is required" });
+            return BadRequest(new { message = "كلمة البحث مطلوبة" });
 
         var users = await _context.Users
             .Where(u => u.Name.Contains(keyword) || u.Email.Contains(keyword))
-            .Select(u => new
-            {
-                u.Id,
-                u.Name,
-                u.Email,
-                Type = "user"
-            })
+            .Select(u => new { u.Id, u.Name, u.Email, Type = "user" })
             .ToListAsync();
 
         var orders = await _context.Orders
             .Where(o => o.PhoneNumber.Contains(keyword) || o.Address.Contains(keyword))
-            .Select(o => new
-            {
-                o.Id,
-                o.PhoneNumber,
-                o.Address,
-                Type = "order"
-            })
+            .Select(o => new { o.Id, o.PhoneNumber, o.Address, Type = "order" })
             .ToListAsync();
 
         return Ok(new { users, orders });
     }
 
-    //  NOTIFICATIONS (DB VERSION)
     [HttpGet("notifications")]
     public async Task<IActionResult> GetNotifications()
     {
@@ -117,29 +115,45 @@ public class AdminController : ControllerBase
             .OrderByDescending(n => n.CreatedAt)
             .Take(10)
             .ToListAsync();
-
         return Ok(notifications);
     }
 
-    //  ACCOUNT INFO
-    [HttpGet("me")]
-    public async Task<IActionResult> GetMyAccount()
+   [HttpGet("me")]
+public async Task<IActionResult> GetMyAccount()
+{
+    var emailFromClaim = User.FindFirst(ClaimTypes.Email)?.Value 
+                        ?? User.FindFirst(ClaimTypes.Name)?.Value 
+                        ?? User.Identity?.Name; 
+    var userIdFromClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    User? user = null;
+
+    if (!string.IsNullOrEmpty(userIdFromClaim) && int.TryParse(userIdFromClaim, out int id))
     {
-        var email = User.FindFirst(ClaimTypes.Name)?.Value;
+        user = await _context.Users.FindAsync(id);
+    }
 
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email == email);
+    if (user == null && !string.IsNullOrEmpty(emailFromClaim))
+    {
+        user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == emailFromClaim.ToLower());
+    }
 
-        if (user == null)
-            return NotFound();
-
-        return Ok(new
-        {
-            user.Id,
-            user.Name,
-            user.Email,
-            user.PhoneNumber,
-            user.Role
+    if (user == null)
+    {
+        return NotFound(new { 
+            message = "المستخدم غير موجود",
+            details = "التوكن سليم بس البيانات مش مطابقة للداتا بيز",
+            extractedEmail = emailFromClaim,
+            extractedId = userIdFromClaim
         });
     }
+
+    return Ok(new { 
+        user.Id, 
+        user.Name, 
+        user.Email, 
+        user.PhoneNumber,
+        user.Role 
+    });
+}
 }

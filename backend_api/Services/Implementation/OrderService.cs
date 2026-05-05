@@ -47,7 +47,7 @@ var order = new Order
     PhoneNumber = dto.PhoneNumber,
 
     Price = service.Price, 
-    OrderStatus = OrderStatus.New,
+    OrderStatus = OrderStatus.Pending,
     CreatedAt = DateTime.UtcNow
 };
 
@@ -93,7 +93,7 @@ var order = new Order
             if (order == null)
                 return null;
 
-            order.OrderStatus = OrderStatus.Canceled;
+            order.OrderStatus = OrderStatus.Rejected;
             order.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

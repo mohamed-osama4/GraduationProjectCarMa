@@ -118,7 +118,7 @@ using (var scope = app.Services.CreateScope())
         {
             Name = "Abdlerahman",
             Email = "Elmongy@gmail.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("1122"),
+            PasswordHash = "1122",
             PhoneNumber = "01000000000",
             Role = "admin"
         });

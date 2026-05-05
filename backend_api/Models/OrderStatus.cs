@@ -2,11 +2,11 @@ namespace CarMaintenance.Models
 {
     public enum OrderStatus
     {
+        Pending=0,
         New=0,
-        Approve=1,
+        Accepted=1,
         InProgress=2,
         Completed=3,
-        Rejected=4,
-        Canceled=5
+        Rejected=4
     }
 }
