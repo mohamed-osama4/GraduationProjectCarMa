@@ -5,12 +5,14 @@
 /* ---------- Hero Section ---------- */
 .hero-section {
   background: 
-    linear-gradient(135deg, #000814 0%, #001D3D 40%, #003566 100%),
-    url("https://www.transparenttextures.com/patterns/fabric-1-light.png");
-  background-blend-mode: overlay;
+    linear-gradient(rgba(0, 8, 20, 0.7), rgba(0, 8, 20, 0.7)),
+    url("../../../assets/images/landing/hero-section-image.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   position: relative;
   overflow: hidden;
-  min-height: 95vh;
+  min-height: 100vh;
 }
 
 .premium-dark-section {
