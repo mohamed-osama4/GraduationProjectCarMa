@@ -152,6 +152,43 @@ namespace CarMaintenance.Controllers
             
             return Ok(new { message = "Order rejected" });
         }
+           [HttpGet("user/{userId}")]
+public async Task<IActionResult> GetUserOrders(int userId)
+{
+    var orders = await _context.Orders
+        .Where(o => o.UserId == userId)
+        .OrderByDescending(o => o.CreatedAt)
+        .ToListAsync();
+
+    return Ok(new
+    {
+        success = true,
+        data = orders
+    });
+}
+
+    [HttpGet("{id}")]
+public async Task<IActionResult> GetOrderById(int id)
+{
+    var order = await _context.Orders
+        .Include(o => o.User)
+        .FirstOrDefaultAsync(o => o.Id == id);
+
+    if (order == null)
+    {
+        return NotFound(new
+        {
+            success = false,
+            message = "Order not found"
+        });
+    }
+
+    return Ok(new
+    {
+        success = true,
+        data = order
+    });
+}
 
         // ================= NOTIFICATIONS =================
         [HttpGet("/api/notifications")]

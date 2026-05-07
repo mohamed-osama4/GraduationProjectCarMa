@@ -5,6 +5,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using CarMaintenance.DTOs;
 
 [ApiController]
 [Route("api/admin")]
@@ -88,6 +89,37 @@ public class AdminController : ControllerBase
             currentOrders
         });
     }
+    [Authorize]
+[HttpPut("profile")]
+public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto)
+{
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    if (string.IsNullOrEmpty(userId))
+        return Unauthorized();
+
+    var user = await _context.Users.FindAsync(int.Parse(userId));
+
+    if (user == null)
+        return NotFound(new
+        {
+            success = false,
+            message = "User not found"
+        });
+
+    user.Name = dto.FullName;
+    user.Email = dto.Email;
+    user.PhoneNumber = dto.PhoneNumber;
+
+    await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        success = true,
+        message = "Profile updated successfully",
+        data = user
+    });
+}
 
     [HttpGet("search")]
     public async Task<IActionResult> GlobalSearch(string keyword)
