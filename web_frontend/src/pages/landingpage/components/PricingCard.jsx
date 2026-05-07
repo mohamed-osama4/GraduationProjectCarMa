@@ -9,44 +9,46 @@ import { HiCheck } from "react-icons/hi2";
  * @param {boolean} popular - Whether this is the highlighted plan
  * @param {number} delay - AOS animation delay
  */
-export default function PricingCard({ name, price, features, popular = false, delay = 0 }) {
+export default function PricingCard({ name, price, features, popular = false, showBadge = false, delay = 0 }) {
   return (
     <div
-      className={`pricing-card ${popular ? "popular" : ""}`}
+      className={`pricing-card group flex flex-col ${popular ? "popular" : ""}`}
       data-aos="zoom-in"
       data-aos-delay={delay}
     >
-      {popular && <span className="pricing-badge">الأكثر طلباً</span>}
+      {showBadge && <span className="pricing-badge">الأكثر طلباً</span>}
 
-      <h3 className={`text-xl font-bold mb-2 ${popular ? "text-white" : "text-white"}`}>
-        {name}
-      </h3>
+      <div className="flex-grow">
+        <h3 className="text-2xl font-black mb-2 text-white group-hover:text-premium-gold transition-colors">
+          {name}
+        </h3>
 
-      <div className="my-6">
-        <span className="pricing-price">{price}</span>
-        <span className={`pricing-currency ${popular ? "text-blue-200" : "text-silver/60"}`}>جنيه</span>
-        <div className={`pricing-period mt-1 ${popular ? "text-blue-200" : "text-silver/40"}`}>/ شهرياً</div>
-      </div>
+        <div className="my-6">
+          <span className="pricing-price text-white">{price}</span>
+          <span className="pricing-currency text-premium-gold mr-1">جنيه</span>
+          <div className="pricing-period mt-1 text-silver/40">/ شهرياً</div>
+        </div>
 
-      <div className="space-y-3 mb-8 text-right">
-        {features.map((feature, i) => (
-          <div key={i} className="pricing-feature">
-            <HiCheck
-              className={`flex-shrink-0 ${popular ? "text-green-300" : "text-premium-gold"}`}
-              size={18}
-            />
-            <span className={`${popular ? "text-blue-100" : "text-silver/70"}`}>
-              {feature}
-            </span>
-          </div>
-        ))}
+        <div className="space-y-4 mb-10 text-right">
+          {features.map((feature, i) => (
+            <div key={i} className="pricing-feature flex items-center gap-3">
+              <HiCheck
+                className="flex-shrink-0 text-premium-gold"
+                size={20}
+              />
+              <span className="text-silver/80 text-sm">
+                {feature}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <button
-        className={`w-full py-3 px-6 rounded-xl font-bold text-sm transition-all duration-300 cursor-pointer ${
+        className={`w-full py-4 px-6 rounded-xl font-black text-sm transition-all duration-500 cursor-pointer mt-auto ${
           popular
-            ? "bg-white text-midnight hover:bg-silver shadow-lg"
-            : "bg-premium-gold text-midnight hover:bg-gold-light shadow-md hover:shadow-lg"
+            ? "bg-premium-gold text-midnight hover:bg-gold-light shadow-[0_0_30px_rgba(255,195,0,0.3)] hover:shadow-[0_0_40px_rgba(255,195,0,0.5)] hover:-translate-y-1"
+            : "bg-white/10 text-white hover:bg-premium-gold hover:text-midnight border border-white/10 hover:border-transparent"
         }`}
       >
         اشترك الآن

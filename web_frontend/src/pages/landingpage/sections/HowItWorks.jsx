@@ -49,8 +49,8 @@ export default function HowItWorks() {
               <div
                 key={index}
                 className="group text-center flex-1"
-                data-aos="fade-up"
-                data-aos-delay={index * 100}
+                data-aos="fade-left"
+                data-aos-delay={index * 200}
               >
                 <div 
                   className="w-24 h-24 mx-auto mb-8 rounded-full bg-midnight/60 backdrop-blur-xl border border-white/10 flex items-center justify-center text-premium-gold group-hover:bg-premium-gold group-hover:text-midnight group-hover:shadow-[0_0_30px_rgba(255,195,0,0.4)] transition-all duration-500 relative z-10 cursor-pointer"

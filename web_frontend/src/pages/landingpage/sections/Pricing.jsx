@@ -14,6 +14,7 @@ const PLANS = [
       "تقرير مفصل عن حالة السيارة",
     ],
     popular: false,
+    showBadge: false,
   },
   {
     name: "الباقة المتقدمة",
@@ -27,6 +28,7 @@ const PLANS = [
       "ضمان 3 أشهر",
     ],
     popular: true,
+    showBadge: true,
   },
   {
     name: "الباقة الشاملة",
@@ -40,6 +42,7 @@ const PLANS = [
       "ضمان 6 أشهر",
     ],
     popular: false,
+    showBadge: false,
   },
 ];
 
@@ -47,17 +50,18 @@ export default function Pricing() {
   return (
     <section id="pricing" className="landing-section premium-dark-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div data-aos="fade-up">
-          <span className="section-badge flex items-center justify-center gap-2 w-fit mx-auto">
-            <HiOutlineCurrencyDollar size={20} /> الأسعار
+        <div data-aos="fade-up" className="mb-16">
+          <span className="section-badge flex items-center justify-center gap-2 w-fit mx-auto mb-6">
+            <HiOutlineCurrencyDollar size={20} className="text-premium-gold" />
+            باقات الصيانة
           </span>
-          <h2 className="section-title">اختر الباقة المناسبة لك</h2>
-          <p className="section-subtitle">
+          <h2 className="section-title text-4xl lg:text-5xl font-black mb-6">اختر الباقة المناسبة لك</h2>
+          <p className="section-subtitle max-w-2xl mx-auto">
             باقات متنوعة تناسب احتياجاتك مع أسعار تنافسية وشفافة بدون رسوم مخفية
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 items-start max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 items-stretch max-w-5xl mx-auto">
           {PLANS.map((plan, index) => (
             <PricingCard
               key={index}
@@ -65,6 +69,7 @@ export default function Pricing() {
               price={plan.price}
               features={plan.features}
               popular={plan.popular}
+              showBadge={plan.showBadge}
               delay={index * 150}
             />
           ))}

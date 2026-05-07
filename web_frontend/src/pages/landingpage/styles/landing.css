@@ -4,15 +4,16 @@
 
 /* ---------- Hero Section ---------- */
 .hero-section {
-  background: 
-    linear-gradient(rgba(0, 8, 20, 0.7), rgba(0, 8, 20, 0.7)),
-    url("../../../assets/images/landing/hero-section-image.png");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
   position: relative;
   overflow: hidden;
   min-height: 100vh;
+}
+
+.hero-image-container {
+  width: 100%;
+  transform: scale(1.9);
+  transform-origin: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .premium-dark-section {
@@ -84,67 +85,6 @@
 .hero-swiper {
   padding: 0 !important;
   border-radius: 2rem;
-}
-
-.hero-swiper .swiper-slide {
-  height: 480px;
-  border-radius: 2rem;
-  overflow: hidden;
-}
-
-.hero-swiper .swiper-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Enhancing Pagination */
-.hero-swiper .swiper-pagination {
-  bottom: 1.5rem !important;
-  z-index: 20;
-}
-
-.hero-swiper .swiper-pagination-bullet {
-  background: rgba(255, 255, 255, 0.4);
-  opacity: 1;
-  width: 8px;
-  height: 8px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hero-swiper .swiper-pagination-bullet-active {
-  background: #ffffff;
-  width: 36px;
-  border-radius: 4px;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
-}
-
-/* Enhancing Navigation */
-.hero-swiper .swiper-button-prev,
-.hero-swiper .swiper-button-next {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 20;
-}
-
-.hero-swiper .swiper-button-prev:hover,
-.hero-swiper .swiper-button-next:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-.hero-swiper .swiper-button-prev::after,
-.hero-swiper .swiper-button-next::after {
-  font-size: 16px;
-  font-weight: 900;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 /* ---------- Section Shared ---------- */
@@ -385,14 +325,15 @@
 
 /* ---------- Pricing Card ---------- */
 .pricing-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border-radius: 1.5rem;
-  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, rgba(2, 8, 23, 0.8), rgba(15, 23, 42, 0.8));
+  backdrop-filter: blur(20px);
+  border-radius: 2rem;
+  padding: 3rem 2rem;
   text-align: center;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   position: relative;
+  z-index: 1;
 }
 
 .pricing-card:hover {
@@ -403,15 +344,16 @@
 }
 
 .pricing-card.popular {
-  background: linear-gradient(135deg, var(--color-blue-900), var(--color-primary));
-  border-color: transparent;
-  color: #fff;
-  transform: scale(1.05);
-  box-shadow: 0 25px 60px rgba(30, 64, 175, 0.3);
+  background: linear-gradient(135deg, #020817, #0f172a);
+  border: 2px solid var(--color-premium-gold);
+  transform: scale(1.08);
+  z-index: 10;
+  box-shadow: 0 30px 70px rgba(255, 195, 0, 0.2);
 }
 
 .pricing-card.popular:hover {
-  transform: scale(1.05) translateY(-10px);
+  transform: scale(1.08) translateY(-10px);
+  box-shadow: 0 40px 80px rgba(255, 195, 0, 0.3);
 }
 
 .pricing-badge {
@@ -419,13 +361,15 @@
   top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--color-amber-500), var(--color-orange-500));
-  color: #fff;
-  font-weight: 800;
-  font-size: 0.8rem;
-  padding: 0.35rem 1.5rem;
+  background: linear-gradient(135deg, var(--color-premium-gold), var(--color-gold-light));
+  color: var(--color-midnight);
+  font-weight: 900;
+  font-size: 0.75rem;
+  padding: 0.4rem 1.8rem;
   border-radius: 999px;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 20px rgba(255, 195, 0, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .pricing-price {
@@ -644,18 +588,6 @@
   width: 100%;
 }
 
-/* ---------- Responsive Swiper ---------- */
-@media (max-width: 768px) {
-  .hero-swiper .swiper-slide {
-    height: 320px;
-    border-radius: 1.5rem;
-  }
-
-  .hero-swiper .swiper-button-prev,
-  .hero-swiper .swiper-button-next {
-    display: none;
-  }
-
   .section-title {
     font-size: 1.5rem;
   }
@@ -667,7 +599,6 @@
   .pricing-card.popular:hover {
     transform: translateY(-10px);
   }
-}
 
 /* ---------- Animations ---------- */
 @keyframes float {

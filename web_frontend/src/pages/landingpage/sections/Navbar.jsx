@@ -32,7 +32,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <a href="#hero" className="flex items-center gap-2">
-              <span className={`text-2xl font-black italic tracking-tighter transition-colors duration-500 ${
+              <span className={`text-3xl font-black italic tracking-tighter transition-colors duration-500 ${
                 scrolled || mobileOpen ? "text-premium-gold" : "text-white"
               }`}>
                 CarMA
