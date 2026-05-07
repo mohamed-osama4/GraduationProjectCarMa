@@ -1,16 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CarMaintenance.Data;
-using CarMaintenance.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
-using CarMaintenance.Hubs;
+using Microsoft.AspNetCore.Authorization; 
+using Microsoft.AspNetCore.SignalR;    
+using  CarMaintenance.Models;             
+using CarMaintenance.Hubs;             
 using CarMaintenance.DTOs;
-
+using CarMaintenance.Data;
 namespace CarMaintenance.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/orders")]
     public class OrdersController : ControllerBase
     {
         private readonly AppDbContext _context;

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:graduation_project/core/comeponents/app_image.dart';
+import 'package:graduation_project/core/localization/app_strings.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
+import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -22,14 +25,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final s = appStrings(context.watch<LocaleProvider>().isArabic);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
-          'الاعدادات',
-          style: TextStyle(
+        title: Text(
+          s.settings,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -41,13 +45,13 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _buildGeneralSettingsStack(),
+            _buildGeneralSettingsStack(s),
             const SizedBox(height: 24),
-            _buildPrivacySecurityStack(),
+            _buildPrivacySecurityStack(s),
             const SizedBox(height: 24),
-            _buildHelpSupportStack(),
+            _buildHelpSupportStack(s),
             const SizedBox(height: 32),
-            _buildFooterInfo(),
+            _buildFooterInfo(s),
             const SizedBox(height: 16),
           ],
         ),
@@ -55,14 +59,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildGeneralSettingsStack() {
+  Widget _buildGeneralSettingsStack(AppStrings s) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 12.0, right: 4.0),
           child: Text(
-            'الإعدادات العامة',
+            s.generalSettings,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -87,8 +91,8 @@ class _SettingsPageState extends State<SettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSwitchCategory(
-                title: 'الإشعارات',
-                hint: 'تلقي إشعارات الطلبات',
+                title: s.notifications,
+                hint: s.notifHint,
                 iconPath: 'notification.svg',
                 iconBgColor: const Color(0xFFDBEAFE),
                 value: isNotificationOn,
@@ -96,8 +100,8 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               _buildDivider(),
               _buildSwitchCategory(
-                title: 'الوضع الليلي',
-                hint: 'مظهر داكن للتطبيق',
+                title: s.darkMode,
+                hint: s.darkModeHint,
                 iconPath: 'darkmode.svg',
                 iconBgColor: const Color(0xFFF1F5F9),
                 value: isDarkModeOn,
@@ -109,10 +113,11 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               _buildDivider(),
               _buildArrowCategory(
-                title: 'اللغة',
-                hint: 'العربية',
+                title: s.language,
+                hint: context.watch<LocaleProvider>().isArabic ? s.arabic : s.english,
                 iconPath: 'language.svg',
                 iconBgColor: const Color(0xFFE0E7FF),
+                onTap: () => _showLanguageDialog(context),
               ),
             ],
           ),
@@ -121,14 +126,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildPrivacySecurityStack() {
+  Widget _buildPrivacySecurityStack(AppStrings s) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 12.0, right: 4.0),
           child: Text(
-            'الخصوصية والأمان',
+            s.privacy,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -153,15 +158,15 @@ class _SettingsPageState extends State<SettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildArrowCategory(
-                title: 'سياسة الخصوصية',
-                hint: 'كيف نحمي بياناتك',
+                title: s.privacyPolicy,
+                hint: null,
                 iconPath: 'privacy.svg',
                 iconBgColor: const Color(0xFFF3E8FF),
               ),
               _buildDivider(),
               _buildArrowCategory(
-                title: 'الشروط والاحكام',
-                hint: 'اتفاقية الاستخدام',
+                title: s.terms,
+                hint: null,
                 iconPath: 'conditions.svg',
                 iconBgColor: const Color(0xFFDBEAFE),
               ),
@@ -172,14 +177,14 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildHelpSupportStack() {
+  Widget _buildHelpSupportStack(AppStrings s) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 12.0, right: 4.0),
           child: Text(
-            'الدعم والمساعدة',
+            s.helpSupport,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -204,15 +209,15 @@ class _SettingsPageState extends State<SettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildArrowCategory(
-                title: 'مركز المساعدة',
-                hint: 'الأسئلة الشائعة والدعم',
+                title: s.helpCenter,
+                hint: null,
                 iconPath: 'Question.svg',
                 iconBgColor: const Color(0xFFFEF3C6),
               ),
               _buildDivider(),
               _buildArrowCategory(
-                title: 'اتصل بنا',
-                hint: 'تواصل مع فريق الدعم',
+                title: s.contactUs,
+                hint: null,
                 iconData: CupertinoIcons.phone_solid,
                 iconColor: const Color(0xFF00A63E),
                 iconBgColor: const Color(0xFFDCFCE7),
@@ -225,7 +230,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildFooterInfo() {
+  Widget _buildFooterInfo(AppStrings s) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -247,7 +252,7 @@ class _SettingsPageState extends State<SettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'اصدار التطبيق',
+                s.appVersion,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -265,7 +270,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               const SizedBox(height: 12),
               Text(
-                '© 2024 خدمة صيانة السيارات. جميع الحقوق محفوظة.',
+                s.allRights,
                 style: TextStyle(
                   fontSize: 12,
                   color: Theme.of(
@@ -338,9 +343,10 @@ class _SettingsPageState extends State<SettingsPage> {
     Color? iconColor,
     required Color iconBgColor,
     bool isBuiltInIcon = false,
+    VoidCallback? onTap,
   }) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap ?? () {},
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Row(
@@ -421,6 +427,55 @@ class _SettingsPageState extends State<SettingsPage> {
         color: Theme.of(context).colorScheme.outline,
         height: 1,
         thickness: 1,
+      ),
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context) {
+    final locale = context.read<LocaleProvider>();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(appStrings(locale.isArabic).chooseLanguage),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _langOption(context, 'العربية', '🇸🇦', 'ar', locale),
+            const SizedBox(height: 12),
+            _langOption(context, 'English', '🇺🇸', 'en', locale),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _langOption(BuildContext context, String label, String flag, String code, LocaleProvider locale) {
+    final isSelected = locale.locale.languageCode == code;
+    return InkWell(
+      onTap: () {
+        locale.setLocale(code);
+        Navigator.pop(context);
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryColor : Theme.of(context).colorScheme.outline,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(flag, style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: 12),
+            Text(label, style: TextStyle(fontSize: 16, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? AppTheme.primaryColor : Theme.of(context).colorScheme.onSurface)),
+            const Spacer(),
+            if (isSelected) const Icon(Icons.check_circle, color: AppTheme.primaryColor),
+          ],
+        ),
       ),
     );
   }

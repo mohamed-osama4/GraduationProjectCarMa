@@ -40,7 +40,6 @@ class AppDrawer extends StatelessWidget {
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Inter',
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -50,7 +49,6 @@ class AppDrawer extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 14,
-                      fontFamily: 'Inter',
                     ),
                   ),
                 ],
@@ -161,7 +159,6 @@ class AppDrawer extends StatelessWidget {
                           color: AppTheme.errorColor,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Inter',
                         ),
                       ),
                     ],

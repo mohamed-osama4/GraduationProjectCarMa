@@ -85,7 +85,6 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 16,
-                                  fontFamily: 'Inter',
                                 ),
                               ),
                               Text(
@@ -94,7 +93,6 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                                   color: Colors.white,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'Inter',
                                 ),
                               ),
                             ],
@@ -110,7 +108,6 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 14,
-                                  fontFamily: 'Inter',
                                 ),
                               ),
                               Text(
@@ -119,7 +116,6 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                                   color: Colors.white,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  fontFamily: 'Inter',
                                 ),
                               ),
                             ],
@@ -134,7 +130,6 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Inter',
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -198,7 +193,6 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                                               isSelected
                                                   ? FontWeight.bold
                                                   : FontWeight.w600,
-                                          fontFamily: 'Inter',
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -207,7 +201,6 @@ class _PaymentMethodsPageState extends State<PaymentMethodsPage> {
                                         style: TextStyle(
                                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                                           fontSize: 12,
-                                          fontFamily: 'Inter',
                                         ),
                                       ),
                                     ],

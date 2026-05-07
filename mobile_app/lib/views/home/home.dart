@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:graduation_project/core/comeponents/app_image.dart';
+import 'package:graduation_project/core/localization/app_strings.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
+import 'package:graduation_project/logic/providers/locale_provider.dart';
 import 'package:graduation_project/views/home/widgets/gradients.dart';
 import 'package:graduation_project/views/home/widgets/active_order_card.dart';
 import 'package:graduation_project/views/home/widgets/emergency_action_card.dart';
@@ -16,6 +18,9 @@ import 'package:graduation_project/views/services/settings.dart';
 import 'package:graduation_project/views/services/tire_services.dart';
 import 'package:graduation_project/views/services/emergency_services.dart';
 import 'package:graduation_project/views/services/towing_services.dart';
+import 'package:provider/provider.dart';
+import 'package:graduation_project/logic/providers/orders_provider.dart';
+import 'package:graduation_project/logic/providers/auth_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,7 +33,19 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth   = Provider.of<AuthProvider>(context, listen: false);
+      final orders = Provider.of<OrdersProvider>(context, listen: false);
+      final userId = auth.currentUser?.id;
+      orders.fetchOrders(userId: userId);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final s = appStrings(context.watch<LocaleProvider>().isArabic);
     return Scaffold(
       key: _scaffoldKey,
       drawer: Drawer(
@@ -52,9 +69,9 @@ class _HomePageState extends State<HomePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'القائمة',
-                        style: TextStyle(
+                      Text(
+                        s.menu,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -106,26 +123,28 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'محمد أحمد',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                      Consumer<AuthProvider>(
+                        builder: (_, auth, __) => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              auth.currentUser?.name ?? 'مستخدم',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'mohamed@example.com',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontSize: 14,
+                            const SizedBox(height: 4),
+                            Text(
+                              auth.currentUser?.email ?? '',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -152,8 +171,8 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: _buildDrawerItem(
                         context: context,
-                        title: 'الملف الشخصي',
-                        subtitle: 'عرض وتحرير معلوماتك',
+                        title: s.profile,
+                        subtitle: s.isArabic ? 'عرض وتحرير معلوماتك' : 'View and edit your info',
                         svgAsset: 'assets/icons/person.svg',
                         backgroundColor: const Color(0xFFDBEAFE),
                         showArrow: true,
@@ -171,8 +190,8 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 24),
                     _buildDrawerItem(
                       context: context,
-                      title: 'الإعدادات',
-                      subtitle: 'تغيير كلمة المرور وغيرها',
+                      title: s.settings,
+                      subtitle: s.isArabic ? 'تغيير كلمة المرور وغيرها' : 'Change password and more',
                       svgAsset: 'assets/icons/setting.svg',
                       backgroundColor: const Color(0xFFF1F5F9),
                       showArrow: true,
@@ -195,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 24),
                     _buildDrawerItem(
                       context: context,
-                      title: 'تسجيل الخروج',
+                      title: s.logout,
                       subtitle: null,
                       svgAsset: 'assets/icons/logout.svg',
                       backgroundColor: const Color(0xFFFFE2E2),
@@ -277,17 +296,19 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 16),
                       // النصوص الترحيبية
-                      const Text(
-                        'مرحباً، محمد 👋',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      Consumer<AuthProvider>(
+                        builder: (_, auth, __) => Text(
+                          '${s.hello}، ${auth.currentUser?.name ?? ''} 👋',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'كيف يمكننا مساعدتك اليوم؟',
+                        s.howHelp,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.9),
                           fontSize: 14,
@@ -322,7 +343,7 @@ class _HomePageState extends State<HomePage> {
                           backgroundColor: const Color(0xffFFE2E2),
                           borderColor: const Color(0xffFFC9C9),
                           actionColor: const Color(0xffE7000B),
-                          title: 'صيانة طارئة',
+                          title: s.emergency,
                           svg: 'assets/icons/emergancy.svg',
                           color: const Color(0xffFFF7ED),
                           onTap: () {
@@ -341,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                           backgroundColor: const Color(0xffFFEDD4),
                           borderColor: const Color(0xffFFD6A8),
                           actionColor: const Color(0xffF54900),
-                          title: 'طلب ونش',
+                          title: s.towing,
                           svg: 'assets/icons/truck.svg',
                           color: const Color(0xffFFFBEB),
                           onTap: () {
@@ -362,7 +383,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'الخدمات الأساسية',
+                        s.mainServices,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
@@ -378,8 +399,8 @@ class _HomePageState extends State<HomePage> {
                             ),
                           );
                         },
-                        child: const Text(
-                          'عرض الكل',
+                        child: Text(
+                          s.viewAll,
                           style: TextStyle(
                             color: AppTheme.primaryColor,
                             fontSize: 14,
@@ -399,7 +420,7 @@ class _HomePageState extends State<HomePage> {
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       ServiceCard(
-                        title: 'البطارية',
+                        title: s.battery,
                         svg: 'assets/icons/battery.svg',
                         onTap: () {
                           Navigator.push(
@@ -412,7 +433,7 @@ class _HomePageState extends State<HomePage> {
                         gradientColors: AppGradients.gradient2,
                       ),
                       ServiceCard(
-                        title: 'تغيير الزيت',
+                        title: s.oilChange,
                         svg: 'assets/icons/oil.svg',
                         gradientColors: AppGradients.gradient1,
                         onTap: () {
@@ -425,7 +446,7 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                       ServiceCard(
-                        title: 'الإطارات',
+                        title: s.tires,
                         svg: 'assets/icons/tire.svg',
                         onTap: () {
                           Navigator.push(
@@ -438,7 +459,7 @@ class _HomePageState extends State<HomePage> {
                         gradientColors: AppGradients.gradient4,
                       ),
                       ServiceCard(
-                        title: 'غسيل السيارة',
+                        title: s.carWash,
                         svg: 'assets/icons/clean.svg',
                         onTap: () {
                           Navigator.push(

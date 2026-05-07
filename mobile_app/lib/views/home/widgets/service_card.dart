@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:graduation_project/core/localization/app_strings.dart';
+import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:graduation_project/views/home/widgets/gradients.dart';
 
 class ServiceCard extends StatelessWidget {
@@ -20,6 +23,7 @@ class ServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = appStrings(context.watch<LocaleProvider>().isArabic);
     final List<Color> colorsToUse = gradientColors ?? AppGradients.gradient1;
     return GestureDetector(
       onTap: onTap,
@@ -81,7 +85,7 @@ class ServiceCard extends StatelessWidget {
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        'تفاصيل الخدمة',
+                        s.isArabic ? 'تفاصيل الخدمة' : 'Service Details',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 10,
@@ -98,7 +102,7 @@ class ServiceCard extends StatelessWidget {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          'ابدأ',
+                          s.isArabic ? 'ابدأ' : 'Start',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontSize: 12,

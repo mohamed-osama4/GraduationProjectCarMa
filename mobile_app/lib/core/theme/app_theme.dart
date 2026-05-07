@@ -12,13 +12,20 @@ class AppTheme {
   static const Color borderColor = Color(0xffE2E8F0);
   static const Color warningColor = Color(0xffFFA726);
 
-  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(
+    ThemeMode.light,
+  );
+
+  /// Arabic UI: Tajawal — modern, clean, iOS-like for Arabic
+  /// English UI: Inter — closest to SF Pro (Apple's system font)
+  static String get arabicFont => GoogleFonts.tajawal().fontFamily!;
+  static String get englishFont => GoogleFonts.almarai().fontFamily!;
 
   static ThemeData get lightTheme {
     return ThemeData(
       primaryColor: primaryColor,
       scaffoldBackgroundColor: backgroundColor,
-      fontFamily: GoogleFonts.tajawal().fontFamily,
+      fontFamily: arabicFont, // Tajawal renders both Arabic & Latin perfectly
       colorScheme: ColorScheme.light(
         primary: primaryColor,
         secondary: secondaryColor,
@@ -28,17 +35,17 @@ class AppTheme {
         onSurfaceVariant: subtleTextColor,
         outline: borderColor,
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: backgroundColor,
         elevation: 0,
         centerTitle: true,
         surfaceTintColor: Colors.white,
-        iconTheme: IconThemeData(color: textColor),
+        iconTheme: const IconThemeData(color: textColor),
         titleTextStyle: TextStyle(
           color: textColor,
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          fontFamily: 'Inter',
+          fontFamily: GoogleFonts.tajawal().fontFamily,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -48,10 +55,10 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
+          textStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Inter',
+            fontFamily: GoogleFonts.tajawal().fontFamily,
           ),
           minimumSize: const Size(double.infinity, 48),
         ),
@@ -63,10 +70,10 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
+          textStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Inter',
+            fontFamily: GoogleFonts.tajawal().fontFamily,
           ),
           minimumSize: const Size(double.infinity, 48),
         ),
@@ -94,11 +101,11 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: errorColor),
         ),
-        hintStyle: const TextStyle(
-          color: Color(0xff94A3B8),
+        hintStyle: TextStyle(
+          color: const Color(0xff94A3B8),
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          fontFamily: 'Inter',
+          fontFamily: GoogleFonts.tajawal().fontFamily,
         ),
       ),
     );
@@ -119,17 +126,17 @@ class AppTheme {
         onSurfaceVariant: Color(0xFF9CA3AF),
         outline: Color(0xFF374151),
       ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1F2937),
+      appBarTheme: AppBarTheme(
+        backgroundColor: const Color(0xFF1F2937),
         elevation: 0,
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         titleTextStyle: TextStyle(
           color: Colors.white,
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          fontFamily: 'Inter',
+          fontFamily: GoogleFonts.tajawal().fontFamily,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -139,10 +146,10 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
+          textStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Inter',
+            fontFamily: GoogleFonts.tajawal().fontFamily,
           ),
           minimumSize: const Size(double.infinity, 48),
         ),
@@ -154,10 +161,10 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
+          textStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Inter',
+            fontFamily: GoogleFonts.tajawal().fontFamily,
           ),
           minimumSize: const Size(double.infinity, 48),
         ),
@@ -185,11 +192,11 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: errorColor),
         ),
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
           color: Color(0xff94A3B8),
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          fontFamily: 'Inter',
+          fontFamily: GoogleFonts.tajawal().fontFamily,
         ),
       ),
     );

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/core/comeponents/app_image.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
+import 'package:graduation_project/core/localization/app_strings.dart';
+import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:graduation_project/views/home/widgets/gradients.dart';
 
 class ServiceItemCard extends StatelessWidget {
@@ -15,6 +18,7 @@ class ServiceItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = appStrings(context.watch<LocaleProvider>().isArabic);
     final String iconName = service['icon'];
     
     // Identify specifically colored SVG icons
@@ -106,7 +110,7 @@ class ServiceItemCard extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            'السعر: ',
+                            s.isArabic ? 'السعر: ' : 'Price: ',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -140,9 +144,9 @@ class ServiceItemCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 alignment: Alignment.center,
-                child: const Text(
-                  'ابدأ',
-                  style: TextStyle(
+                child: Text(
+                  s.isArabic ? 'ابدأ' : 'Start',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

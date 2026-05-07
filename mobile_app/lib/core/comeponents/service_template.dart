@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/core/comeponents/app_image.dart';
+import 'package:graduation_project/core/localization/app_strings.dart';
+import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
-import 'package:graduation_project/views/services/location_picker.dart';
+import 'package:graduation_project/views/services/request_service_page.dart';
 
 class ServiceOption {
   final String title;
@@ -30,6 +33,8 @@ class ServiceTemplate extends StatefulWidget {
   final Color primaryActionColor;
   final Color primaryActionShadowColor;
   final Color primaryActionBackgroundColor;
+  /// serviceId sent to backend when user submits the order
+  final int serviceId;
 
   const ServiceTemplate({
     super.key,
@@ -45,6 +50,7 @@ class ServiceTemplate extends StatefulWidget {
     required this.primaryActionColor,
     required this.primaryActionShadowColor,
     required this.primaryActionBackgroundColor,
+    this.serviceId = 1,
   });
 
   @override
@@ -53,13 +59,22 @@ class ServiceTemplate extends StatefulWidget {
 
 class _ServiceTemplateState extends State<ServiceTemplate> {
   int _selectedServiceIndex = 0;
+  final TextEditingController _notesController = TextEditingController();
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final s = appStrings(context.watch<LocaleProvider>().isArabic);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(title: Text(widget.title)),
       body: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -120,9 +135,9 @@ class _ServiceTemplateState extends State<ServiceTemplate> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'السعر الأساسي',
-                          style: TextStyle(
+                        Text(
+                          s.isArabic ? 'السعر الأساسي' : 'Base Price',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -146,7 +161,7 @@ class _ServiceTemplateState extends State<ServiceTemplate> {
             
             // Options title
             Text(
-              'تفاصيل الخدمة',
+              s.isArabic ? 'تفاصيل الخدمة' : 'Service Details',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -166,7 +181,7 @@ class _ServiceTemplateState extends State<ServiceTemplate> {
             
             // Notes mapping
             Text(
-              'ملاحظات إضافية (اختياري)',
+              s.isArabic ? 'ملاحظات إضافية (اختياري)' : 'Additional Notes (Optional)',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -175,6 +190,7 @@ class _ServiceTemplateState extends State<ServiceTemplate> {
             ),
             const SizedBox(height: 12),
             TextField(
+              controller: _notesController,
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: widget.notesHintText,
@@ -225,17 +241,25 @@ class _ServiceTemplateState extends State<ServiceTemplate> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const LocationPickerPage()),
+              MaterialPageRoute(
+                builder: (context) => RequestServicePage(
+                  serviceName: widget.headerTitle,
+                  serviceId: widget.serviceId,
+                  serviceIcon: Icons.build_rounded,
+                  serviceColor: widget.primaryActionColor,
+                  notes: _notesController.text.trim(),
+                ),
+              ),
             );
           },
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.location_on_rounded, size: 22),
-              SizedBox(width: 8),
+              const Icon(Icons.location_on_rounded, size: 22),
+              const SizedBox(width: 8),
               Text(
-                'التالي: تحديد الموقع',
-                style: TextStyle(
+                s.isArabic ? 'التالي: تحديد الموقع' : 'Next: Set Details',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),

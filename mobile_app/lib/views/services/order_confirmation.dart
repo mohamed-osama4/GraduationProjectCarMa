@@ -38,7 +38,6 @@ class OrderConfirmationPage extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -49,7 +48,6 @@ class OrderConfirmationPage extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 16,
                   height: 1.5,
-                  fontFamily: 'Inter',
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -112,7 +110,6 @@ class OrderConfirmationPage extends StatelessWidget {
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 14,
-            fontFamily: 'Inter',
           ),
         ),
         Text(
@@ -121,7 +118,6 @@ class OrderConfirmationPage extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSurface,
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Inter',
           ),
         ),
       ],

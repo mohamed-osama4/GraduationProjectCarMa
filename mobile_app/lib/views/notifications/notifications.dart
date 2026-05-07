@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:graduation_project/core/comeponents/app_image.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
+import 'package:graduation_project/core/localization/app_strings.dart';
+import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:provider/provider.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -11,21 +14,26 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   List<NotificationModel> notifications = [];
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    loadNotifications();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      final s = appStrings(context.watch<LocaleProvider>().isArabic);
+      loadNotifications(s);
+      _initialized = true;
+    }
   }
 
-  void loadNotifications() {
+  void loadNotifications(AppStrings s) {
     notifications = [
       NotificationModel(
         id: '1',
         iconAsset: 'time.svg',
         iconBackgroundColor: const Color(0xffFEF3C6),
-        title: 'طلبك قيد المراجعة',
-        message: 'جاري مراجعة الطلب من قبل الإدارة',
+        title: s.isArabic ? 'طلبك قيد المراجعة' : 'Order Under Review',
+        message: s.isArabic ? 'جاري مراجعة الطلب من قبل الإدارة' : 'Your order is being reviewed by management',
         timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
         isRead: false,
       ),
@@ -33,8 +41,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
         id: '2',
         iconAsset: 'accept.svg',
         iconBackgroundColor: const Color(0xffDCFCE7),
-        title: 'تمت الموافقة على الطلب',
-        message: 'يمكنك الآن متابعة حالة الطلب',
+        title: s.isArabic ? 'تمت الموافقة على الطلب' : 'Order Approved',
+        message: s.isArabic ? 'يمكنك الآن متابعة حالة الطلب' : 'You can now track your order status',
         timestamp: DateTime.now().subtract(const Duration(hours: 1)),
         isRead: false,
       ),
@@ -42,8 +50,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
         id: '3',
         iconAsset: 'done.svg',
         iconBackgroundColor: const Color(0xffDBEAFE),
-        title: 'تم تعيين فني',
-        message: 'جارٍ تجهيز التتبع',
+        title: s.isArabic ? 'تم تعيين فني' : 'Technician Assigned',
+        message: s.isArabic ? 'جارٍ تجهيز التتبع' : 'Tracking is being prepared',
         timestamp: DateTime.now().subtract(const Duration(hours: 2)),
         isRead: false,
       ),
@@ -51,8 +59,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
         id: '4',
         iconAsset: 'trucks.svg',
         iconBackgroundColor: const Color(0xffF3E8FF),
-        title: 'الفني في الطريق',
-        message: 'الرجاء الانتظار، الفني في طريقه إليك',
+        title: s.isArabic ? 'الفني في الطريق' : 'Technician On The Way',
+        message: s.isArabic ? 'الرجاء الانتظار، الفني في طريقه إليك' : 'Please wait, the technician is on the way',
         timestamp: DateTime.now().subtract(const Duration(days: 1)),
         isRead: false,
       ),
@@ -60,8 +68,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
         id: '5',
         iconAsset: 'star.svg',
         iconBackgroundColor: const Color(0xffFEF9C2),
-        title: 'اكتملت الخدمة',
-        message: 'شكراً لاستخدامك خدماتنا، نأمل تقييم الخدمة',
+        title: s.isArabic ? 'اكتملت الخدمة' : 'Service Completed',
+        message: s.isArabic ? 'شكراً لاستخدامك خدماتنا، نأمل تقييم الخدمة' : 'Thank you for using our services. Please rate the service.',
         timestamp: DateTime.now().subtract(const Duration(days: 2)),
         isRead: true,
       ),
@@ -69,8 +77,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
         id: '6',
         iconAsset: 'fales.svg',
         iconBackgroundColor: const Color(0xffFFE2E2),
-        title: 'تم رفض الطلب',
-        message: 'يمكنك تعديل الطلب واعادة الارسال',
+        title: s.isArabic ? 'تم رفض الطلب' : 'Order Rejected',
+        message: s.isArabic ? 'يمكنك تعديل الطلب واعادة الارسال' : 'You can edit the order and resubmit',
         timestamp: DateTime.now().subtract(const Duration(days: 3)),
         isRead: true,
       ),
@@ -100,35 +108,39 @@ class _NotificationsPageState extends State<NotificationsPage> {
     });
   }
 
-  String getTimeAgo(DateTime timestamp) {
+  String getTimeAgo(DateTime timestamp, bool isArabic) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
 
     if (difference.inDays > 365) {
-      return 'منذ ${(difference.inDays / 365).floor()} سنة';
+      final years = (difference.inDays / 365).floor();
+      return isArabic ? 'منذ $years سنة' : '$years years ago';
     } else if (difference.inDays > 30) {
-      return 'منذ ${(difference.inDays / 30).floor()} شهر';
+      final months = (difference.inDays / 30).floor();
+      return isArabic ? 'منذ $months شهر' : '$months months ago';
     } else if (difference.inDays > 7) {
-      return 'منذ ${(difference.inDays / 7).floor()} أسبوع';
+      final weeks = (difference.inDays / 7).floor();
+      return isArabic ? 'منذ $weeks أسبوع' : '$weeks weeks ago';
     } else if (difference.inDays >= 1) {
-      return 'منذ ${difference.inDays} يوم';
+      return isArabic ? 'منذ ${difference.inDays} يوم' : '${difference.inDays} days ago';
     } else if (difference.inHours >= 1) {
-      return 'منذ ${difference.inHours} ساعة';
+      return isArabic ? 'منذ ${difference.inHours} ساعة' : '${difference.inHours} hours ago';
     } else if (difference.inMinutes >= 1) {
-      return 'منذ ${difference.inMinutes} دقيقة';
+      return isArabic ? 'منذ ${difference.inMinutes} دقيقة' : '${difference.inMinutes} minutes ago';
     } else {
-      return 'الآن';
+      return isArabic ? 'الآن' : 'Just now';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final s = appStrings(context.watch<LocaleProvider>().isArabic);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
-          'الإشعارات',
-          style: TextStyle(
+        title: Text(
+          s.notifications,
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 20,
@@ -143,8 +155,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 notifications.clear();
               });
             },
-            child: const Text(
-              'مسح الكل',
+            child: Text(
+              s.isArabic ? 'مسح الكل' : 'Clear All',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -183,7 +195,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'لا توجد إشعارات',
+                      s.isArabic ? 'لا توجد إشعارات' : 'No notifications',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
@@ -192,7 +204,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'ستظهر الإشعارات الجديدة هنا',
+                      s.isArabic ? 'ستظهر الإشعارات الجديدة هنا' : 'New notifications will appear here',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 14,
@@ -289,7 +301,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        getTimeAgo(notification.timestamp),
+                                        getTimeAgo(notification.timestamp, s.isArabic),
                                         style: TextStyle(
                                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                                           fontSize: 12,
