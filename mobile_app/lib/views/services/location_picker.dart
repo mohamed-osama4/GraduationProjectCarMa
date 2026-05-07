@@ -1,22 +1,41 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:graduation_project/core/comeponents/app_button.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
 import 'package:graduation_project/views/services/payment_methods.dart';
 
-class LocationPickerPage extends StatelessWidget {
+class LocationPickerPage extends StatefulWidget {
   const LocationPickerPage({super.key});
+
+  @override
+  State<LocationPickerPage> createState() => _LocationPickerPageState();
+}
+
+class _LocationPickerPageState extends State<LocationPickerPage> {
+  final Completer<GoogleMapController> _controller = Completer();
+  static const CameraPosition _initialPosition = CameraPosition(
+    target: LatLng(30.0444, 31.2357),
+    zoom: 14.4746,
+  );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Simulated Beautiful Map Background using CustomPaint
+          // Google Map Background
           SizedBox(
             width: double.infinity,
             height: double.infinity,
-            child: CustomPaint(
-              painter: SimulatedMapPainter(Theme.of(context).brightness),
+            child: GoogleMap(
+              initialCameraPosition: _initialPosition,
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
             ),
           ),
 
@@ -72,7 +91,10 @@ class LocationPickerPage extends StatelessWidget {
             right: 20,
             child: FloatingActionButton(
               backgroundColor: Theme.of(context).colorScheme.surface,
-              onPressed: () {},
+              onPressed: () async {
+                final GoogleMapController controller = await _controller.future;
+                controller.animateCamera(CameraUpdate.newCameraPosition(_initialPosition));
+              },
               child: const Icon(Icons.my_location, color: AppTheme.primaryColor),
             ),
           ),
@@ -145,7 +167,6 @@ class LocationPickerPage extends StatelessWidget {
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Inter',
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -180,7 +201,6 @@ class LocationPickerPage extends StatelessWidget {
                                   color: Theme.of(context).colorScheme.onSurface,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  fontFamily: 'Inter',
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -189,7 +209,6 @@ class LocationPickerPage extends StatelessWidget {
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   fontSize: 13,
-                                  fontFamily: 'Inter',
                                 ),
                               ),
                             ],
@@ -223,65 +242,3 @@ class LocationPickerPage extends StatelessWidget {
   }
 }
 
-// A custom painter to simulate a luxurious generic map layout
-class SimulatedMapPainter extends CustomPainter {
-  final Brightness brightness;
-
-  SimulatedMapPainter(this.brightness);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    bool isDark = brightness == Brightness.dark;
-
-    // light blue/grey map bg (or dark equivalent)
-    Paint background = Paint()..color = isDark ? const Color(0xff1E293B) : const Color(0xffEFF3F8); 
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), background);
-
-    Paint roadPaint = Paint()
-      ..color = isDark ? const Color(0xff334155) : Colors.white
-      ..strokeWidth = 14.0
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-      
-    Paint majorRoadPaint = Paint()
-      ..color = isDark ? const Color(0xff92400E) : const Color(0xffFFECB3) // Yellowish major road
-      ..strokeWidth = 24.0
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-
-    Paint parkPaint = Paint()
-      ..color = isDark ? const Color(0xff064E3B) : const Color(0xffD6EED1) // Soft green for parks
-      ..style = PaintingStyle.fill;
-
-    // Draw a park (organic shape)
-    Path parkPath = Path();
-    parkPath.moveTo(size.width * 0.1, size.height * 0.15);
-    parkPath.quadraticBezierTo(size.width * 0.4, size.height * 0.1, size.width * 0.5, size.height * 0.3);
-    parkPath.quadraticBezierTo(size.width * 0.6, size.height * 0.5, size.width * 0.3, size.height * 0.6);
-    parkPath.close();
-    canvas.drawPath(parkPath, parkPaint);
-
-    // Draw intersecting roads
-    // Horizontal mapping
-    canvas.drawLine(Offset(0, size.height * 0.35), Offset(size.width, size.height * 0.40), roadPaint);
-    canvas.drawLine(Offset(-50, size.height * 0.75), Offset(size.width + 50, size.height * 0.65), roadPaint);
-    
-    // Vertical mapping
-    canvas.drawLine(Offset(size.width * 0.25, -50), Offset(size.width * 0.35, size.height + 50), roadPaint);
-    canvas.drawLine(Offset(size.width * 0.75, -50), Offset(size.width * 0.65, size.height + 50), roadPaint);
-    
-    // Major Diagonal Road
-    canvas.drawLine(Offset(0, size.height * 0.1), Offset(size.width, size.height * 0.9), majorRoadPaint);
-    
-    // Draw building blocks / POI
-    Paint buildingPaint = Paint()..color = isDark ? const Color(0xff475569) : const Color(0xffDFE6EE);
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(size.width * 0.45, size.height * 0.45, 90, 90), const Radius.circular(12)), buildingPaint);
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(size.width * 0.80, size.height * 0.25, 70, 110), const Radius.circular(12)), buildingPaint);
-    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(size.width * 0.15, size.height * 0.8, 140, 70), const Radius.circular(12)), buildingPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
-}

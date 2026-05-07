@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:graduation_project/core/localization/app_strings.dart';
+import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:provider/provider.dart';
 
 class EmergencyActionCard extends StatelessWidget {
   final String title;
@@ -72,9 +75,9 @@ class EmergencyActionCard extends StatelessWidget {
                 color: actionColor,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text(
-                'اطلب الآن',
-                style: TextStyle(
+              child: Text(
+                appStrings(context.watch<LocaleProvider>().isArabic).orderNow,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,

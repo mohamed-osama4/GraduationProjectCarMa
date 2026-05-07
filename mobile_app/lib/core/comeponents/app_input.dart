@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:graduation_project/core/theme/app_theme.dart';
 
 class AppInput extends StatefulWidget {
   final String? label, hint, suffixIcon, prefixIcon;
@@ -14,6 +13,7 @@ class AppInput extends StatefulWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final List<TextInputFormatter>? inputFormatters;
+  final void Function(String)? onChanged;
 
   const AppInput({
     super.key,
@@ -30,6 +30,7 @@ class AppInput extends StatefulWidget {
     this.controller,
     this.validator,
     this.inputFormatters,
+    this.onChanged,
   });
 
   @override
@@ -68,7 +69,6 @@ class _AppInputState extends State<AppInput> {
               color: Theme.of(context).colorScheme.onSurface,
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              fontFamily: 'Inter',
             ),
           ),
           const SizedBox(height: 8),
@@ -122,6 +122,7 @@ class _AppInputState extends State<AppInput> {
                 obscureText: _obscureText,
                 validator: widget.validator,
                 inputFormatters: widget.inputFormatters,
+                onChanged: widget.onChanged,
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                 decoration: InputDecoration(
                   hintText: widget.hint,

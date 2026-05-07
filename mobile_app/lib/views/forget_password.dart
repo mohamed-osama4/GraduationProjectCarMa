@@ -17,7 +17,6 @@ class ForgetPassword extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurface,
           fontSize: 20,
           fontWeight: FontWeight.bold,
-          fontFamily: 'Inter',
           height: 32,
           letterSpacing: 0,
         ),
@@ -31,6 +30,7 @@ class ForgetPassword extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.symmetric(

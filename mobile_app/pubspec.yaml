@@ -18,19 +18,21 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   cupertino_icons: ^1.0.8
+  google_maps_flutter: ^2.14.0
+  dio: ^5.9.2
+  shared_preferences: ^2.5.3
+  provider: ^6.1.5+1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-
   flutter_lints: ^5.0.0
 
 
 flutter:
-
 
   uses-material-design: true
 
@@ -39,15 +41,16 @@ flutter:
     - assets/icons/
     - assets/lotties/
 
-  
   fonts:
     - family: Mystery Quest
       fonts:
         - asset: assets/fonts/MysteryQuest-Regular.ttf
-  #         style: italic
-    - family: Inter
+    - family: Cairo
       fonts:
-        - asset: assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf
-        - asset: assets/fonts/Inter-VariableFont_opsz,wght.ttf
-  #         weight: 700
-  #
+        - asset: assets/fonts/Cairo-Regular.ttf
+        - asset: assets/fonts/Cairo-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Cairo-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Cairo-Bold.ttf
+          weight: 700
