@@ -56,3 +56,23 @@ export const searchOrders = () => {
 export const updateOrderStatus = (id, status) => {
   return api.put(`/api/orders/${id}`, { orderStatus: status });
 };
+
+/**
+ * Accept an order.
+ * POST /api/orders/{id}/accept
+ * @param {string|number} id
+ * @returns {Promise<import("axios").AxiosResponse>}
+ */
+export const acceptOrder = (id) => {
+  return api.post(`/api/orders/${id}/accept`);
+};
+
+/**
+ * Reject an order.
+ * POST /api/orders/{id}/reject
+ * @param {string|number} id
+ * @returns {Promise<import("axios").AxiosResponse>}
+ */
+export const rejectOrder = (id) => {
+  return api.post(`/api/orders/${id}/reject`);
+};
