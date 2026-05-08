@@ -120,7 +120,9 @@ class _CreateAccountState extends State<CreateAccount> {
       if (!mounted) return;
       final error = auth.errorMessage ?? '';
 
-      if (error.contains('مسجّل بالفعل') || error.contains('EMAIL_EXISTS')) {
+      // Handles both English (new backend) and Arabic (legacy) messages
+      if (error.contains('مسجّل بالفعل') || error.contains('EMAIL_EXISTS') ||
+          error.contains('Email already exists') || error.contains('already exists')) {
         setState(() => _emailError = 'هذا البريد الإلكتروني مسجّل بالفعل، يمكنك تسجيل الدخول');
       } else if (error.contains('متطابقتين') || error.contains('PASSWORD_MISMATCH')) {
         setState(() => _confirmPasswordError = 'كلمتا المرور غير متطابقتين');
