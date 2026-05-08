@@ -4,6 +4,7 @@ import 'package:graduation_project/core/comeponents/app_image.dart';
 import 'package:graduation_project/core/localization/app_strings.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
 import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:graduation_project/views/ai_chat/ai_chat_page.dart';
 import 'package:graduation_project/views/home/widgets/gradients.dart';
 import 'package:graduation_project/views/home/widgets/active_order_card.dart';
 import 'package:graduation_project/views/home/widgets/emergency_action_card.dart';
@@ -230,6 +231,34 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const AiChatPage()),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              colors: [Color(0xFF7C3AED), Color(0xFFA78BFA)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF7C3AED).withValues(alpha: 0.5),
+                blurRadius: 16,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: const Icon(Icons.auto_awesome, color: Colors.white, size: 26),
         ),
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
