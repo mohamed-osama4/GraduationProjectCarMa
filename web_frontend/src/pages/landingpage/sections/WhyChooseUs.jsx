@@ -61,7 +61,7 @@ export default function WhyChooseUs() {
           <span className="section-badge flex items-center justify-center gap-2 w-fit mx-auto">
             <HiOutlineStar size={20} /> لماذا نحن
           </span>
-          <h2 className="section-title">لماذا تختار CarMA؟</h2>
+          <h2 className="section-title">لماذا تختار CarMa؟</h2>
           <p className="section-subtitle">
             نتميز بتقديم خدمات صيانة سيارات استثنائية تجمع بين الجودة والراحة
           </p>

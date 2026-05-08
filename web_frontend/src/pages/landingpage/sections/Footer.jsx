@@ -4,7 +4,7 @@ import { FaXTwitter, FaInstagram, FaSnapchat, FaTiktok } from "react-icons/fa6";
 
 const FOOTER_LINKS = {
   خدماتنا: ["صيانة دورية", "فحص البطارية", "صيانة المكيف", "الإطارات والفرامل"],
-  "عن CarMA": ["من نحن", "فريق العمل", "شركاؤنا", "وظائف"],
+  "عن CarMa": ["من نحن", "فريق العمل", "شركاؤنا", "وظائف"],
   الدعم: ["الأسئلة الشائعة", "سياسة الخصوصية", "الشروط والأحكام", "تواصل معنا"],
 };
 
@@ -35,7 +35,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <HiOutlineEnvelope className="text-premium-gold" size={16} />
-                <span>info@carma.sa</span>
+                <span>info@CarMa.sa</span>
               </div>
               <div className="flex items-center gap-2">
                 <HiOutlineMapPin className="text-premium-gold" size={16} />

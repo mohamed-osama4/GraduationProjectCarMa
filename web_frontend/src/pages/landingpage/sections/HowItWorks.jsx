@@ -34,7 +34,7 @@ export default function HowItWorks() {
     <section id="how-it-works" className="landing-section premium-dark-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <div data-aos="fade-up" className="mb-12">
-          <h2 className="section-title">كيف يعمل CarMA</h2>
+          <h2 className="section-title">كيف يعمل CarMa</h2>
           <p className="section-subtitle mx-auto">
             خطوات بسيطة تفصلك عن صيانة سيارتك
           </p>

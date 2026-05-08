@@ -15,7 +15,7 @@ export default function CTA() {
               <span className="text-premium-gold">من موبايلك</span>
             </h2>
             <p className="text-blue-100 text-[20px] text-base leading-relaxed mb-6 max-w-lg">
-              حمّل تطبيق CarMA الآن واحصل على خصم 20% على أول خدمة. 
+              حمّل تطبيق CarMa الآن واحصل على خصم 20% على أول خدمة. 
               متوفر على iOS و Android.
             </p>
             <div className="flex flex-wrap gap-3">
@@ -41,7 +41,7 @@ export default function CTA() {
             <div className="relative">
               <img
                 src={mobileMockup}
-                alt="تطبيق CarMA"
+                alt="تطبيق CarMa"
                 className="relative drop-shadow-3xl max-h-[570px] w-auto object-contain transform hover:scale-105 transition-transform duration-500"
               />
             </div>
