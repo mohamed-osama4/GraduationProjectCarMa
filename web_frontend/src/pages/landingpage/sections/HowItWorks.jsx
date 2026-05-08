@@ -44,7 +44,7 @@ export default function HowItWorks() {
           {/* Continuous Connection Line (Desktop only) */}
           <div className="hidden lg:block absolute top-12 left-[10%] right-[10%] h-[2px] animate-dash opacity-30 z-0" />
 
-          <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-4 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 lg:gap-4 relative z-10">
             {STEPS.map((step, index) => (
               <div
                 key={index}
