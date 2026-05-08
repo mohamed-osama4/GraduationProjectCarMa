@@ -3,9 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiClient {
   // ✅ Android Emulator  → use: http://10.0.2.2:5000/api
-  // ✅ Real Device (WiFi) → use: http://192.168.1.8:5000/api
+  // ✅ Real Device (WiFi) → use: http://192.168.1.2:5000/api
   // ✅ iOS Simulator     → use: http://localhost:5000/api
-  static const String _baseUrl = 'http://192.168.1.8:5000/api'; // Real Device (WiFi)
+  static const String _baseUrl = 'http://192.168.1.2:5000/api'; // Real Device (WiFi)
 
   final Dio _dio;
 

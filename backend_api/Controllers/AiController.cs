@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using CarMaintenance.Services;
 using CarMaintenance.Models;
 using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CarMaintenance.Controllers
 {
@@ -16,8 +17,9 @@ namespace CarMaintenance.Controllers
             _aiService = aiService;
         }
 
-        [Authorize]
         [HttpPost("chat")]
+        [SwaggerOperation(Summary = "Ai Chat")]
+
         public async Task<IActionResult> Chat([FromBody] ChatRequest request)
         {
             var reply = await _aiService.GetSmartAssistantResponse(request.Message);

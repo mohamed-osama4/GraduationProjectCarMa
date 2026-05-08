@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using CarMaintenance.Models.DTOs;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace CarMaintenance.Controllers
 {
@@ -22,6 +23,8 @@ namespace CarMaintenance.Controllers
         }
 
         [HttpPost("login")]
+       [SwaggerOperation(Summary = "Log In")]
+
         public async Task<IActionResult> Login(LoginRequest request)
         {
             var user = await _context.Users
@@ -50,6 +53,8 @@ namespace CarMaintenance.Controllers
         }
 
         [HttpPost("register")]
+       [SwaggerOperation(Summary = " Register")]
+
         public async Task<IActionResult> Register(RegisterRequest request)
         {
             var exists = await _context.Users
@@ -62,7 +67,7 @@ namespace CarMaintenance.Controllers
             {
                 Name = request.Name,
                 Email = request.Email,
-                PhoneNumber = request.PhoneNumber,
+                PhoneNumber = request.PhoneNumber.ToString(),
                 PasswordHash = request.Password,
                 Role = request.Role ?? "customer"
             };
@@ -76,7 +81,7 @@ namespace CarMaintenance.Controllers
                 userId = user.Id
             });
         }
-
+       [SwaggerOperation(Summary = "Delete User By Id")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -119,8 +124,8 @@ new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
 
     public class LoginRequest
     {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 
     public class RegisterRequest
@@ -128,7 +133,7 @@ new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
+        public long PhoneNumber { get; set; }
         public string? Role { get; set; }
     }
 }
