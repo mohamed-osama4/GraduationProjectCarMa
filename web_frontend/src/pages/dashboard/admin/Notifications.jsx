@@ -11,7 +11,9 @@ import {
   Loader2,
   Wallet,
   Tag,
-  Wrench
+  Wrench,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import DashboardHeader from '../../../component/dashboard/DashboardHeader';
 import StatCard from '../../../component/dashboard/StatCard';
@@ -46,6 +48,7 @@ const Notifications = () => {
   
   // Pagination & Counts
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const pageSize = 10;
@@ -66,6 +69,16 @@ const Notifications = () => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     setCurrentDate(date.toLocaleDateString('ar-EG', options));
   }, []);
+
+  const handleTypeChange = (id) => {
+    setTypeFilter(id);
+    setPage(1);
+  };
+
+  const handleStatusChange = (id) => {
+    setStatusFilter(id);
+    setPage(1);
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -90,6 +103,7 @@ const Notifications = () => {
       if (res.data) {
         setNotifications(res.data.items || []);
         setTotalCount(res.data.totalCount || 0);
+        setTotalPages(res.data.totalPages || 1);
         // Sometimes backend includes unreadCount in the list response
         if (res.data.unreadCount !== undefined) {
           setUnreadCount(res.data.unreadCount);
@@ -298,7 +312,7 @@ const Notifications = () => {
               {typeFiltersList.map(filter => (
                 <button 
                   key={filter.id}
-                  onClick={() => setTypeFilter(filter.id)}
+                  onClick={() => handleTypeChange(filter.id)}
                   className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors ${typeFilter === filter.id ? 'bg-primary text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
                 >
                   {filter.label}
@@ -311,19 +325,19 @@ const Notifications = () => {
             <span className="text-slate-500 font-bold mb-1">الحالة</span>
             <div className="flex flex-wrap items-center gap-2">
               <button 
-                onClick={() => setStatusFilter('all')}
+                onClick={() => handleStatusChange('all')}
                 className={`px-6 py-2 rounded-xl font-bold transition-colors ${statusFilter === 'all' ? 'bg-[#1e40af] text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
               >
                 الكل
               </button>
               <button 
-                onClick={() => setStatusFilter('unread')}
+                onClick={() => handleStatusChange('unread')}
                 className={`px-6 py-2 rounded-xl font-bold transition-colors ${statusFilter === 'unread' ? 'bg-[#1e40af] text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
               >
                 غير مقروءة
               </button>
               <button 
-                onClick={() => setStatusFilter('read')}
+                onClick={() => handleStatusChange('read')}
                 className={`px-6 py-2 rounded-xl font-bold transition-colors ${statusFilter === 'read' ? 'bg-[#1e40af] text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
               >
                 مقروءة
@@ -420,6 +434,55 @@ const Notifications = () => {
               <p className="text-slate-500 font-bold">لا توجد إشعارات تطابق بحثك</p>
             </div>
           )}
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-gray-100 gap-3">
+            {/* Next */}
+            <button
+              onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+              disabled={page === totalPages}
+              className="flex items-center gap-1 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-gray-50 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft size={16} />
+              <span>التالي</span>
+            </button>
+
+            {/* Page Numbers */}
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`h-10 w-10 rounded-xl text-sm font-black transition-all duration-200
+                    ${page === p
+                      ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-110'
+                      : 'text-slate-600 hover:bg-gray-100'
+                    }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+
+            {/* Previous */}
+            <button
+              onClick={() => setPage(p => Math.max(p - 1, 1))}
+              disabled={page === 1}
+              className="flex items-center gap-1 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-gray-50 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <span>السابق</span>
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
+
+        {/* Results Count */}
+        <div className="px-6 py-4 bg-gray-50/50 text-center border-t border-gray-100 rounded-b-3xl -mx-6 -mb-6 mt-2">
+          <p className="text-xs text-slate-400 font-bold">
+            عرض {totalCount > 0 ? ((page - 1) * pageSize) + 1 : 0} - {Math.min(page * pageSize, totalCount)} من أصل {totalCount} إشعار
+          </p>
         </div>
 
       </div>
