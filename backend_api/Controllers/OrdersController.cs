@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.SignalR;
 using CarMaintenance.Hubs;
 using CarMaintenance.DTOs;
 using Swashbuckle.AspNetCore.Annotations;
+using CarMaintenance.Services.Interfaces;
+using CarMaintenance.DTOs.NewNotifications;
+using CarMaintenance.Models.Enums;
 
 namespace CarMaintenance.Controllers
 {
@@ -16,14 +19,19 @@ namespace CarMaintenance.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IHubContext<NotificationHub> _hub;
+        private readonly INewNotificationService _newNotificationService;
 
-        public OrdersController(AppDbContext context, IHubContext<NotificationHub> hub)
+        public OrdersController(
+            AppDbContext context,
+            IHubContext<NotificationHub> hub,
+            INewNotificationService newNotificationService)
         {
             _context = context;
             _hub = hub;
+            _newNotificationService = newNotificationService;
         }
 
-        // ================= GET ORDERS WITH STATS, SEARCH & ICONS =================
+        // ================= GET ALL ORDERS =================
         [HttpGet]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAll([FromQuery] string? search = null, [FromQuery] string? status = null)
@@ -52,10 +60,12 @@ namespace CarMaintenance.Controllers
                     (o.TechnicianName != null && o.TechnicianName.Contains(search)));
             }
 
-            if (!string.IsNullOrEmpty(status) && status.ToLower() != "all")
+            if (!string.IsNullOrWhiteSpace(status) && status.ToLower() != "all")
             {
-                query = query.AsEnumerable().Where(o =>
-                    o.OrderStatus.ToString().Equals(status, StringComparison.OrdinalIgnoreCase)).AsQueryable();
+                if (Enum.TryParse<OrderStatus>(status, true, out var parsedStatus))
+                {
+                    query = query.Where(o => o.OrderStatus == parsedStatus);
+                }
             }
 
             var orders = await query
@@ -63,11 +73,9 @@ namespace CarMaintenance.Controllers
                 .Select(o => new
                 {
                     id = "#" + o.Id,
-
                     service = new
                     {
                         name = o.Service.Name,
-
                         icon = o.Service.Name.Contains("زيت") ? "oil-icon" :
                                o.Service.Name.Contains("بطارية") ? "battery-icon" :
                                o.Service.Name.Contains("غسيل") ? "wash-icon" :
@@ -85,7 +93,7 @@ namespace CarMaintenance.Controllers
                     customer = new
                     {
                         name = o.User.Name,
-                        rating = 4.8,
+                        rating = 4.8
                     },
 
                     location = o.Address,
@@ -98,14 +106,11 @@ namespace CarMaintenance.Controllers
                                 o.OrderStatus == OrderStatus.Accepted ? "تمت الموافقة" :
                                 o.OrderStatus == OrderStatus.InProgress ? "جاري التنفيذ" :
                                 o.OrderStatus == OrderStatus.Rejected ? "مرفوض" : "مكتمل",
-
                         value = o.OrderStatus.ToString()
                     },
 
                     technician = o.TechnicianName ?? "غير معين",
-
                     paymentStatus = o.IsPaid ? "مدفوع" : "لم يدفع",
-
                     price = o.Price.ToString("N0") + " جنيه"
                 })
                 .ToListAsync();
@@ -113,67 +118,8 @@ namespace CarMaintenance.Controllers
             return Ok(new { stats, orders });
         }
 
-        // ================= ACCEPT ORDER =================
-        [HttpPost("{id}/accept")]
-        [SwaggerOperation(Summary = "Accept Order")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> AcceptOrder(int id)
-        {
-            var order = await _context.Orders.FindAsync(id);
-
-            if (order == null)
-                return NotFound();
-
-            order.OrderStatus = OrderStatus.Accepted;
-
-            await _context.SaveChangesAsync();
-
-            await _hub.Clients.All.SendAsync("OrderUpdated",
-                new
-                {
-                    orderId = id,
-                    status = "Accepted"
-                });
-
-            return Ok(new
-            {
-                message = "Order accepted",
-                status = "Accepted"
-            });
-        }
-
-        // ================= REJECT ORDER =================
-        [HttpPost("{id}/reject")]
-        [SwaggerOperation(Summary = "Reject Order")]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> RejectOrder(int id)
-        {
-            var order = await _context.Orders.FindAsync(id);
-
-            if (order == null)
-                return NotFound();
-
-            order.OrderStatus = OrderStatus.Rejected;
-
-            await _context.SaveChangesAsync();
-
-            await _hub.Clients.All.SendAsync("OrderUpdated",
-                new
-                {
-                    orderId = id,
-                    status = "Rejected"
-                });
-
-            return Ok(new
-            {
-                message = "Order rejected",
-                status = "Rejected"
-            });
-        }
-
         // ================= CREATE ORDER =================
         [HttpPost]
-        [SwaggerOperation(Summary = "Create Order")]
         public async Task<IActionResult> Create(CreateOrderDto dto)
         {
             var service = await _context.Services.FindAsync(dto.ServiceId);
@@ -197,19 +143,116 @@ namespace CarMaintenance.Controllers
             };
 
             _context.Orders.Add(order);
-
             await _context.SaveChangesAsync();
 
-            return Ok(new
+            await _newNotificationService.CreateAsync(new CreateNewNotificationRequestDto
             {
-                message = "Order created",
-                order
+                UserId = order.UserId,
+                Type = NewNotificationType.System,
+                Severity = NewNotificationSeverity.Info,
+                Title = "تم إنشاء الطلب",
+                Message = $"تم إنشاء طلب {service.Name} بنجاح. رقم الطلب #{order.Id}",
+                TargetType = "Order",
+                TargetId = order.Id,
+                ActionUrl = $"/orders/{order.Id}"
             });
+
+            await _hub.Clients.All.SendAsync("OrderCreated", new
+            {
+                orderId = order.Id,
+                status = order.OrderStatus.ToString()
+            });
+
+            return Ok(new { message = "Order created", order });
         }
 
-        // ================= GET USER ORDERS =================
+        // ================= ACCEPT ORDER =================
+        [HttpPost("{id}/accept")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> AcceptOrder(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null) return NotFound();
+
+            order.OrderStatus = OrderStatus.Accepted;
+            await _context.SaveChangesAsync();
+
+            await _newNotificationService.CreateAsync(new CreateNewNotificationRequestDto
+            {
+                UserId = order.UserId,
+                Type = NewNotificationType.RequestAccepted,
+                Severity = NewNotificationSeverity.Success,
+                Title = "تم قبول الطلب",
+                Message = $"تم قبول طلبك #{order.Id}",
+                TargetType = "Order",
+                TargetId = order.Id,
+                ActionUrl = $"/orders/{order.Id}"
+            });
+
+            await _hub.Clients.All.SendAsync("OrderUpdated", new
+            {
+                orderId = id,
+                status = "Accepted"
+            });
+
+            return Ok(new { message = "Order accepted" });
+        }
+
+        // ================= REJECT ORDER =================
+        [HttpPost("{id}/reject")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> RejectOrder(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null) return NotFound();
+
+            order.OrderStatus = OrderStatus.Rejected;
+            await _context.SaveChangesAsync();
+
+            await _newNotificationService.CreateAsync(new CreateNewNotificationRequestDto
+            {
+                UserId = order.UserId,
+                Type = NewNotificationType.System,
+                Severity = NewNotificationSeverity.Error,
+                Title = "تم رفض الطلب",
+                Message = $"تم رفض طلبك #{order.Id}",
+                TargetType = "Order",
+                TargetId = order.Id,
+                ActionUrl = $"/orders/{order.Id}"
+            });
+
+            await _hub.Clients.All.SendAsync("OrderUpdated", new
+            {
+                orderId = id,
+                status = "Rejected"
+            });
+
+            return Ok(new { message = "Order rejected" });
+        }
+
+        // ================= UPDATE STATUS =================
+        [HttpPut("{id}")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> UpdateStatus(int id, UpdateOrderStatusDto dto)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null)
+                return NotFound();
+
+            order.OrderStatus = dto.OrderStatus;
+            await _context.SaveChangesAsync();
+
+            await _hub.Clients.All.SendAsync("OrderUpdated", new
+            {
+                orderId = id,
+                status = dto.OrderStatus.ToString()
+            });
+
+            return Ok(new { message = "Order updated", order });
+        }
+
+        // ================= USER ORDERS =================
         [HttpGet("user/{userId}")]
-        [SwaggerOperation(Summary = "Get A Specific User Orders")]
         public async Task<IActionResult> GetUserOrders(int userId)
         {
             var orders = await _context.Orders
@@ -217,16 +260,11 @@ namespace CarMaintenance.Controllers
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
 
-            return Ok(new
-            {
-                success = true,
-                data = orders
-            });
+            return Ok(new { success = true, data = orders });
         }
 
-        // ================= GET ORDER DETAILS =================
+        // ================= GET BY ID =================
         [HttpGet("{id}")]
-        [SwaggerOperation(Summary = "Get Order By Id")]
         public async Task<IActionResult> GetOrderById(int id)
         {
             var order = await _context.Orders
@@ -235,63 +273,9 @@ namespace CarMaintenance.Controllers
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
-            {
-                return NotFound(new
-                {
-                    success = false,
-                    message = "Order not found"
-                });
-            }
+                return NotFound(new { success = false, message = "Order not found" });
 
-            var result = new
-            {
-                id = order.Id,
-
-                customer = new
-                {
-                    name = order.User.Name,
-                    phone = order.PhoneNumber,
-                },
-
-                service = new
-                {
-                    name = order.Service.Name
-                },
-
-                address = order.Address,
-
-                status = order.OrderStatus.ToString(),
-
-                price = order.Price,
-
-                paymentStatus = order.IsPaid ? "مدفوع" : "لم يدفع",
-
-                technician = order.TechnicianName ?? "غير معين",
-
-                createdAt = order.CreatedAt.ToString("yyyy/MM/dd hh:mm tt"),
-
-                imageUrl = order.ImageUrl,
-
-                notes = order.Notes
-            };
-
-            return Ok(new
-            {
-                success = true,
-                data = result
-            });
-        }
-
-        // ================= NOTIFICATIONS =================
-        [HttpGet("/api/notifications")]
-        [SwaggerOperation(Summary = "Get Orders Notifications")]
-        public async Task<IActionResult> GetNotifications()
-        {
-            var data = await _context.Notifications
-                .OrderByDescending(x => x.CreatedAt)
-                .ToListAsync();
-
-            return Ok(data);
+            return Ok(new { success = true, data = order });
         }
     }
 }
