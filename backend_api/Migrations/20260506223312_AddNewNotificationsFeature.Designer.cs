@@ -3,6 +3,7 @@ using System;
 using CarMaintenance.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CarMaintenance.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506223312_AddNewNotificationsFeature")]
+    partial class AddNewNotificationsFeature
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -217,10 +220,6 @@ namespace CarMaintenance.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -236,44 +235,20 @@ namespace CarMaintenance.Migrations
                         new
                         {
                             Id = 1,
-                            Description = "تغيير زيت المحرك مع الفلتر",
-                            Name = "غيار زيت",
+                            Name = "Oil Change",
                             Price = 300m
                         },
                         new
                         {
                             Id = 2,
-                            Description = "فحص وتغيير بطارية السيارة",
-                            Name = "بطارية",
+                            Name = "Battery Change",
                             Price = 500m
                         },
                         new
                         {
                             Id = 3,
-                            Description = "إصلاح أو تبديل إطارات السيارة",
-                            Name = "تغير إطار",
+                            Name = "Tire Service",
                             Price = 250m
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "غسيل وتنظيف السيارة بالكامل",
-                            Name = "غسيل",
-                            Price = 150m
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Description = "إصلاح أعطال مفاجئة في الموقع",
-                            Name = "صيانة طارئة",
-                            Price = 450m
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Description = "خدمة سحب وإنقاذ السيارات",
-                            Name = "ونش",
-                            Price = 600m
                         });
                 });
 
