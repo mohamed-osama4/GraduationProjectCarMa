@@ -2,6 +2,104 @@
   CarMa Landing Page Styles
    =========================== */
 
+/* ---------- Thmanyah Font Family ---------- */
+
+/* Thmanyah Sans */
+@font-face {
+  font-family: 'ThmanyahSans';
+  src: url('/fonts/thmanyah/thmanyahsans-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ThmanyahSans';
+  src: url('/fonts/thmanyah/thmanyahsans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ThmanyahSans';
+  src: url('/fonts/thmanyah/thmanyahsans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ThmanyahSans';
+  src: url('/fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ThmanyahSans';
+  src: url('/fonts/thmanyah/thmanyahsans-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Thmanyah Serif Display (for headings) */
+@font-face {
+  font-family: 'ThmanyahSerifDisplay';
+  src: url('/fonts/thmanyah/thmanyahserifdisplay-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ThmanyahSerifDisplay';
+  src: url('/fonts/thmanyah/thmanyahserifdisplay-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ThmanyahSerifDisplay';
+  src: url('/fonts/thmanyah/thmanyahserifdisplay-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ThmanyahSerifDisplay';
+  src: url('/fonts/thmanyah/thmanyahserifdisplay-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ThmanyahSerifDisplay';
+  src: url('/fonts/thmanyah/thmanyahserifdisplay-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- Font Utility ---------- */
+.font-thmanyah {
+  font-family: 'ThmanyahSans', 'Alyamama', sans-serif !important;
+}
+
+.font-thmanyah h1,
+.font-thmanyah h2,
+.font-thmanyah h3,
+.font-thmanyah h4,
+.font-thmanyah .section-title,
+.font-thmanyah .pricing-price {
+  font-family: 'ThmanyahSerifDisplay', 'ThmanyahSans', serif !important;
+}
+
 /* ---------- Hero Section ---------- */
 .hero-section {
   position: relative;

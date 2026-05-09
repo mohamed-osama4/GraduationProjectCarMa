@@ -7,7 +7,7 @@ content: [
 theme: {
     extend: {
     fontFamily: {
-        sans: ['Tajawal', 'sans-serif'],
+        sans: ['Alyamama', 'sans-serif'],
     },
     colors: {
         primary: {

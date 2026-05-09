@@ -26,7 +26,7 @@ export default function LandingPageV2() {
   }, []);
 
   return (
-    <div className="font-alyamama bg-[#020817] text-white min-h-screen" dir="rtl">
+    <div className="font-thmanyah bg-[#020817] text-white min-h-screen" dir="rtl">
       <main>
         <HeroV2 />
         <ServicesV2 />

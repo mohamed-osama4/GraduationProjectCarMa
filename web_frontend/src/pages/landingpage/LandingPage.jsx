@@ -27,7 +27,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="font-sans" dir="rtl">
+    <div className="font-thmanyah" dir="rtl">
       <Navbar />
       <main>
         <Hero />
