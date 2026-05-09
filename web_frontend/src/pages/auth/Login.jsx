@@ -13,15 +13,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { saveAuth, isAuthenticated } = useAuth();
+  const { saveAuth } = useAuth();
   const navigate = useNavigate();
-
-  // Redirect if already authenticated - Commented out as per user request to access login page directly
-  // React.useEffect(() => {
-  //   if (isAuthenticated) {
-  //     navigate('/admin', { replace: true });
-  //   }
-  // }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,8 +23,6 @@ export default function Login() {
 
     try {
       const { data } = await login({ email, password });
-
-      // Save token & user data from the API response
       const token = data.token || data.data?.token;
       const user = data.user || data.data?.user || data.data;
 
@@ -39,7 +30,6 @@ export default function Login() {
         saveAuth(token, user);
         navigate('/admin');
       } else {
-        // If the API returned success but no token, show the message
         setError(data.message || 'حدث خطأ أثناء تسجيل الدخول');
       }
     } catch (err) {
@@ -54,98 +44,108 @@ export default function Login() {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center font-sans select-none w-full" dir="rtl">
+    <div className="relative flex flex-col items-center justify-center font-tajawal select-none w-full" dir="rtl">
 
       {/* Branding */}
       <div className="text-center mb-8">
-        <h1 className="text-7xl font-black text-premium-gold italic tracking-tighter drop-shadow-lg flip-animation">CarMa</h1>
-        <p className="text-sm text-premium-gold/70 font-bold tracking-[0.25em] mt-2 uppercase">نحافظ على سيارتك بأفضل حال</p>
+        <h1 className="text-7xl font-black text-white italic tracking-tighter drop-shadow-lg">
+          Car<span className="text-[#D9B07C]">Ma</span>
+        </h1>
+        <p className="text-[10px] text-[#D9B07C] font-black tracking-[0.4em] mt-3 uppercase opacity-80">
+          PREMIUM AUTO CARE
+        </p>
       </div>
 
       {/* Feature Badges */}
-      <div className="flex gap-10 mb-12">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-16 h-16 rounded-full border-2 border-premium-gold/30 flex items-center justify-center bg-premium-gold/5 shadow-lg shadow-premium-gold/5">
-            <HiOutlineCog6Tooth className="text-premium-gold" size={32} />
+      <div className="flex gap-8 mb-12">
+        {[
+          { icon: <HiOutlineCog6Tooth />, label: "فنيين\nخبراء" },
+          { icon: <HiOutlineShieldCheck />, label: "جودة\nعالية" },
+          { icon: <HiOutlineBolt />, label: "سريع\nوموثوق" }
+        ].map((feature, i) => (
+          <div key={i} className="flex flex-col items-center gap-3">
+            <div className="w-14 h-14 rounded-full border border-[#D9B07C]/30 flex items-center justify-center bg-[#D9B07C]/5 transition-all hover:border-[#D9B07C]/60">
+              {React.cloneElement(feature.icon, { className: "text-[#D9B07C]", size: 26 })}
+            </div>
+            <span className="text-[10px] text-gray-400 font-bold text-center leading-tight whitespace-pre-line">
+              {feature.label}
+            </span>
           </div>
-          <span className="text-[11px] text-premium-gold font-bold text-center leading-tight">فنيين<br/>خبراء</span>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-16 h-16 rounded-full border-2 border-premium-gold/30 flex items-center justify-center bg-premium-gold/5 shadow-lg shadow-premium-gold/5">
-            <HiOutlineShieldCheck className="text-premium-gold" size={32} />
-          </div>
-          <span className="text-[11px] text-premium-gold font-bold text-center leading-tight">جودة<br/>عالية</span>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-16 h-16 rounded-full border-2 border-premium-gold/30 flex items-center justify-center bg-premium-gold/5 shadow-lg shadow-premium-gold/5">
-            <HiOutlineBolt className="text-premium-gold" size={32} />
-          </div>
-          <span className="text-[11px] text-premium-gold font-bold text-center leading-tight">سريع<br/>وموثوق</span>
-        </div>
+        ))}
       </div>
 
       {/* Glass Form Card */}
-      <div className="w-full rounded-3xl overflow-hidden px-8 py-10 border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_0_60px_0_rgba(0,0,0,0.3)]">
-        <h2 className="text-2xl font-black text-premium-gold text-center mb-2">مرحباً بعودتك</h2>
-        <p className="text-premium-gold/60 text-sm text-center mb-8 font-medium">سجل دخولك للوصول إلى حسابك</p>
-
-      {error && (
-        <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center font-medium">
-          {error}
-        </div>
-      )}
-
-      <form className="space-y-6" onSubmit={handleSubmit}>
-        <Input
-          label="البريد الإلكتروني"
-          labelClassName="text-premium-gold/80"
-          icon={<HiOutlineEnvelope className="text-premium-gold/60" size={20} />}
-          placeholder="example@mail.com"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <div className="relative">
-          <Input
-            label="كلمة المرور"
-            labelClassName="text-premium-gold/80"
-            type={showPassword ? "text" : "password"}
-            icon={<HiOutlineLockClosed className="text-premium-gold/60" size={20} />}
-            placeholder="********"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {password.length > 0 && (
-            <button 
-              type="button" 
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute left-4 top-[45px] text-premium-gold/60 hover:text-premium-gold transition-colors"
-            >
-              {showPassword ? <HiOutlineEye size={18} /> : <HiOutlineEyeSlash size={18} />}
-            </button>
-          )}
+      <div className="w-full rounded-2xl overflow-hidden px-8 py-10 border border-white/5 bg-[#121212]/80 backdrop-blur-xl shadow-2xl">
+        <div className="mb-10 text-center">
+          <h2 className="text-2xl font-black text-white mb-2">مرحباً بعودتك</h2>
+          <div className="w-8 h-[2px] bg-[#D9B07C] mx-auto"></div>
         </div>
 
-        <div className="flex justify-between items-center px-1 text-xs">
-          <label className="flex items-center gap-2 text-premium-gold/60 cursor-pointer font-medium">
-            <input type="checkbox" className="w-4 h-4 rounded border-premium-gold/20 text-premium-gold bg-transparent" />
-            تذكرني
-          </label>
-          {/* <a href="#" className="text-premium-gold font-bold hover:underline transition-all">نسيت كلمة المرور؟</a> */}
-        </div>
+        {error && (
+          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-right font-bold">
+            {error}
+          </div>
+        )}
 
-        <Button
-          type="submit"
-          disabled={loading}
-          variant="custom"
-          className="w-full bg-premium-gold text-black hover:bg-gold-light h-14 rounded-2xl shadow-xl shadow-premium-gold/20 text-lg font-bold mt-2 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
-        >
-          {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
-        </Button> 
-      </form>
-    </div>
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <label className="block text-xs font-black text-gray-400 text-right mr-1 uppercase tracking-widest">
+              البريد الإلكتروني
+            </label>
+            <div className="relative">
+              <input
+                type="email"
+                placeholder="admin@carma.eg"
+                className="w-full bg-white/5 border border-white/10 h-14 px-12 rounded-xl text-white text-sm focus:border-[#D9B07C]/50 focus:bg-white/[0.08] outline-none transition-all text-right"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <HiOutlineEnvelope className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-xs font-black text-gray-400 text-right mr-1 uppercase tracking-widest">
+              كلمة المرور
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                className="w-full bg-white/5 border border-white/10 h-14 px-12 rounded-xl text-white text-sm focus:border-[#D9B07C]/50 focus:bg-white/[0.08] outline-none transition-all text-right"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <HiOutlineLockClosed className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
+              <button 
+                type="button" 
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#D9B07C] transition-colors"
+              >
+                {showPassword ? <HiOutlineEye size={18} /> : <HiOutlineEyeSlash size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center px-1 text-[11px] font-bold text-gray-500">
+            <label className="flex items-center gap-2 cursor-pointer hover:text-gray-300 transition-colors">
+              <input type="checkbox" className="w-4 h-4 rounded border-white/10 bg-white/5 text-[#D9B07C] focus:ring-0" />
+              تذكرني
+            </label>
+            <a href="#" className="hover:text-[#D9B07C] transition-colors">نسيت كلمة المرور؟</a>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#D9B07C] text-black h-14 rounded-xl text-base font-black transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 mt-4 shadow-lg shadow-[#D9B07C]/10"
+          >
+            {loading ? 'جاري التحقق...' : 'تسجيل الدخول'}
+          </button> 
+        </form>
+      </div>
     </div>
   );
-
-};
+}

@@ -7,12 +7,14 @@ import AuthLayout from "./layouts/AuthLayout.jsx";
 import DashboardLayout from "./layouts/DashboardLayout.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import Login from "./pages/auth/Login.jsx";
+import LoginV2 from "./pages/auth/LoginV2.jsx";
 import AdminHome from "./pages/dashboard/admin/AdminHome.jsx";
 import AdminOrders from "./pages/dashboard/admin/AdminOrders.jsx";
 import Technicians from "./pages/dashboard/admin/Technicians.jsx";
 import Reports from "./pages/dashboard/admin/Reports.jsx";
 import Notifications from "./pages/dashboard/admin/Notifications.jsx";
 import LandingPage from "./pages/landingpage/LandingPage.jsx";
+import LandingPageV2 from "./pages/landingpage/LandingPageV2.jsx";
 
 
 import { AdminDataProvider } from "./context/AdminDataContext.jsx";
@@ -30,11 +32,13 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<LandingPageV2 />} />
+          <Route path="/landing-v1" element={<LandingPage />} />
 
           {/* Auth */}
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<Login />} />
+            <Route path="/login-v2" element={<LoginV2 />} />
           </Route>
 
           {/* Dashboard (protected) */}
