@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Bell, 
   AlertCircle, 
@@ -13,11 +13,13 @@ import {
   Tag,
   Wrench,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Zap
 } from 'lucide-react';
 import DashboardHeader from '../../../component/dashboard/DashboardHeader';
 import StatCard from '../../../component/dashboard/StatCard';
 import { getNewNotifications, getUnreadNotificationsCount, markNotificationAsRead, markAllNotificationsAsRead } from '../../../services/adminService';
+import { useSignalREvent } from '../../../context/SignalRContext';
 
 // Updated mappings to match NewNotificationType enum from backend
 const TYPE_MAP = {
@@ -63,6 +65,9 @@ const Notifications = () => {
   
   // To handle marking as read loading state
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Real-time flash animation state
+  const [flashingIds, setFlashingIds] = useState(new Set());
 
   useEffect(() => {
     const date = new Date();
@@ -131,6 +136,83 @@ const Notifications = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, typeFilter, statusFilter]); // Re-fetch when these change
 
+  // ─── SignalR Real-time Event Handlers ───────────────────────────────────────
+
+  // Handle "notification.created" - new notification arrived
+  const handleNotificationCreated = useCallback((newNotif) => {
+    console.log('[SignalR] notification.created:', newNotif);
+
+    // Update global counts
+    setTotalCount(prev => prev + 1);
+    setUnreadCount(prev => prev + 1);
+
+    // If user is on page 1, and the notification matches the active filter, prepend it
+    if (page === 1) {
+      const matchesTypeFilter = typeFilter === 'all' || 
+        (TYPE_MAP[typeFilter] !== undefined && 
+          newNotif.type?.toString().toLowerCase() === typeFilter.toLowerCase());
+      
+      const matchesStatusFilter = statusFilter === 'all' || statusFilter === 'unread';
+
+      if (matchesTypeFilter && matchesStatusFilter) {
+        setNotifications(prev => {
+          // Avoid duplicates
+          if (prev.some(n => n.id === newNotif.id)) return prev;
+          // Prepend and trim to pageSize
+          const updated = [newNotif, ...prev];
+          return updated.slice(0, pageSize);
+        });
+
+        // Add flash animation
+        setFlashingIds(prev => new Set(prev).add(newNotif.id));
+        setTimeout(() => {
+          setFlashingIds(prev => {
+            const next = new Set(prev);
+            next.delete(newNotif.id);
+            return next;
+          });
+        }, 2000);
+      }
+    }
+  }, [page, typeFilter, statusFilter, pageSize]);
+
+  // Handle "notification.read" - single notification marked as read
+  const handleNotificationRead = useCallback((data) => {
+    console.log('[SignalR] notification.read:', data);
+    const notifId = data?.id;
+    if (!notifId) return;
+
+    setNotifications(prev =>
+      prev.map(n => n.id === notifId ? { ...n, isRead: true, readAt: new Date().toISOString() } : n)
+    );
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  }, []);
+
+  // Handle "notifications.read_all" - all notifications marked as read
+  const handleAllRead = useCallback(() => {
+    console.log('[SignalR] notifications.read_all');
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true, readAt: new Date().toISOString() })));
+    setUnreadCount(0);
+  }, []);
+
+  // Handle "notification.deleted" - notification was deleted
+  const handleNotificationDeleted = useCallback((data) => {
+    console.log('[SignalR] notification.deleted:', data);
+    const notifId = data?.id;
+    if (!notifId) return;
+
+    setNotifications(prev => prev.filter(n => n.id !== notifId));
+    setTotalCount(prev => Math.max(0, prev - 1));
+  }, []);
+
+  // Subscribe to SignalR events
+  useSignalREvent('notification.created', handleNotificationCreated, [page, typeFilter, statusFilter]);
+  useSignalREvent('notification.read', handleNotificationRead, []);
+  useSignalREvent('notifications.read_all', handleAllRead, []);
+  useSignalREvent('notification.deleted', handleNotificationDeleted, []);
+
+  // ─── End SignalR Handlers ──────────────────────────────────────────────────
+
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       setSelectedItems(filteredNotifications.map(n => n.id));
@@ -149,23 +231,33 @@ const Notifications = () => {
 
   const handleMarkAsRead = async () => {
     setActionLoading(true);
+    
+    // Optimistic update: update UI immediately
+    if (selectedItems.length > 0) {
+      setNotifications(prev => prev.map(n => 
+        selectedItems.includes(n.id) ? { ...n, isRead: true } : n
+      ));
+      setUnreadCount(prev => Math.max(0, prev - selectedItems.length));
+    } else {
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    }
+
     try {
       if (selectedItems.length > 0) {
-        // Mark only selected
         await Promise.all(selectedItems.map(id => markNotificationAsRead(id)));
       } else {
-        // Mark all as read using the bulk endpoint
         await markAllNotificationsAsRead();
       }
-      
-      // Clear selection and refresh data
-      setSelectedItems([]);
-      fetchData();
     } catch (error) {
-      console.error("Error marking notifications as read:", error);
-      alert("حدث خطأ أثناء تحديث الإشعارات.");
+      // PATCH requests may fail due to backend CORS preflight issues
+      // The optimistic update already applied, so we just log the error
+      console.warn("Mark as read API call failed (possible CORS issue):", error.message);
     } finally {
+      setSelectedItems([]);
       setActionLoading(false);
+      // Refresh data from server to sync state
+      fetchData();
     }
   };
 
@@ -266,6 +358,8 @@ const Notifications = () => {
       return dateString;
     }
   };
+
+
 
   return (
     <div className="font-tajawal space-y-6 max-w-7xl mx-auto pb-10">
@@ -375,11 +469,12 @@ const Notifications = () => {
             filteredNotifications.map((notif) => {
               const styles = getTypeStyles(notif.type, notif.severity);
               const isSelected = selectedItems.includes(notif.id);
+              const isFlashing = flashingIds.has(notif.id);
               
               return (
                 <div 
                   key={notif.id} 
-                  className={`flex flex-col md:flex-row gap-4 p-4 rounded-2xl transition-all border border-transparent hover:border-gray-100 hover:bg-gray-50 ${!notif.isRead ? 'bg-slate-50/50' : ''}`}
+                  className={`flex flex-col md:flex-row gap-4 p-4 rounded-2xl transition-all border border-transparent hover:border-gray-100 hover:bg-gray-50 ${!notif.isRead ? 'bg-slate-50/50' : ''} ${isFlashing ? 'animate-notification-flash ring-2 ring-primary/30 bg-primary/5' : ''}`}
                 >
                   {/* Right side: Checkbox, Icon, Content */}
                   <div className="flex items-start gap-4 flex-1">
@@ -402,6 +497,12 @@ const Notifications = () => {
                         </span>
                         {!notif.isRead && (
                           <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                        )}
+                        {isFlashing && (
+                          <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black bg-primary/10 text-primary">
+                            <Zap size={10} />
+                            جديد
+                          </span>
                         )}
                       </div>
                       <h4 className="text-base font-black text-slate-800">{notif.title}</h4>

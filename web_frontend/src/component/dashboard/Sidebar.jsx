@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { 
   Home, 
@@ -12,15 +12,33 @@ import {
   X
 } from 'lucide-react';
 import { useAuth } from "../../context/AuthContext";
+import { useSignalREvent } from "../../context/SignalRContext";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+
+  // Real-time notification badge count
+  const [liveNotifCount, setLiveNotifCount] = useState(0);
+
+  // Listen for new notifications to increment badge
+  const handleNewNotification = useCallback(() => {
+    setLiveNotifCount(prev => prev + 1);
+  }, []);
+
+  // Reset badge when notifications are read
+  const handleAllRead = useCallback(() => {
+    setLiveNotifCount(0);
+  }, []);
+
+  useSignalREvent('notification.created', handleNewNotification, []);
+  useSignalREvent('notifications.read_all', handleAllRead, []);
+
   const menuItems = [
     { name: 'الرئيسية', icon: Home, path: '/admin', end: true, color: 'text-blue-400' },
     { name: 'الطلبات', icon: FileText, path: '/admin/orders', color: 'text-emerald-400' },
-    { name: 'الورش', icon: Users, path: '/admin/technicians', color: 'text-orange-400' },
-    { name: 'الإشعارات', icon: Bell, path: '/admin/notifications', color: 'text-rose-400' },
+    { name: 'الفنيون', icon: Users, path: '/admin/technicians', color: 'text-orange-400' },
+    { name: 'الإشعارات', icon: Bell, path: '/admin/notifications', color: 'text-rose-400', badge: liveNotifCount > 0 ? liveNotifCount : undefined },
     { name: 'التقارير', icon: BarChart2, path: '/admin/reports', color: 'text-purple-400' },
     { name: 'الملف الشخصي', icon: User, path: '/admin/profile', color: 'text-cyan-400' },
     { name: 'الإعدادات', icon: Settings, path: '/admin/settings', color: 'text-slate-400' },
@@ -29,6 +47,14 @@ const Sidebar = ({ isOpen, onClose }) => {
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  // Reset badge when clicking on notifications link
+  const handleNavClick = (item) => {
+    if (item.path === '/admin/notifications') {
+      setLiveNotifCount(0);
+    }
+    if (window.innerWidth < 768) onClose();
   };
 
   return (
@@ -55,7 +81,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             key={item.name}
             to={item.path}
             end={item.end}
-            onClick={() => window.innerWidth < 768 && onClose()}
+            onClick={() => handleNavClick(item)}
             className={({ isActive }) => `
               flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-300
               ${isActive 
@@ -74,8 +100,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                   <span className={`text-lg transition-all duration-300 ${isActive ? 'font-bold' : 'font-medium opacity-90'}`}>{item.name}</span>
                 </div>
                 {item.badge && (
-                  <span className="bg-[#ef4444] text-white text-[11px] font-black h-6 w-6 flex items-center justify-center rounded-full shadow-lg ring-2 ring-white/10">
-                    {item.badge}
+                  <span className="bg-[#ef4444] text-white text-[11px] font-black h-6 min-w-[24px] px-1 flex items-center justify-center rounded-full shadow-lg ring-2 ring-white/10 animate-bounce-gentle">
+                    {item.badge > 99 ? '99+' : item.badge}
                   </span>
                 )}
               </>

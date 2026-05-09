@@ -798,3 +798,65 @@
   transform: scale(1.08);
   box-shadow: 0 6px 24px rgba(30,64,175,0.45);
 }
+
+/* ===== Real-time Notification Animations ===== */
+
+/* Flash animation for new real-time notifications */
+@keyframes notification-flash {
+  0% {
+    background-color: rgba(59, 130, 246, 0.15);
+    transform: scale(1.01);
+  }
+  50% {
+    background-color: rgba(59, 130, 246, 0.08);
+    transform: scale(1);
+  }
+  100% {
+    background-color: transparent;
+    transform: scale(1);
+  }
+}
+
+.animate-notification-flash {
+  animation: notification-flash 2s ease-out;
+}
+
+/* Slide in from left for toast */
+@keyframes slide-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Gentle bounce for sidebar badge */
+@keyframes bounce-gentle {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 1s ease-in-out 3;
+}

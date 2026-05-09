@@ -1,7 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, ChevronDown, Menu, User, FileText, Loader2, X, AlertCircle, Clock } from 'lucide-react';
-import { globalSearch, getAdminNotifications, getAccountInfo } from '../../services/adminService';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Bell, ChevronDown, Menu, User, FileText, Loader2, X, AlertCircle, Clock, Zap, Check, Wallet, Tag, Users, CheckCircle } from 'lucide-react';
+import { globalSearch, getNewNotifications, getAccountInfo, markAllNotificationsAsRead } from '../../services/adminService';
 import { useNavigate } from 'react-router-dom';
+import { useSignalREvent } from '../../context/SignalRContext';
+
+// Notification type icon/color mapping (matches Notifications.jsx)
+const getNotifTypeStyle = (typeVal) => {
+  const t = (typeVal || '').toString().toLowerCase();
+  if (t === '1' || t.includes('servicecompleted')) return { bg: 'bg-emerald-100 text-emerald-600', icon: CheckCircle };
+  if (t === '2' || t.includes('technicianonway')) return { bg: 'bg-blue-100 text-blue-600', icon: Users };
+  if (t === '3' || t.includes('requestaccepted')) return { bg: 'bg-indigo-100 text-indigo-600', icon: Check };
+  if (t === '4' || t.includes('walletcredit')) return { bg: 'bg-teal-100 text-teal-600', icon: Wallet };
+  if (t === '5' || t.includes('appointment')) return { bg: 'bg-orange-100 text-orange-600', icon: Clock };
+  if (t === '6' || t.includes('specialoffer')) return { bg: 'bg-fuchsia-100 text-fuchsia-600', icon: Tag };
+  if (t === '7' || t.includes('system')) return { bg: 'bg-slate-100 text-slate-600', icon: AlertCircle };
+  return { bg: 'bg-gray-100 text-slate-500', icon: Bell };
+};
 
 const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
   const [query, setQuery] = useState('');
@@ -12,6 +26,9 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
   const [showResults, setShowResults] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  
+  // Toast state for new real-time notifications
+  const [toast, setToast] = useState(null);
   
   const searchRef = useRef(null);
   const notificationRef = useRef(null);
@@ -31,34 +48,94 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Fetch Notifications & Profile
+  // Fetch latest 5 notifications for popup + profile
+  const fetchHeaderNotifications = useCallback(async () => {
+    try {
+      const res = await getNewNotifications({ page: 1, pageSize: 5 });
+      if (res.data) {
+        setNotifications(res.data.items || []);
+        setUnreadCount(res.data.unreadCount ?? res.data.totalUnreadCounts ?? 0);
+      }
+    } catch (err) {
+      console.error("Error fetching header notifications:", err);
+    }
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [notifRes, profileRes] = await Promise.all([
-          getAdminNotifications(),
+        const [, profileRes] = await Promise.all([
+          fetchHeaderNotifications(),
           getAccountInfo()
         ]);
-        setNotifications(notifRes.data || []);
-        setUnreadCount(notifRes.data?.filter(n => !n.isRead).length || 0);
         setProfile(profileRes.data);
       } catch (err) {
         console.error("Error fetching header data:", err);
       }
     };
     fetchData();
-    // Poll notifications every 60 seconds
-    const interval = setInterval(async () => {
-      try {
-        const response = await getAdminNotifications();
-        setNotifications(response.data || []);
-        setUnreadCount(response.data?.filter(n => !n.isRead).length || 0);
-      } catch (err) {
-        console.error("Notifications poll error:", err);
-      }
-    }, 60000);
+    // Poll notifications every 60 seconds as fallback
+    const interval = setInterval(fetchHeaderNotifications, 60000);
     return () => clearInterval(interval);
+  }, [fetchHeaderNotifications]);
+
+  // ─── SignalR Real-time Updates ────────────────────────────────────────────
+
+  // Show toast notification
+  const showToastNotif = useCallback((notif) => {
+    setToast(notif);
+    setTimeout(() => setToast(null), 5000);
   }, []);
+
+  // Handle new notification created
+  const handleNotifCreated = useCallback((newNotif) => {
+    console.log('[DashboardHeader] notification.created:', newNotif);
+    setUnreadCount(prev => prev + 1);
+    // Prepend to popup list, keep max 5
+    setNotifications(prev => {
+      if (prev.some(n => n.id === newNotif.id)) return prev;
+      return [newNotif, ...prev].slice(0, 5);
+    });
+    showToastNotif(newNotif);
+  }, [showToastNotif]);
+
+  // Handle single notification read
+  const handleNotifRead = useCallback((data) => {
+    const notifId = data?.id;
+    if (!notifId) return;
+    setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, isRead: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  }, []);
+
+  // Handle all notifications read
+  const handleAllRead = useCallback(() => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    setUnreadCount(0);
+  }, []);
+
+  // Handle order events (refresh data)
+  const handleOrderEvent = useCallback(() => {
+    fetchHeaderNotifications();
+  }, [fetchHeaderNotifications]);
+
+  useSignalREvent('notification.created', handleNotifCreated, []);
+  useSignalREvent('notification.read', handleNotifRead, []);
+  useSignalREvent('notifications.read_all', handleAllRead, []);
+  useSignalREvent('OrderCreated', handleOrderEvent, []);
+  useSignalREvent('OrderUpdated', handleOrderEvent, []);
+
+  // ─── End SignalR ──────────────────────────────────────────────────────────
+
+  // Mark all as read from popup
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllNotificationsAsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error("Error marking all as read:", err);
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -94,8 +171,20 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
 
   const formatNotificationTime = (dateString) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMins / 60);
+
+      if (diffMins < 1) return 'الآن';
+      if (diffMins < 60) return `منذ ${diffMins} د`;
+      if (diffHours < 24) return `منذ ${diffHours} س`;
+      return date.toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' });
+    } catch {
+      return '';
+    }
   };
 
   const getInitials = (name) => {
@@ -105,6 +194,27 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
 
   return (
     <div className="flex flex-col font-tajawal relative z-50">
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed top-4 left-4 z-[100] animate-slide-in-left">
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 max-w-sm flex gap-3 items-start">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <Zap size={20} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-black text-slate-800 truncate">{toast.title}</p>
+              <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{toast.message}</p>
+            </div>
+            <button 
+              onClick={() => setToast(null)} 
+              className="text-slate-400 hover:text-slate-600 transition-colors shrink-0"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Top Bar */}
       <div className="flex items-center justify-between h-16">
         {/* Right Section: Mobile Toggle + Title */}
@@ -216,8 +326,8 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
             >
               <Bell size={22} />
               {unreadCount > 0 && (
-                <span className="absolute top-2 right-2 h-4 w-4 bg-red-500 rounded-full border-2 border-white text-[9px] font-black text-white flex items-center justify-center animate-pulse">
-                  {unreadCount}
+                <span className="absolute top-0 right-0 h-5 w-5 bg-red-500 rounded-full border-2 border-white text-[9px] font-black text-white flex items-center justify-center animate-pulse">
+                  {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
             </div>
@@ -225,35 +335,42 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
             {showNotifications && (
               <div className="absolute top-full left-0 mt-3 w-[380px] bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-right">
                 <div className="p-6 border-b border-gray-50 flex justify-between items-center">
-                  <button className="text-xs font-bold text-primary hover:underline">تحديد الكل كمقروء</button>
+                  <button 
+                    onClick={handleMarkAllRead}
+                    disabled={unreadCount === 0}
+                    className={`text-xs font-bold transition-colors ${unreadCount > 0 ? 'text-primary hover:underline' : 'text-slate-300 cursor-not-allowed'}`}
+                  >
+                    تحديد الكل كمقروء
+                  </button>
                   <h3 className="text-lg font-black text-slate-800">التنبيهات</h3>
                 </div>
 
-                <div className="max-h-[450px] overflow-y-auto">
+                <div className="max-h-[400px] overflow-y-auto">
                   {notifications.length > 0 ? (
-                    notifications.map((notif) => (
-                      <div 
-                        key={notif.id}
-                        className={`p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer flex gap-4 ${!notif.isRead ? 'bg-blue-50/30' : ''}`}
-                      >
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-1">
-                            <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
-                              {formatNotificationTime(notif.createdAt)}
-                              <Clock size={10} />
-                            </span>
-                            <h4 className="text-sm font-black text-slate-800">{notif.title}</h4>
+                    notifications.map((notif) => {
+                      const typeStyle = getNotifTypeStyle(notif.type);
+                      const TypeIcon = typeStyle.icon;
+                      return (
+                        <div 
+                          key={notif.id}
+                          className={`p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer flex gap-3 ${!notif.isRead ? 'bg-blue-50/30' : ''}`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-center mb-1 gap-2">
+                              <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1 shrink-0">
+                                {formatNotificationTime(notif.createdAt)}
+                                <Clock size={10} />
+                              </span>
+                              <h4 className="text-sm font-black text-slate-800 truncate">{notif.title}</h4>
+                            </div>
+                            <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{notif.message}</p>
                           </div>
-                          <p className="text-xs text-slate-500 leading-relaxed">{notif.message}</p>
+                          <div className={`h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 ${typeStyle.bg}`}>
+                            <TypeIcon size={18} />
+                          </div>
                         </div>
-                        <div className={`h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 ${
-                          notif.type === 'order' ? 'bg-blue-100 text-blue-600' : 
-                          notif.type === 'alert' ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-slate-500'
-                        }`}>
-                          {notif.type === 'order' ? <FileText size={18} /> : <AlertCircle size={18} />}
-                        </div>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="py-12 text-center">
                       <Bell size={48} className="mx-auto text-slate-100 mb-4" />
@@ -262,8 +379,16 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
                   )}
                 </div>
 
-                <div className="p-4 bg-gray-50 text-center">
-                  <button className="text-xs font-black text-slate-500 hover:text-primary transition-colors">عرض جميع التنبيهات</button>
+                <div className="p-4 bg-gray-50 text-center border-t border-gray-100">
+                  <button 
+                    onClick={() => {
+                      setShowNotifications(false);
+                      navigate('/admin/notifications');
+                    }}
+                    className="text-xs font-black text-primary hover:underline transition-colors"
+                  >
+                    عرض جميع الإشعارات
+                  </button>
                 </div>
               </div>
             )}
