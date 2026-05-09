@@ -31,7 +31,7 @@ namespace CarMaintenance.Controllers
             _newNotificationService = newNotificationService;
         }
 
-        // ================= GET ORDERS WITH STATS, SEARCH & ICONS =================
+        // ================= GET ALL ORDERS =================
         [HttpGet]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAll(
@@ -96,7 +96,9 @@ namespace CarMaintenance.Controllers
                         name = o.User.Name,
                         rating = 4.8
                     },
+
                     location = o.Address,
+
                     dateTime = o.CreatedAt.ToString("yyyy/MM/dd | hh:mm tt"),
                     status = new
                     {
@@ -104,9 +106,9 @@ namespace CarMaintenance.Controllers
                                 o.OrderStatus == OrderStatus.Accepted ? "تمت الموافقة" :
                                 o.OrderStatus == OrderStatus.InProgress ? "جاري التنفيذ" :
                                 o.OrderStatus == OrderStatus.Rejected ? "مرفوض" : "مكتمل",
-
                         value = o.OrderStatus.ToString()
                     },
+
                     technician = o.TechnicianName ?? "غير معين",
                     paymentStatus = o.IsPaid ? "مدفوع" : "لم يدفع",
                     price = o.Price.ToString("N0") + " جنيه"
@@ -118,7 +120,6 @@ namespace CarMaintenance.Controllers
 
         // ================= CREATE ORDER =================
         [HttpPost]
-        [SwaggerOperation(Summary = "Create Order")]
         public async Task<IActionResult> Create(CreateOrderDto dto)
         {
             var service = await _context.Services.FindAsync(dto.ServiceId);
@@ -134,7 +135,10 @@ namespace CarMaintenance.Controllers
                 Price = service.Price,
                 OrderStatus = OrderStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
-                IsPaid = false
+                IsPaid = false,
+
+                ImageUrl = dto.ImageUrl,
+                Notes = dto.Notes
             };
 
             _context.Orders.Add(order);
@@ -158,22 +162,16 @@ namespace CarMaintenance.Controllers
                 status = order.OrderStatus.ToString()
             });
 
-            return Ok(new
-            {
-                message = "Order created",
-                order
-            });
+            return Ok(new { message = "Order created", order });
         }
 
         // ================= ACCEPT ORDER =================
         [HttpPost("{id}/accept")]
-        [SwaggerOperation(Summary = "Accept Order")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> AcceptOrder(int id)
         {
             var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-                return NotFound();
+            if (order == null) return NotFound();
 
             order.OrderStatus = OrderStatus.Accepted;
             await _context.SaveChangesAsync();
@@ -184,7 +182,7 @@ namespace CarMaintenance.Controllers
                 Type = NewNotificationType.RequestAccepted,
                 Severity = NewNotificationSeverity.Success,
                 Title = "تم قبول الطلب",
-                Message = $"تم قبول طلبك #{order.Id} وجاري تعيين فني لك.",
+                Message = $"تم قبول طلبك #{order.Id}",
                 TargetType = "Order",
                 TargetId = order.Id,
                 ActionUrl = $"/orders/{order.Id}"
@@ -196,22 +194,16 @@ namespace CarMaintenance.Controllers
                 status = "Accepted"
             });
 
-            return Ok(new
-            {
-                message = "Order accepted",
-                status = "Accepted"
-            });
+            return Ok(new { message = "Order accepted" });
         }
 
         // ================= REJECT ORDER =================
         [HttpPost("{id}/reject")]
-        [SwaggerOperation(Summary = "Reject Order")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> RejectOrder(int id)
         {
             var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-                return NotFound();
+            if (order == null) return NotFound();
 
             order.OrderStatus = OrderStatus.Rejected;
             await _context.SaveChangesAsync();
@@ -222,7 +214,7 @@ namespace CarMaintenance.Controllers
                 Type = NewNotificationType.System,
                 Severity = NewNotificationSeverity.Error,
                 Title = "تم رفض الطلب",
-                Message = $"نأسف، تم رفض طلبك #{order.Id}. يرجى التواصل مع الدعم لمزيد من التفاصيل.",
+                Message = $"تم رفض طلبك #{order.Id}",
                 TargetType = "Order",
                 TargetId = order.Id,
                 ActionUrl = $"/orders/{order.Id}"
@@ -234,63 +226,20 @@ namespace CarMaintenance.Controllers
                 status = "Rejected"
             });
 
-            return Ok(new
-            {
-                message = "Order rejected",
-                status = "Rejected"
-            });
+            return Ok(new { message = "Order rejected" });
         }
 
-        // ================= UPDATE ORDER STATUS =================
+        // ================= UPDATE STATUS =================
         [HttpPut("{id}")]
-        [SwaggerOperation(Summary = "Update Order Status")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateOrderStatusDto dto)
+        public async Task<IActionResult> UpdateStatus(int id, UpdateOrderStatusDto dto)
         {
             var order = await _context.Orders.FindAsync(id);
             if (order == null)
-                return NotFound(new { message = "Order not found" });
+                return NotFound();
 
             order.OrderStatus = dto.OrderStatus;
             await _context.SaveChangesAsync();
-
-            var notificationType = dto.OrderStatus switch
-            {
-                OrderStatus.Accepted => NewNotificationType.RequestAccepted,
-                OrderStatus.InProgress => NewNotificationType.TechnicianOnWay,
-                OrderStatus.Completed => NewNotificationType.ServiceCompleted,
-                OrderStatus.Rejected => NewNotificationType.System,
-                _ => NewNotificationType.System
-            };
-
-            var severity = dto.OrderStatus switch
-            {
-                OrderStatus.Accepted => NewNotificationSeverity.Success,
-                OrderStatus.Completed => NewNotificationSeverity.Success,
-                OrderStatus.Rejected => NewNotificationSeverity.Error,
-                _ => NewNotificationSeverity.Info
-            };
-
-            var title = dto.OrderStatus switch
-            {
-                OrderStatus.Accepted => "تم قبول الطلب",
-                OrderStatus.InProgress => "الفني في الطريق",
-                OrderStatus.Completed => "تم إتمام الخدمة",
-                OrderStatus.Rejected => "تم رفض الطلب",
-                _ => "تحديث حالة الطلب"
-            };
-
-            await _newNotificationService.CreateAsync(new CreateNewNotificationRequestDto
-            {
-                UserId = order.UserId,
-                Type = notificationType,
-                Severity = severity,
-                Title = title,
-                Message = $"تم تحديث حالة طلبك #{order.Id} إلى {dto.OrderStatus}",
-                TargetType = "Order",
-                TargetId = order.Id,
-                ActionUrl = $"/orders/{order.Id}"
-            });
 
             await _hub.Clients.All.SendAsync("OrderUpdated", new
             {
@@ -298,16 +247,11 @@ namespace CarMaintenance.Controllers
                 status = dto.OrderStatus.ToString()
             });
 
-            return Ok(new
-            {
-                message = "Order status updated",
-                order
-            });
+            return Ok(new { message = "Order updated", order });
         }
 
-        // ================= GET A SPECIFIC USER ORDERS =================
+        // ================= USER ORDERS =================
         [HttpGet("user/{userId}")]
-        [SwaggerOperation(Summary = "Get A Specific User Orders")]
         public async Task<IActionResult> GetUserOrders(int userId)
         {
             var orders = await _context.Orders
@@ -322,40 +266,62 @@ namespace CarMaintenance.Controllers
             });
         }
 
-        // ================= GET ORDER BY ID =================
-        [HttpGet("{id}")]
-        [SwaggerOperation(Summary = "Get Order By Id")]
-        public async Task<IActionResult> GetOrderById(int id)
+        // ================= GET BY ID =================
+      // ================= GET ORDER DETAILS =================
+[HttpGet("{id}")]
+public async Task<IActionResult> GetOrderById(int id)
+{
+    var order = await _context.Orders
+        .Include(o => o.User)
+        .Include(o => o.Service)
+        .FirstOrDefaultAsync(o => o.Id == id);
+
+    if (order == null)
+    {
+        return NotFound(new
         {
-            var order = await _context.Orders
-                .Include(o => o.User)
-                .Include(o => o.Service)
-                .FirstOrDefaultAsync(o => o.Id == id);
+            success = false,
+            message = "Order not found"
+        });
+    }
 
-            if (order == null)
-                return NotFound(new
-                {
-                    success = false,
-                    message = "Order not found"
-                });
+    var result = new
+    {
+        id = order.Id,
 
-            return Ok(new
-            {
-                success = true,
-                data = order
-            });
-        }
-
-        // ================= NOTIFICATIONS =================
-        [HttpGet("/api/notifications")]
-        [SwaggerOperation(Summary = "Get Orders Notifications")]
-        public async Task<IActionResult> GetNotifications()
+        customer = new
         {
-            var data = await _context.Notifications
-                .OrderByDescending(x => x.CreatedAt)
-                .ToListAsync();
+            name = order.User.Name,
+            phone = order.PhoneNumber
+        },
 
-            return Ok(data);
-        }
+        service = new
+        {
+            name = order.Service.Name
+        },
+
+        address = order.Address,
+
+        status = order.OrderStatus.ToString(),
+
+        price = order.Price,
+
+        paymentStatus = order.IsPaid ? "مدفوع" : "لم يدفع",
+
+        technician = order.TechnicianName ?? "غير معين",
+
+        createdAt = order.CreatedAt.ToString("yyyy/MM/dd hh:mm tt"),
+
+        imageUrl = order.ImageUrl,
+
+        notes = order.Notes
+    };
+
+    return Ok(new
+    {
+        success = true,
+        data = result
+    });
+}
     }
 }

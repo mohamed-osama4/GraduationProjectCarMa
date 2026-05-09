@@ -42,6 +42,9 @@ namespace CarMaintenance.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+        public string? ImageUrl { get; set; }
+
+     public string? Notes { get; set; }
         
         [Required]
         public string PaymentMethod { get; set; } = "Cash";
