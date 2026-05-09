@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project/core/localization/app_strings.dart';
 import 'package:graduation_project/logic/providers/locale_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:graduation_project/core/theme/app_theme.dart';
 import 'package:graduation_project/views/services/battery_services.dart';
 import 'package:graduation_project/views/home/widgets/gradients.dart';
 import 'package:graduation_project/views/services/carWash_services.dart';
@@ -191,12 +190,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final service = filteredServices[index];
-                final String iconName = service['icon'];
-
-                final List<Color> gradient =
-                    service['gradient'] as List<Color>? ??
-                    AppGradients.gradient1;
-
                 void handleNavigation() {
                   final int index = service['filterIndex'];
                   if (index == 1) {

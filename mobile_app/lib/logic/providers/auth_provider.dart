@@ -116,7 +116,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _apiClient.dio.post('/auth/register', data: {
+      final response = await _apiClient.dio.post('/Auth/register', data: {
         'name': name,
         'email': email,
         'phoneNumber': phoneNumber,
