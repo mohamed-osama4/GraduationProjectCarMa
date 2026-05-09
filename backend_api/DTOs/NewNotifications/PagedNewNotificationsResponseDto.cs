@@ -11,5 +11,11 @@ namespace CarMaintenance.DTOs.NewNotifications
         public int TotalPages { get; set; }
 
         public int UnreadCount { get; set; }
+
+        /// <summary>Total notifications count (ignoring current filters).</summary>
+        public int TotalAllCounts { get; set; }
+
+        /// <summary>Total unread notifications count (ignoring current filters).</summary>
+        public int TotalUnreadCounts { get; set; }
     }
 }

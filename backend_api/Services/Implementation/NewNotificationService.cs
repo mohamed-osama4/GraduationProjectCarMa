@@ -54,7 +54,11 @@ namespace CarMaintenance.Services.Implementation
             }
 
             var totalCount = await query.CountAsync(cancellationToken);
-            var unreadCount = await _db.NewNotifications
+
+            // Global counts (ignoring current filters)
+            var totalAllCounts = await _db.NewNotifications
+                .CountAsync(x => x.UserId == userId && !x.IsDeleted, cancellationToken);
+            var totalUnreadCounts = await _db.NewNotifications
                 .CountAsync(x => x.UserId == userId && !x.IsDeleted && !x.IsRead, cancellationToken);
 
             var items = await query
@@ -70,7 +74,9 @@ namespace CarMaintenance.Services.Implementation
                 PageSize = pageSize,
                 TotalCount = totalCount,
                 TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                UnreadCount = unreadCount
+                UnreadCount = totalUnreadCounts,
+                TotalAllCounts = totalAllCounts,
+                TotalUnreadCounts = totalUnreadCounts
             };
         }
 
