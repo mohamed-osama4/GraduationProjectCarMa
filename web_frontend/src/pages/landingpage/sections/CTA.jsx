@@ -1,5 +1,5 @@
 import React from "react";
-import mobileMockup from "../../../assets/mockup2.PNG";
+import mobileMockup from "../../../assets/mockup2.png";
 import { FaApple, FaGooglePlay } from "react-icons/fa6";
 
 export default function CTA() {
