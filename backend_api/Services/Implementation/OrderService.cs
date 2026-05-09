@@ -5,6 +5,8 @@ using CarMaintenance.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
 using CarMaintenance.Hubs;
+using CarMaintenance.DTOs.NewNotifications;
+using CarMaintenance.Models.Enums;
 
 namespace CarMaintenance.Services.Implementation
 {
@@ -12,11 +14,13 @@ namespace CarMaintenance.Services.Implementation
     {
         private readonly AppDbContext _context;
         private readonly IHubContext<NotificationHub> _hub;
+        private readonly INewNotificationService _newNotificationService;
 
-        public OrderService(AppDbContext context, IHubContext<NotificationHub> hub)
+        public OrderService(AppDbContext context, IHubContext<NotificationHub> hub, INewNotificationService newNotificationService)
         {
             _context = context;
-            _hub=hub;
+            _hub = hub;
+            _newNotificationService = newNotificationService;
         }
 
         // ================= GET ALL =================
@@ -60,6 +64,18 @@ var order = new Order
                 "OrderCreated"
             );
 
+            await _newNotificationService.CreateAsync(new CreateNewNotificationRequestDto
+            {
+                UserId = order.UserId,
+                Type = NewNotificationType.System,
+                Severity = NewNotificationSeverity.Info,
+                Title = "تم إنشاء الطلب",
+                Message = $"تم إنشاء طلبك #{order.Id} بنجاح.",
+                TargetType = "Order",
+                TargetId = order.Id,
+                ActionUrl = $"/orders/{order.Id}"
+            });
+
             return order;
         }
 
@@ -82,6 +98,44 @@ var order = new Order
                 "OrderUpdated"
             );
 
+            var notificationType = dto.OrderStatus switch
+            {
+                OrderStatus.Accepted => NewNotificationType.RequestAccepted,
+                OrderStatus.InProgress => NewNotificationType.TechnicianOnWay,
+                OrderStatus.Completed => NewNotificationType.ServiceCompleted,
+                OrderStatus.Rejected => NewNotificationType.System,
+                _ => NewNotificationType.System
+            };
+
+            var severity = dto.OrderStatus switch
+            {
+                OrderStatus.Completed => NewNotificationSeverity.Success,
+                OrderStatus.Accepted => NewNotificationSeverity.Success,
+                OrderStatus.Rejected => NewNotificationSeverity.Error,
+                _ => NewNotificationSeverity.Info
+            };
+
+            var title = dto.OrderStatus switch
+            {
+                OrderStatus.Accepted => "تم قبول الطلب",
+                OrderStatus.InProgress => "الفني في الطريق",
+                OrderStatus.Completed => "تم إتمام الخدمة",
+                OrderStatus.Rejected => "تم رفض الطلب",
+                _ => "تحديث حالة الطلب"
+            };
+
+            await _newNotificationService.CreateAsync(new CreateNewNotificationRequestDto
+            {
+                UserId = order.UserId,
+                Type = notificationType,
+                Severity = severity,
+                Title = title,
+                Message = $"تم تحديث حالة طلبك #{order.Id} إلى {dto.OrderStatus}",
+                TargetType = "Order",
+                TargetId = order.Id,
+                ActionUrl = $"/orders/{order.Id}"
+            });
+
             return order;
         }
 
@@ -103,6 +157,18 @@ var order = new Order
                 "Order has been canceled",
                 "OrderRejected"
             );
+
+            await _newNotificationService.CreateAsync(new CreateNewNotificationRequestDto
+            {
+                UserId = order.UserId,
+                Type = NewNotificationType.System,
+                Severity = NewNotificationSeverity.Warning,
+                Title = "تم إلغاء الطلب",
+                Message = $"تم إلغاء طلبك #{order.Id} بنجاح.",
+                TargetType = "Order",
+                TargetId = order.Id,
+                ActionUrl = $"/orders/{order.Id}"
+            });
 
             return order;
         }
