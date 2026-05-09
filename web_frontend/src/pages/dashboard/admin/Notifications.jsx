@@ -8,20 +8,37 @@ import {
   Briefcase,
   Users,
   Check,
-  Loader2
+  Loader2,
+  Wallet,
+  Tag,
+  Wrench
 } from 'lucide-react';
 import DashboardHeader from '../../../component/dashboard/DashboardHeader';
 import StatCard from '../../../component/dashboard/StatCard';
 import { getNewNotifications, getUnreadNotificationsCount, markNotificationAsRead, markAllNotificationsAsRead } from '../../../services/adminService';
 
-// Fallback mappings until backend team confirms exact integer mapping for types
+// Updated mappings to match NewNotificationType enum from backend
 const TYPE_MAP = {
   all: undefined,
-  urgent: 1,
-  order: 2,
-  warning: 3,
-  success: 4,
+  serviceCompleted: 1,
+  technicianOnWay: 2,
+  requestAccepted: 3,
+  walletCreditAdded: 4,
+  appointmentReminder: 5,
+  specialOffer: 6,
+  system: 7,
 };
+
+const typeFiltersList = [
+  { id: 'all', label: 'الكل' },
+  { id: 'serviceCompleted', label: 'اكتمال الخدمة' },
+  { id: 'technicianOnWay', label: 'فني في الطريق' },
+  { id: 'requestAccepted', label: 'مقبولة' },
+  { id: 'walletCreditAdded', label: 'رصيد محفظة' },
+  { id: 'appointmentReminder', label: 'تذكير موعد' },
+  { id: 'specialOffer', label: 'عروض' },
+  { id: 'system', label: 'نظام' },
+];
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -175,22 +192,44 @@ const Notifications = () => {
     }
   ];
 
-  const getTypeStyles = (typeStr, severityStr) => {
-    const t = (typeStr || '').toString().toLowerCase();
+  const getTypeStyles = (typeVal, severityStr) => {
+    const t = (typeVal || '').toString().toLowerCase();
     const s = (severityStr || '').toString().toLowerCase();
     
-    if (t.includes('urgent') || s.includes('high') || t === '1') {
+    // Check by exact backend Enum ID or String
+    if (t === '1' || t.includes('servicecompleted')) {
+      return { badgeBg: 'bg-emerald-100 text-emerald-600', iconBg: 'bg-emerald-50 text-emerald-500', icon: CheckCircle, label: 'مكتملة' };
+    }
+    if (t === '2' || t.includes('technicianonway')) {
+      return { badgeBg: 'bg-blue-100 text-blue-600', iconBg: 'bg-blue-50 text-blue-500', icon: Users, label: 'فني' };
+    }
+    if (t === '3' || t.includes('requestaccepted')) {
+      return { badgeBg: 'bg-indigo-100 text-indigo-600', iconBg: 'bg-indigo-50 text-indigo-500', icon: Check, label: 'مقبول' };
+    }
+    if (t === '4' || t.includes('walletcredit')) {
+      return { badgeBg: 'bg-teal-100 text-teal-600', iconBg: 'bg-teal-50 text-teal-500', icon: Wallet, label: 'رصيد' };
+    }
+    if (t === '5' || t.includes('appointment')) {
+      return { badgeBg: 'bg-orange-100 text-orange-600', iconBg: 'bg-orange-50 text-orange-500', icon: Clock, label: 'موعد' };
+    }
+    if (t === '6' || t.includes('specialoffer')) {
+      return { badgeBg: 'bg-fuchsia-100 text-fuchsia-600', iconBg: 'bg-fuchsia-50 text-fuchsia-500', icon: Tag, label: 'عرض' };
+    }
+    if (t === '7' || t.includes('system')) {
+      return { badgeBg: 'bg-slate-100 text-slate-600', iconBg: 'bg-slate-50 text-slate-500', icon: AlertCircle, label: 'نظام' };
+    }
+    
+    // Fallback using severity if type doesn't match
+    if (s === '4' || s.includes('error')) {
       return { badgeBg: 'bg-red-100 text-red-600', iconBg: 'bg-red-50 text-red-500', icon: AlertCircle, label: 'عاجل' };
     }
-    if (t.includes('order') || t === '2') {
-      return { badgeBg: 'bg-blue-100 text-blue-600', iconBg: 'bg-blue-50 text-blue-500', icon: Briefcase, label: 'طلب' };
-    }
-    if (t.includes('warning') || s.includes('warning') || t === '3') {
-      return { badgeBg: 'bg-orange-100 text-orange-600', iconBg: 'bg-orange-50 text-orange-500', icon: Users, label: 'تحذير' };
-    }
-    if (t.includes('success') || t === '4') {
+    if (s === '1' || s.includes('success')) {
       return { badgeBg: 'bg-green-100 text-green-600', iconBg: 'bg-green-50 text-green-500', icon: Check, label: 'نجاح' };
     }
+    if (s === '3' || s.includes('warning')) {
+      return { badgeBg: 'bg-orange-100 text-orange-600', iconBg: 'bg-orange-50 text-orange-500', icon: AlertCircle, label: 'تحذير' };
+    }
+
     return { badgeBg: 'bg-gray-100 text-gray-600', iconBg: 'bg-gray-50 text-gray-500', icon: Bell, label: 'إشعار' };
   };
 
@@ -256,36 +295,15 @@ const Notifications = () => {
           <div className="flex flex-col gap-2">
             <span className="text-slate-500 font-bold mb-1">النوع</span>
             <div className="flex flex-wrap items-center gap-2">
-              <button 
-                onClick={() => setTypeFilter('all')}
-                className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors ${typeFilter === 'all' ? 'bg-primary text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
-              >
-                الكل
-              </button>
-              <button 
-                onClick={() => setTypeFilter('urgent')}
-                className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors ${typeFilter === 'urgent' ? 'bg-primary text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
-              >
-                عاجل
-              </button>
-              <button 
-                onClick={() => setTypeFilter('order')}
-                className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors ${typeFilter === 'order' ? 'bg-primary text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
-              >
-                طلبات
-              </button>
-              <button 
-                onClick={() => setTypeFilter('warning')}
-                className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors ${typeFilter === 'warning' ? 'bg-primary text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
-              >
-                تحذيرات
-              </button>
-              <button 
-                onClick={() => setTypeFilter('success')}
-                className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors ${typeFilter === 'success' ? 'bg-primary text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
-              >
-                نجاح
-              </button>
+              {typeFiltersList.map(filter => (
+                <button 
+                  key={filter.id}
+                  onClick={() => setTypeFilter(filter.id)}
+                  className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors ${typeFilter === filter.id ? 'bg-primary text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
+                >
+                  {filter.label}
+                </button>
+              ))}
             </div>
           </div>
 
