@@ -1,19 +1,43 @@
 enum OrderStatus {
+  pending,
+  accepted,
+  inProgress,
+  completed,
+  rejected,
+  // Legacy aliases kept for backward compat
   newOrder,
   onTheWay,
   underProcess,
-  completed,
-  canceled
+  canceled,
 }
 
-OrderStatus _orderStatusFromString(String? status) {
-  switch (status?.toLowerCase()) {
-    case 'new':          return OrderStatus.newOrder;
-    case 'ontheway':     return OrderStatus.onTheWay;
-    case 'underprocess': return OrderStatus.underProcess;
+OrderStatus _orderStatusFromString(dynamic status) {
+  if (status == null) return OrderStatus.pending;
+
+  // Handle integer (C# enum default JSON serialization: 0=Pending, 1=Accepted...)
+  if (status is int) {
+    switch (status) {
+      case 0: return OrderStatus.pending;
+      case 1: return OrderStatus.accepted;
+      case 2: return OrderStatus.inProgress;
+      case 3: return OrderStatus.completed;
+      case 4: return OrderStatus.rejected;
+      default: return OrderStatus.pending;
+    }
+  }
+
+  // Handle string (e.g. "Pending", "Accepted")
+  switch (status.toString().toLowerCase()) {
+    case 'pending':      return OrderStatus.pending;
+    case 'new':          return OrderStatus.pending;
+    case 'accepted':     return OrderStatus.accepted;
+    case 'ontheway':     return OrderStatus.accepted;
+    case 'inprogress':   return OrderStatus.inProgress;
+    case 'underprocess': return OrderStatus.inProgress;
     case 'completed':    return OrderStatus.completed;
-    case 'canceled':     return OrderStatus.canceled;
-    default:             return OrderStatus.newOrder;
+    case 'rejected':     return OrderStatus.rejected;
+    case 'canceled':     return OrderStatus.rejected;
+    default:             return OrderStatus.pending;
   }
 }
 
@@ -25,6 +49,9 @@ class OrderModel {
   final OrderStatus orderStatus;
   final String address;
   final String phoneNumber;
+  final double price;
+  final bool isPaid;
+  final String paymentMethod;
 
   // Technician info (filled when admin accepts)
   final int? technicianId;
@@ -44,6 +71,9 @@ class OrderModel {
     required this.orderStatus,
     required this.address,
     required this.phoneNumber,
+    this.price = 0.0,
+    this.isPaid = false,
+    this.paymentMethod = 'Cash',
     this.technicianId,
     this.technicianName,
     this.technicianPhone,
@@ -59,9 +89,12 @@ class OrderModel {
       userId:          json['userId'] as int? ?? 0,
       vehicleId:       json['vehicleId'] as int? ?? 0,
       serviceId:       json['serviceId'] as int? ?? 0,
-      orderStatus:     _orderStatusFromString(json['orderStatus'] as String?),
+      orderStatus:     _orderStatusFromString(json['orderStatus']),
       address:         json['address'] as String? ?? '',
       phoneNumber:     json['phoneNumber'] as String? ?? '',
+      price:           (json['price'] as num?)?.toDouble() ?? 0.0,
+      isPaid:          json['isPaid'] as bool? ?? false,
+      paymentMethod:   json['paymentMethod'] as String? ?? 'Cash',
       technicianId:    json['technicianId'] as int?,
       technicianName:  json['technicianName'] as String?,
       technicianPhone: json['technicianPhone'] as String?,
@@ -72,7 +105,15 @@ class OrderModel {
     );
   }
 
-  bool get hasTechnician => technicianId != null && technicianName != null;
+  bool get hasTechnician => technicianName != null && technicianName!.isNotEmpty;
+
+  // Convenience helpers
+  bool get isPending   => orderStatus == OrderStatus.pending;
+  bool get isAccepted  => orderStatus == OrderStatus.accepted;
+  bool get isInProgress => orderStatus == OrderStatus.inProgress;
+  bool get isCompleted => orderStatus == OrderStatus.completed;
+  bool get isRejected  => orderStatus == OrderStatus.rejected;
+  bool get isActive    => !isCompleted && !isRejected;
 }
 
 class CreateOrderDto {

@@ -2,56 +2,51 @@ import React from "react";
 import ServiceCard from "../components/ServiceCard";
 import { HiOutlinePhone } from "react-icons/hi2";
 import { FaDroplet, FaCircleDot, FaWater, FaTruckPickup, FaBatteryFull } from "react-icons/fa6";
+import { GiCarWheel } from "react-icons/gi";
 import { MdMiscellaneousServices } from "react-icons/md";
 
 const SERVICES = [
   {
-    icon: <FaBatteryFull size={32} />,
+    icon: <FaBatteryFull size={40} />,
     title: "تغيير البطارية",
-    description: "تبديل بطارية سيارتك بأفضل الأنواع المتوفرة",
-    bgColor: "bg-blue-600 text-white",
+    description: "تبديل بطارية سيارتك بأفضل الأنواع المتوفرة والمضمونة",
     price: 500,
   },
   {
-    icon: <FaDroplet size={28} />,
+    icon: <FaDroplet size={40} />,
     title: "تغيير الزيت",
-    description: "تغيير زيت المحرك والفلتر بزيوت أصلية",
-    bgColor: "bg-orange-500 text-white",
+    description: "تغيير زيت المحرك والفلتر بزيوت أصلية تناسب محركك",
     price: 350,
   },
   {
-    icon: <FaCircleDot size={28} />,
+    icon: <GiCarWheel size={40} />,
     title: "خدمة الإطارات",
-    description: "فحص وتبديل وإصلاح جميع أنواع الإطارات",
-    bgColor: "bg-slate-700 text-white",
+    description: "فحص وتبديل وإصلاح وترصيص جميع أنواع الإطارات",
     price: 250,
   },
   {
-    icon: <FaWater size={28} />,
+    icon: <FaWater size={40} />,
     title: "غسيل السيارة",
-    description: "غسيل شامل وتنظيف داخلي وخارجي احترافي",
-    bgColor: "bg-cyan-500 text-white",
+    description: "غسيل شامل وتنظيف داخلي وخارجي احترافي بأفضل المواد",
     price: 200,
   },
   {
-    icon: <HiOutlinePhone size={30} />,
+    icon: <HiOutlinePhone size={40} />,
     title: "خدمة الطوارئ",
-    description: "استجابة سريعة لجميع حالات الطوارئ على الطريق",
-    bgColor: "bg-red-600 text-white",
+    description: "استجابة سريعة لجميع حالات الطوارئ والأعطال المفاجئة",
     price: 300,
   },
   {
-    icon: <FaTruckPickup size={30} />,
+    icon: <FaTruckPickup size={40} />,
     title: "خدمة الونش",
-    description: "نقل سيارتك بأمان إلى أي مكان تريد",
-    bgColor: "bg-purple-600 text-white",
+    description: "نقل سيارتك بأمان واحترافية إلى أي مكان في الجمهورية",
     price: 600,
   },
 ];
 
 export default function Services() {
   return (
-    <section id="services" className="landing-section bg-gray-50">
+    <section id="services" className="landing-section premium-dark-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div data-aos="fade-up">
           <span className="section-badge flex items-center justify-center gap-2 w-fit mx-auto">

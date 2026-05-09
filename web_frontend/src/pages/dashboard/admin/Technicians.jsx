@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import DashboardHeader from '../../../component/dashboard/DashboardHeader';
-import { 
-  Users, 
-  CheckCircle, 
-  Activity, 
-  XCircle, 
-  Star, 
+import {
+  Users,
+  CheckCircle,
+  Activity,
+  XCircle,
+  Star,
   Briefcase,
   Search,
   Plus,
@@ -34,7 +34,7 @@ const TechnicianStatCard = ({ title, value, icon: Icon, colorClass, bgClass }) =
 const TechnicianGridCard = ({ tech }) => {
   const isAvailable = tech.status === 'available' || tech.status === 'متاح';
   const statusLabel = isAvailable ? 'متاح' : (tech.status === 'busy' ? 'مشغول' : 'غير متصل');
-  
+
   return (
     <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
       {/* Header Profile Section */}
@@ -44,16 +44,15 @@ const TechnicianGridCard = ({ tech }) => {
             {tech.name?.[0] || 'ف'}
           </div>
           <div className="flex flex-col items-start gap-1">
-            <span className={`text-[10px] px-3 py-1 rounded-full font-bold ${
-              isAvailable ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-slate-500'
-            }`}>
+            <span className={`text-[10px] px-3 py-1 rounded-full font-bold ${isAvailable ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-slate-500'
+              }`}>
               {statusLabel}
             </span>
             <h3 className="font-black text-slate-800 text-lg leading-tight mt-1">{tech.name}</h3>
             <p className="text-xs text-slate-500 font-medium">{tech.specialty || 'فني متخصص'}</p>
           </div>
         </div>
-        
+
         {/* Action Icons */}
         <div className="flex items-center gap-2">
           <button className="p-1.5 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
@@ -106,8 +105,8 @@ const TechnicianGridCard = ({ tech }) => {
           <span className="text-sm font-black text-green-500">{tech.progress || 95}%</span>
         </div>
         <div className="w-full bg-gray-100 rounded-full h-2">
-          <div 
-            className="bg-green-500 h-2 rounded-full" 
+          <div
+            className="bg-green-500 h-2 rounded-full"
             style={{ width: `${tech.progress || 95}%` }}
           ></div>
         </div>
@@ -161,12 +160,12 @@ const Technicians = () => {
   }
 
   const technicians = data?.technicians || [];
-  
+
   // Calculate dynamic stats
   const availableCount = technicians.filter(t => t.status === 'available').length;
   const busyCount = technicians.filter(t => t.status === 'busy').length;
   const offlineCount = technicians.filter(t => t.status === 'offline').length;
-  const avgRating = technicians.length > 0 
+  const avgRating = technicians.length > 0
     ? (technicians.reduce((acc, t) => acc + (t.rating || 0), 0) / technicians.length).toFixed(1)
     : '0';
 
@@ -211,11 +210,11 @@ const Technicians = () => {
             <Plus size={20} strokeWidth={2.5} />
             إضافة فني جديد
           </button>
-          
+
           <div className="relative flex-1 order-1 md:order-2">
-            <input 
-              type="text" 
-              placeholder="ابحث باسم الفني..." 
+            <input
+              type="text"
+              placeholder="ابحث باسم الفني..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-white border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400"
@@ -229,15 +228,13 @@ const Technicians = () => {
             <button
               key={filter.id}
               onClick={() => setActiveFilter(filter.id)}
-              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl font-bold text-sm transition-all whitespace-nowrap ${
-                activeFilter === filter.id 
-                  ? 'bg-[#254BA6] text-white shadow-md shadow-blue-200' 
+              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl font-bold text-sm transition-all whitespace-nowrap ${activeFilter === filter.id
+                  ? 'bg-[#254BA6] text-white shadow-md shadow-blue-200'
                   : 'bg-gray-50 text-slate-600 hover:bg-gray-100'
-              }`}
+                }`}
             >
-              <span className={`flex items-center justify-center h-6 min-w-[24px] px-2 text-[11px] rounded-full font-black ${
-                activeFilter === filter.id ? 'bg-white/20 text-white' : 'bg-gray-200 text-slate-500'
-              }`}>
+              <span className={`flex items-center justify-center h-6 min-w-[24px] px-2 text-[11px] rounded-full font-black ${activeFilter === filter.id ? 'bg-white/20 text-white' : 'bg-gray-200 text-slate-500'
+                }`}>
                 {filter.count}
               </span>
               {filter.label}

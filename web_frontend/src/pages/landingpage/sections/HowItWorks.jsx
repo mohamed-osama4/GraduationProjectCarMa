@@ -7,60 +7,63 @@ const STEPS = [
     number: "1",
     title: "اختر الخدمة",
     description: "حدد الخدمة التي تحتاجها لسيارتك من قائمة خدماتنا المتنوعة",
-    icon: <HiOutlineCursorArrowRays size={28} />,
+    icon: <HiOutlineCursorArrowRays size={40} />,
   },
   {
     number: "2",
     title: "سجل طلبك",
     description: "حدد موقعك والوقت المناسب لك لإتمام الخدمة بسهولة",
-    icon: <HiOutlinePencilSquare size={28} />,
+    icon: <HiOutlinePencilSquare size={40} />,
   },
   {
     number: "3",
     title: "تأكيد الطلب",
     description: "سيتم تأكيد طلبك وموعدك من قبل فريق خدمة العملاء",
-    icon: <HiOutlineClipboardDocumentCheck size={28} />,
+    icon: <HiOutlineClipboardDocumentCheck size={40} />,
   },
   {
     number: "4",
     title: "الاستلام في موقعك",
     description: "سيصلك فريقنا المتخصص في الوقت والمكان المحددين",
-    icon: <FaCarSide size={28} />,
+    icon: <FaCarSide size={40} />,
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="landing-section bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div data-aos="fade-up">
-          <span className="section-badge flex items-center justify-center gap-2 w-fit mx-auto">
-            <HiOutlineLightBulb size={20} /> كيف يعمل
-          </span>
-          <h2 className="section-title">احجز خدمتك في 4 خطوات بسيطة</h2>
-          <p className="section-subtitle">
-            عملية بسيطة وسريعة من الحجز حتى استلام سيارتك بأفضل حال
+    <section id="how-it-works" className="landing-section premium-dark-section">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <div data-aos="fade-up" className="mb-12">
+          <h2 className="section-title">كيف يعمل CarMA</h2>
+          <p className="section-subtitle mx-auto">
+            خطوات بسيطة تفصلك عن صيانة سيارتك
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 relative">
-          {/* Connector line - desktop only */}
-          <div className="hidden lg:block step-connector right-[12.5%] left-[12.5%]" />
+        <div className="relative">
+          {/* Continuous Connection Line (Desktop only) */}
+          <div className="hidden lg:block absolute top-12 left-[10%] right-[10%] h-[2px] animate-dash opacity-30 z-0" />
 
-          {STEPS.map((step, index) => (
-            <div
-              key={index}
-              className="step-card relative z-10"
-              data-aos="fade-up"
-              data-aos-delay={index * 150}
-            >
-              <div className="step-circle">
-                {step.icon}
+          <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-4 relative z-10">
+            {STEPS.map((step, index) => (
+              <div
+                key={index}
+                className="group text-center flex-1"
+                data-aos="fade-left"
+                data-aos-delay={index * 200}
+              >
+                <div 
+                  className="w-24 h-24 mx-auto mb-8 rounded-full bg-midnight/60 backdrop-blur-xl border border-white/10 flex items-center justify-center text-premium-gold group-hover:bg-premium-gold group-hover:text-midnight group-hover:shadow-[0_0_30px_rgba(255,195,0,0.4)] transition-all duration-500 relative z-10 cursor-pointer"
+                >
+                  {step.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-premium-gold transition-colors duration-300">{step.title}</h3>
+                <p className="text-silver/60 text-sm leading-relaxed max-w-[200px] mx-auto">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{step.description}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

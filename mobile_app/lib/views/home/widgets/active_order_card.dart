@@ -5,9 +5,9 @@ import 'package:graduation_project/core/comeponents/app_image.dart';
 import 'package:graduation_project/core/localization/app_strings.dart';
 import 'package:graduation_project/logic/providers/locale_provider.dart';
 import 'package:graduation_project/logic/providers/orders_provider.dart';
-import 'package:graduation_project/data/models/order_model.dart';
 import 'package:graduation_project/views/home/order_details_page.dart';
 import 'package:provider/provider.dart';
+
 
 class ActiveOrderCard extends StatelessWidget {
   const ActiveOrderCard({super.key});
@@ -22,32 +22,28 @@ class ActiveOrderCard extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
+        // --- Mock UI for testing/preview when no actual orders exist ---
         if (ordersProvider.orders.isEmpty) {
-          return const SizedBox.shrink();
+          return _buildMockCard(context, s);
         }
 
         final activeOrder = ordersProvider.orders.first;
 
-        // Only show card for active orders (not completed/canceled)
-        if (activeOrder.orderStatus == OrderStatus.completed ||
-            activeOrder.orderStatus == OrderStatus.canceled) {
-          return const SizedBox.shrink();
+        // Only show card for active orders (not completed/rejected)
+        if (activeOrder.isCompleted || activeOrder.isRejected) {
+          return _buildMockCard(context, s); // Show mock if the actual order is done
         }
 
         String title    = s.orderPending;
         String subtitle = s.orderPendingSub;
         Color statusColor = AppTheme.warningColor;
 
-        if (activeOrder.orderStatus == OrderStatus.onTheWay) {
+        if (activeOrder.isAccepted || activeOrder.isInProgress) {
           title    = s.orderOnTheWay;
-          subtitle = activeOrder.technicianName != null
+          subtitle = activeOrder.hasTechnician
               ? '${activeOrder.technicianName} ${s.isArabic ? "في الطريق إليك" : "is on the way"}'
               : s.orderOnTheWaySub;
           statusColor = AppTheme.successColor;
-        } else if (activeOrder.orderStatus == OrderStatus.underProcess) {
-          title    = s.orderUnderProcess;
-          subtitle = s.orderUnderProcessSub;
-          statusColor = AppTheme.primaryColor;
         }
 
         return Transform.translate(
@@ -86,7 +82,7 @@ class ActiveOrderCard extends StatelessWidget {
                       ),
                       child: ordersProvider.imagePathForOrder(activeOrder.id) == null
                           ? Icon(
-                              activeOrder.orderStatus == OrderStatus.onTheWay
+                              activeOrder.isAccepted || activeOrder.isInProgress
                                   ? Icons.directions_car_rounded
                                   : Icons.access_time_filled,
                               color: statusColor,
@@ -170,6 +166,103 @@ class ActiveOrderCard extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  // Helper method to show a mock card when there are no real orders
+  // This keeps the UI looking like the design the user wanted to see.
+  Widget _buildMockCard(BuildContext context, dynamic s) {
+    return Transform.translate(
+      offset: const Offset(0, -30),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              offset: const Offset(0, 4),
+              blurRadius: 12,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppTheme.warningColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.access_time_filled,
+                    color: AppTheme.warningColor,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        s.orderPending, // "Your order is being reviewed"
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 15,
+                        ),
+                      ),
+                      Text(
+                        s.orderPendingSub, // "We will get back to you soon"
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
+                    color: AppTheme.warningColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'لا توجد طلبات حالية',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

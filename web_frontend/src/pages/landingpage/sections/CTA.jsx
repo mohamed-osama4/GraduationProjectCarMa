@@ -12,21 +12,21 @@ export default function CTA() {
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-6 leading-tight">
               احجز خدماتك بسهولة
               <br />
-              <span className="text-blue-200">من موبايلك</span>
+               <span className="text-premium-gold">من موبايلك</span>
             </h2>
             <p className="text-blue-100 text-lg leading-relaxed mb-8 max-w-lg">
               حمّل تطبيق CarMA الآن واحصل على خصم 20% على أول خدمة. 
               متوفر على iOS و Android.
             </p>
             <div className="flex flex-wrap gap-4">
-              <button className="flex items-center gap-3 bg-white text-primary font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-all duration-300 shadow-lg cursor-pointer">
+               <button className="flex items-center gap-3 bg-premium-gold text-midnight font-bold px-6 py-3 rounded-xl hover:bg-gold-light transition-all duration-300 shadow-lg cursor-pointer">
                 <FaApple size={24} />
                 <div className="text-right">
                   <div className="text-[10px] opacity-70">حمّل من</div>
                   <div className="text-sm font-bold">App Store</div>
                 </div>
               </button>
-              <button className="flex items-center gap-3 bg-white/10 backdrop-blur-sm text-white font-bold px-6 py-3 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-300 cursor-pointer">
+               <button className="flex items-center gap-3 bg-white text-midnight font-bold px-6 py-3 rounded-xl hover:bg-silver transition-all duration-300 cursor-pointer shadow-lg">
                 <FaGooglePlay size={22} />
                 <div className="text-right">
                   <div className="text-[10px] opacity-70">حمّل من</div>

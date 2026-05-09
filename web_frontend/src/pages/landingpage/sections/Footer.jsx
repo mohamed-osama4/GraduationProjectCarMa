@@ -22,7 +22,7 @@ export default function Footer() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <h3 className="text-2xl font-black text-white italic tracking-tighter mb-4">
+            <h3 className="text-3xl font-black text-premium-gold italic tracking-tighter mb-4">
               CarMA
             </h3>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-sm">
@@ -30,15 +30,15 @@ export default function Footer() {
             </p>
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-2">
-                <HiOutlinePhone className="text-blue-400" size={16} />
+                <HiOutlinePhone className="text-premium-gold" size={16} />
                 <span className="direction-ltr">+966 50 123 4567</span>
               </div>
               <div className="flex items-center gap-2">
-                <HiOutlineEnvelope className="text-blue-400" size={16} />
+                <HiOutlineEnvelope className="text-premium-gold" size={16} />
                 <span>info@carma.sa</span>
               </div>
               <div className="flex items-center gap-2">
-                <HiOutlineMapPin className="text-blue-400" size={16} />
+                <HiOutlineMapPin className="text-premium-gold" size={16} />
                 <span>القاهرة، مصر</span>
               </div>
             </div>

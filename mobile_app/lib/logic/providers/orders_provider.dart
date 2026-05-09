@@ -76,13 +76,13 @@ class OrdersProvider extends ChangeNotifier {
       final response = await _apiClient.dio.post('/orders', data: dto.toJson());
 
       if (response.statusCode == 200) {
-        final apiResponse = ApiResponse<OrderModel>.fromJson(
-          response.data,
-          (json) => OrderModel.fromJson(json as Map<String, dynamic>),
-        );
+        final body = response.data as Map<String, dynamic>;
 
-        if (apiResponse.success && apiResponse.data != null) {
-          final newOrder = apiResponse.data!;
+        // Backend returns { message, order } — fallback to { data } for compatibility
+        final orderJson = (body['order'] ?? body['data']) as Map<String, dynamic>?;
+
+        if (orderJson != null) {
+          final newOrder = OrderModel.fromJson(orderJson);
           _orders.insert(0, newOrder);
 
           // Store local metadata
@@ -99,12 +99,11 @@ class OrdersProvider extends ChangeNotifier {
           _isLoading = false;
           notifyListeners();
 
-          // Start polling for this order
+          // Start polling for status updates
           startPolling(newOrder.id);
           return newOrder;
-        } else {
-          _errorMessage = apiResponse.message;
         }
+        _errorMessage = 'Order data missing in response';
       }
     } on DioException catch (e) {
       _errorMessage = e.message ?? 'Failed to create order';
@@ -120,7 +119,7 @@ class OrdersProvider extends ChangeNotifier {
   // ── Polling: check order status every 5 seconds ───────────────
   void startPolling(int orderId) {
     stopPolling(); // cancel any existing timer
-    _lastKnownStatus = OrderStatus.newOrder;
+    _lastKnownStatus = OrderStatus.pending;
 
     _pollingTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       _checkOrderStatus(orderId);
@@ -150,16 +149,15 @@ class OrdersProvider extends ChangeNotifier {
             _orders[idx] = updatedOrder;
           }
 
-          // If status just changed to OnTheWay — fire callback!
-          if (_lastKnownStatus != OrderStatus.onTheWay &&
-              updatedOrder.orderStatus == OrderStatus.onTheWay) {
+          // If status just changed to Accepted — fire callback!
+          if (_lastKnownStatus != OrderStatus.accepted &&
+              updatedOrder.orderStatus == OrderStatus.accepted) {
             onOrderAccepted?.call(updatedOrder);
             stopPolling(); // stop after accepted
           }
 
           // Stop polling if terminal status
-          if (updatedOrder.orderStatus == OrderStatus.completed ||
-              updatedOrder.orderStatus == OrderStatus.canceled) {
+          if (updatedOrder.isCompleted || updatedOrder.isRejected) {
             stopPolling();
           }
 

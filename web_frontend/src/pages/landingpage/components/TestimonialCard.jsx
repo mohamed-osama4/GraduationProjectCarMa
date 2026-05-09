@@ -27,7 +27,7 @@ export default function TestimonialCard({ name, role, text, rating = 5, delay = 
       </div>
 
       {/* Quote */}
-      <p className="text-gray-600 leading-relaxed mb-6 text-sm relative z-10">
+      <p className="text-silver/70 leading-relaxed mb-6 text-sm relative z-10">
         {text}
       </p>
 
@@ -37,8 +37,8 @@ export default function TestimonialCard({ name, role, text, rating = 5, delay = 
           {name.charAt(0)}
         </div>
         <div>
-          <h4 className="font-bold text-gray-900 text-sm">{name}</h4>
-          <p className="text-gray-400 text-xs">{role}</p>
+          <h4 className="font-bold text-white text-sm">{name}</h4>
+          <p className="text-silver/40 text-xs">{role}</p>
         </div>
       </div>
     </div>

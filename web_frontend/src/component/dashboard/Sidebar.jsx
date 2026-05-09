@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { 
   Home, 
   FileText, 
@@ -17,13 +17,13 @@ const Sidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const menuItems = [
-    { name: 'الرئيسية', icon: Home, path: '/admin', end: true },
-    { name: 'الطلبات', icon: FileText, path: '/admin/orders' },
-    { name: 'الفنيون', icon: Users, path: '/admin/technicians' },
-    { name: 'الإشعارات', icon: Bell, path: '/admin/notifications', badge: 5 },
-    { name: 'التقارير', icon: BarChart2, path: '/admin/reports' },
-    { name: 'الملف الشخصي', icon: User, path: '/admin/profile' },
-    { name: 'الإعدادات', icon: Settings, path: '/admin/settings' },
+    { name: 'الرئيسية', icon: Home, path: '/admin', end: true, color: 'text-blue-400' },
+    { name: 'الطلبات', icon: FileText, path: '/admin/orders', color: 'text-emerald-400' },
+    { name: 'الفنيون', icon: Users, path: '/admin/technicians', color: 'text-orange-400' },
+    { name: 'الإشعارات', icon: Bell, path: '/admin/notifications', color: 'text-rose-400' },
+    { name: 'التقارير', icon: BarChart2, path: '/admin/reports', color: 'text-purple-400' },
+    { name: 'الملف الشخصي', icon: User, path: '/admin/profile', color: 'text-cyan-400' },
+    { name: 'الإعدادات', icon: Settings, path: '/admin/settings', color: 'text-slate-400' },
   ];
 
   const handleLogout = () => {
@@ -38,7 +38,9 @@ const Sidebar = ({ isOpen, onClose }) => {
       {/* Sidebar Header */}
       <div className="p-8 flex items-center justify-between">
         <div className="flex flex-col">
-          <h1 className="text-3xl font-black tracking-tight">CarMa</h1>
+          <Link to="/" className="hover:opacity-80 transition-opacity">
+            <h1 className="text-3xl font-black tracking-tight">CarMa</h1>
+          </Link>
           <p className="text-sm text-blue-300/80 font-medium mt-1">لوحة التحكم الإدارية</p>
         </div>
         <button onClick={onClose} className="md:hidden p-2 hover:bg-white/10 rounded-xl transition-colors">
@@ -64,7 +66,11 @@ const Sidebar = ({ isOpen, onClose }) => {
             {({ isActive }) => (
               <>
                 <div className="flex items-center gap-4">
-                  <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                  <item.icon 
+                    size={22} 
+                    strokeWidth={isActive ? 2.5 : 2} 
+                    className={isActive ? 'text-[#172554]' : item.color}
+                  />
                   <span className={`text-lg transition-all duration-300 ${isActive ? 'font-bold' : 'font-medium opacity-90'}`}>{item.name}</span>
                 </div>
                 {item.badge && (

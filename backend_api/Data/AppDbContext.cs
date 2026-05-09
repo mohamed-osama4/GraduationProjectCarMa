@@ -47,13 +47,17 @@ namespace CarMaintenance.Data
                       .WithOne(n => n.Order)
                       .HasForeignKey(n => n.OrderId)
                       .OnDelete(DeleteBehavior.Cascade);
-                      //Service
             });
+
+            // ================= SERVICE SEED DATA (The 6 Services) =================
             modelBuilder.Entity<Service>().HasData(
-    new Service { Id = 1, Name = "Oil Change", Price = 300 },
-    new Service { Id = 2, Name = "Battery Change", Price = 500 },
-    new Service { Id = 3, Name = "Tire Service", Price = 250 }
-);
+                new Service { Id = 1, Name = "غيار زيت", Description = "تغيير زيت المحرك مع الفلتر", Price = 300 },
+                new Service { Id = 2, Name = "بطارية", Description = "فحص وتغيير بطارية السيارة", Price = 500 },
+                new Service { Id = 3, Name = "تغير إطار", Description = "إصلاح أو تبديل إطارات السيارة", Price = 250 },
+                new Service { Id = 4, Name = "غسيل", Description = "غسيل وتنظيف السيارة بالكامل", Price = 150 },
+                new Service { Id = 5, Name = "صيانة طارئة", Description = "إصلاح أعطال مفاجئة في الموقع", Price = 450 },
+                new Service { Id = 6, Name = "ونش", Description = "خدمة سحب وإنقاذ السيارات", Price = 600 }
+            );
 
             // ================= USER CONFIG =================
             modelBuilder.Entity<User>()

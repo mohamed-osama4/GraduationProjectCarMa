@@ -38,9 +38,12 @@ class OrderDetailsPage extends StatelessWidget {
 
   Color _statusColor(OrderStatus s) {
     switch (s) {
+      case OrderStatus.accepted:
       case OrderStatus.onTheWay:    return AppTheme.successColor;
+      case OrderStatus.inProgress:
       case OrderStatus.underProcess: return AppTheme.primaryColor;
       case OrderStatus.completed:   return AppTheme.primaryColor;
+      case OrderStatus.rejected:
       case OrderStatus.canceled:    return AppTheme.errorColor;
       default:                      return AppTheme.warningColor;
     }
@@ -48,10 +51,13 @@ class OrderDetailsPage extends StatelessWidget {
 
   String _statusLabel(OrderStatus s, AppStrings str) {
     switch (s) {
+      case OrderStatus.accepted:
       case OrderStatus.onTheWay:    return str.orderOnTheWay;
+      case OrderStatus.inProgress:
       case OrderStatus.underProcess: return str.orderUnderProcess;
       case OrderStatus.completed:   return str.orderCompleted;
-      case OrderStatus.canceled:    return str.isArabic ? 'ملغي' : 'Canceled';
+      case OrderStatus.rejected:
+      case OrderStatus.canceled:    return str.isArabic ? 'مرفوض' : 'Rejected';
       default:                      return str.orderPending;
     }
   }
@@ -95,11 +101,13 @@ class OrderDetailsPage extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      order.orderStatus == OrderStatus.completed
+                      order.isCompleted
                           ? Icons.check_circle_rounded
-                          : order.orderStatus == OrderStatus.onTheWay
+                          : (order.isAccepted || order.isInProgress)
                               ? Icons.directions_car_rounded
-                              : Icons.access_time_rounded,
+                              : order.isRejected
+                                  ? Icons.cancel_rounded
+                                  : Icons.access_time_rounded,
                       color: statusColor,
                       size: 28,
                     ),
@@ -113,7 +121,8 @@ class OrderDetailsPage extends StatelessWidget {
                           _statusLabel(order.orderStatus, s),
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: statusColor),
                         ),
-                        if (order.estimatedArrival != null && order.orderStatus == OrderStatus.onTheWay)
+                        if (order.estimatedArrival != null &&
+                            (order.isAccepted || order.isInProgress))
                           Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
@@ -250,7 +259,7 @@ class OrderDetailsPage extends StatelessWidget {
             ],
 
             // ── Pending note ──────────────────────────────────────
-            if (order.orderStatus == OrderStatus.newOrder)
+            if (order.isPending)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

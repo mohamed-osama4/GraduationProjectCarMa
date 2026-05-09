@@ -17,10 +17,13 @@ export default function LandingPage() {
   useEffect(() => {
     AOS.init({
       duration: 800,
-      once: true,
+      once: false,
+      mirror: true,
       easing: "ease-out-cubic",
       offset: 80,
     });
+    window.addEventListener("scroll", () => AOS.refresh());
+    return () => window.removeEventListener("scroll", () => AOS.refresh());
   }, []);
 
   return (

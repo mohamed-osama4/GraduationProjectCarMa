@@ -8,7 +8,18 @@ import 'package:graduation_project/logic/providers/auth_provider.dart';
 import 'package:graduation_project/logic/providers/orders_provider.dart';
 import 'package:graduation_project/logic/providers/ai_provider.dart';
 
+import 'dart:io';
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 

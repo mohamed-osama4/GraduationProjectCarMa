@@ -5,6 +5,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using CarMaintenance.DTOs;
 
 [ApiController]
 [Route("api/admin")]
@@ -53,33 +54,40 @@ public class AdminController : ControllerBase
             })
             .ToListAsync();
 
-        var technicians = await _context.Users
-            .Where(u => u.Role == "Technician")
-            .Take(5)
-            .Select(u => new {
-                u.Name,
-                Specialization = "فني صيانة معتمد", 
-                Rating = 4.8
-            })
-            .ToListAsync();
+       var technicians = await _context.Users
+    .Where(u => u.Role == "Technician")
+    .Take(5)
+    .Select(u => new {
+        u.Name,
+        Specialization = "إصلاح إطارات وزيوت", // ممكن تجيبها من جدول التخصصات لو عندك
+        Location = "مدينة نصر، القاهرة", // لو مسجل لوكيشن للفني
+        Rating = 4.9,
+        OrdersCount = 234, // محتاج تعمل Count للأوردرات المرتبطة بالفني ده
+        IsAvailable = true, // حالة الفني
+        AvatarInitial = u.Name.Substring(0, 1) // أول حرف للايقونة الخضراء
+    })
+    .ToListAsync();
 
-        var currentOrders = await _context.Orders
-            .Include(o => o.Service)
-            .Include(o => o.User)
-            .Where(o => o.OrderStatus == OrderStatus.InProgress || o.OrderStatus == OrderStatus.Accepted)
-            .OrderByDescending(o => o.CreatedAt)
-            .Take(5)
-            .Select(o => new {
-                o.Id,
-                ServiceName  = o.Service.Name,
-                CustomerName =o.User.Name ,
-                o.Address,
-                o.PhoneNumber,
-                o.Price,
-                Status = o.OrderStatus.ToString(),
-                o.CreatedAt
-            })
-            .ToListAsync();
+      var currentOrders = await _context.Orders
+    .Include(o => o.Service)
+    .Include(o => o.User)
+    .Where(o => o.OrderStatus == OrderStatus.InProgress || o.OrderStatus == OrderStatus.Accepted || o.OrderStatus == OrderStatus.Completed)
+    .OrderByDescending(o => o.CreatedAt)
+    .Take(5)
+    .Select(o => new {
+        o.Id,
+        ServiceName = o.Service.Name,
+        CustomerName = o.User.Name,
+        o.Address,
+        o.Price,
+        StatusLabel = o.OrderStatus == OrderStatus.InProgress ? "جاري التنفيذ" : 
+                      o.OrderStatus == OrderStatus.Completed ? "مكتمل" : "تمت الموافقة",
+        StatusValue = o.OrderStatus.ToString(),
+        TechnicianName = o.TechnicianName ?? "لم يحدد بعد",
+        Time = o.CreatedAt.ToString("hh:mm tt"),
+        Date = o.CreatedAt.ToString("yyyy/MM/dd")
+    })
+    .ToListAsync();
 
         return Ok(new {
             stats,
@@ -88,6 +96,37 @@ public class AdminController : ControllerBase
             currentOrders
         });
     }
+    [Authorize]
+[HttpPut("profile")]
+public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto)
+{
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    if (string.IsNullOrEmpty(userId))
+        return Unauthorized();
+
+    var user = await _context.Users.FindAsync(int.Parse(userId));
+
+    if (user == null)
+        return NotFound(new
+        {
+            success = false,
+            message = "User not found"
+        });
+
+    user.Name = dto.FullName;
+    user.Email = dto.Email;
+    user.PhoneNumber = dto.PhoneNumber;
+
+    await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        success = true,
+        message = "Profile updated successfully",
+        data = user
+    });
+}
 
     [HttpGet("search")]
     public async Task<IActionResult> GlobalSearch(string keyword)

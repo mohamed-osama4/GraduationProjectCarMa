@@ -25,7 +25,7 @@ const TESTIMONIALS = [
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="landing-section bg-gray-50">
+    <section id="testimonials" className="landing-section bg-midnight">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div data-aos="fade-up">
           <span className="section-badge flex items-center justify-center gap-2 w-fit mx-auto">

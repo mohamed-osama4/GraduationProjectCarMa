@@ -32,8 +32,8 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <a href="#hero" className="flex items-center gap-2">
-              <span className={`text-2xl font-black italic tracking-tighter transition-colors duration-500 ${
-                scrolled || mobileOpen ? "text-white" : "text-primary"
+              <span className={`text-3xl font-black italic tracking-tighter transition-colors duration-500 ${
+                scrolled || mobileOpen ? "text-premium-gold" : "text-white"
               }`}>
                 CarMA
               </span>
@@ -59,8 +59,8 @@ export default function Navbar() {
               href="#cta"
               className={`px-6 py-2.5 rounded-full font-bold text-sm shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-500 flex items-center gap-2 ${
                 scrolled 
-                  ? "bg-white text-primary hover:bg-blue-50" 
-                  : "bg-primary text-white hover:bg-primary-dark shadow-primary/20"
+                  ? "bg-premium-gold text-midnight hover:bg-gold-light" 
+                  : "bg-white/10 text-white border border-white/20 hover:bg-white/20"
               }`}
             >
               <HiOutlineArrowDownTray size={18} />
@@ -71,7 +71,7 @@ export default function Navbar() {
           {/* Mobile Toggle */}
           <button
             className={`md:hidden p-2 rounded-lg transition-all duration-500 ${
-              scrolled || mobileOpen ? "text-gray-700 hover:bg-gray-100" : "text-white hover:bg-white/10"
+              scrolled || mobileOpen ? "text-white hover:bg-white/10" : "text-white hover:bg-white/10"
             }`}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
@@ -84,10 +84,10 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
-          mobileOpen ? "max-h-[600px] border-t border-gray-100" : "max-h-0"
+          mobileOpen ? "max-h-[600px] border-t border-white/10" : "max-h-0"
         }`}
       >
-        <div className="px-6 py-6 space-y-4 bg-white/95 backdrop-blur-md rounded-b-[2rem]">
+        <div className="px-6 py-6 space-y-4 bg-midnight/95 backdrop-blur-md rounded-b-[2rem]">
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
@@ -103,7 +103,7 @@ export default function Navbar() {
             
             <a
               href="#cta"
-              className="flex items-center justify-center gap-2 w-full bg-primary text-white py-3 rounded-xl font-bold transition-transform active:scale-95"
+              className="flex items-center justify-center gap-2 w-full bg-premium-gold text-midnight py-3 rounded-xl font-bold transition-transform active:scale-95"
               onClick={handleLinkClick}
             >
               <HiOutlineArrowDownTray size={20} />

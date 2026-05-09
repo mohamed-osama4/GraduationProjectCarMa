@@ -1,92 +1,91 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
   TrendingUp, 
   Users, 
   Briefcase, 
   DollarSign, 
   Activity,
-  Battery,
-  Droplets,
-  Wrench,
-  Clock,
+  Loader2,
   AlertTriangle,
-  Info,
-  Loader2
+  CheckCircle,
+  Clock
 } from 'lucide-react';
+import { FiClock, FiCheckCircle, FiRefreshCw, FiCheckSquare, FiXCircle } from 'react-icons/fi';
 import DashboardHeader from '../../../component/dashboard/DashboardHeader';
 import StatCard from '../../../component/dashboard/StatCard';
 import OrderApprovalCard from '../../../component/dashboard/OrderApprovalCard';
 import AlertCard from '../../../component/dashboard/AlertCard';
-import { getAdminDashboard } from '../../../services/adminService';
+import { updateOrderStatus, acceptOrder, rejectOrder } from '../../../services/adminService';
+import { useAdminData } from '../../../context/AdminDataContext';
 
 const AdminHome = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { dashboardData: data, loading, error, refreshAll, getStatus, getServiceStyle } = useAdminData();
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        setLoading(true);
-        const response = await getAdminDashboard();
-        // Assuming response.data contains the dashboard data
-        setData(response.data?.data || response.data);
-      } catch (err) {
-        console.error("Error fetching dashboard:", err);
-        setError("تعذر تحميل بيانات لوحة التحكم");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleApprove = async (id) => {
+    try {
+      await acceptOrder(id);
+      refreshAll();
+    } catch (err) {
+      console.error("Error approving order:", err);
+      alert("فشل في قبول الطلب");
+    }
+  };
 
-    fetchDashboard();
-  }, []);
+  const handleReject = async (id) => {
+    try {
+      await rejectOrder(id);
+      refreshAll();
+    } catch (err) {
+      console.error("Error rejecting order:", err);
+      alert("فشل في رفض الطلب");
+    }
+  };
 
-  // Map API data to UI stats (matching the 6 blocks in your image)
+  // Map API data to UI stats
   const stats = [
     {
       title: 'إيرادات اليوم',
-      value: data?.stats?.totalRevenue ? `${data.stats.totalRevenue.toLocaleString()} جنيه` : '0 جنيه',
-      trend: '+18.2%',
+      value: data?.stats?.todayRevenue !== undefined ? `${data.stats.todayRevenue.toLocaleString()} جنيه` : '0 جنيه',
+      trend: '+0%',
       trendUp: true,
       icon: DollarSign,
       iconBg: 'bg-green-100',
     },
     {
-      title: 'الفنيون المتاحون',
-      value: data?.stats?.totalOrders || '0', // Mapping from your JSON: totalOrders was 34
-      subValue: `45 / إجمالي`,
+      title: 'الورش المتاحة',
+      value: data?.stats?.totalTechs || '0',
+      subValue: `إجمالي الورش`,
       icon: Users,
       iconBg: 'bg-purple-100',
     },
     {
       title: 'مكتملة اليوم',
-      value: data?.stats?.todayOrders || '0',
-      trend: '+23.1%',
+      value: data?.stats?.completedToday || '0',
+      trend: '+0%',
       trendUp: true,
-      icon: Activity, // Check icon
+      icon: FiCheckSquare,
       iconBg: 'bg-green-100',
     },
     {
       title: 'جاري التنفيذ',
-      value: data?.stats?.activeOrders || '0',
-      trend: '+8',
+      value: data?.stats?.inProgressOrders || '0',
+      trend: '+0',
       trendUp: true,
-      icon: Activity, // Pulse icon
-      iconBg: 'bg-cyan-100',
+      icon: FiRefreshCw,
+      iconBg: 'bg-blue-100',
     },
     {
       title: 'قيد المراجعة',
       value: data?.stats?.pendingOrders || '0',
-      trend: '+5',
+      trend: '+0',
       trendUp: true,
-      icon: Clock,
-      iconBg: 'bg-yellow-100',
+      icon: FiClock,
+      iconBg: 'bg-amber-100',
     },
     {
       title: 'إجمالي الطلبات',
       value: data?.stats?.totalOrders ? data.stats.totalOrders.toLocaleString() : '0',
-      trend: '+12.5%',
+      trend: '+0%',
       trendUp: true,
       icon: TrendingUp,
       iconBg: 'bg-blue-100',
@@ -107,7 +106,7 @@ const AdminHome = () => {
       <div className="flex flex-col items-center justify-center min-h-[60vh] font-tajawal">
         <AlertTriangle className="text-red-500 mb-4" size={48} />
         <p className="text-red-600 font-bold">{error}</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="mt-4 px-6 py-2 bg-primary text-white rounded-xl font-bold"
         >
@@ -117,22 +116,20 @@ const AdminHome = () => {
     );
   }
 
-  const pendingOrders = data?.latestRequests || [];
+  const pendingOrders = data?.requestsNeedingApproval || [];
+  const activeOrders = data?.currentOrders || [];
   const alerts = data?.notifications || [];
 
-  const getServiceIcon = (serviceName) => {
-    if (!serviceName) return Briefcase;
-    const name = serviceName.toLowerCase();
-    if (name.includes('بطارية')) return Battery;
-    if (name.includes('زيت')) return Droplets;
-    if (name.includes('إطارات')) return Wrench;
-    return Briefcase;
+  const formatTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
     <div className="font-tajawal">
-      <DashboardHeader 
-        title="لوحة التحكم" 
+      <DashboardHeader
+        title="لوحة التحكم"
         subtitle="مرحباً بك مجدداً، إليك ملخص العمليات اليوم"
       />
 
@@ -150,31 +147,97 @@ const AdminHome = () => {
             <h2 className="text-2xl font-black text-slate-800">طلبات بانتظار الموافقة</h2>
             <button className="text-primary font-bold hover:underline">عرض الكل</button>
           </div>
-          
+
           <div className="space-y-4">
             {pendingOrders.length > 0 ? (
-              pendingOrders.map((order, idx) => (
-                <OrderApprovalCard 
-                  key={order.orderNumber || idx} 
-                  id={order.orderNumber}
-                  service={order.service}
-                  customer={order.customerName}
-                  phone={order.phoneNumber}
-                  time={order.date}
-                  location={order.address}
-                  price={order.price}
-                  rating={order.customerRate || "5.0"}
-                  prevOrders={order.customerPrevOrders || "0"}
-                  icon={getServiceIcon(order.service)}
-                />
-              ))
+              pendingOrders.map((order, idx) => {
+                const serviceStyle = getServiceStyle(order.serviceName);
+                return (
+                  <OrderApprovalCard
+                    key={order.id || idx}
+                    id={order.id}
+                    service={order.serviceName}
+                    customer={order.customerName}
+                    phone={order.phoneNumber}
+                    time={formatTime(order.createdAt)}
+                    location={order.address}
+                    price={order.price}
+                    rating={order.customerRate || "5.0"}
+                    prevOrders={order.customerPrevOrders || "0"}
+                    icon={serviceStyle.IconComponent}
+                    colorClass="shadow-sm"
+                    style={{ backgroundColor: serviceStyle.color }}
+                    onApprove={handleApprove}
+                    onReject={handleReject}
+                  />
+                );
+              })
             ) : (
               <div className="bg-white p-8 rounded-[2.5rem] text-center border border-dashed border-gray-200">
                 <p className="text-slate-400 font-bold">لا توجد طلبات جديدة حالياً</p>
               </div>
             )}
           </div>
+
+          {/* Active Orders Section */}
+          <div className="mt-12">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-black text-slate-800">الطلبات النشطة</h2>
+              <button className="text-primary font-bold hover:underline">عرض الكل</button>
+            </div>
+
+            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-right">
+                  <thead>
+                    <tr className="bg-gray-50/50">
+                      <th className="px-6 py-4 text-sm font-black text-slate-800">رقم الطلب</th>
+                      <th className="px-6 py-4 text-sm font-black text-slate-800">الخدمة</th>
+                      <th className="px-6 py-4 text-sm font-black text-slate-800">العميل</th>
+                      <th className="px-6 py-4 text-sm font-black text-slate-800">الحالة</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {activeOrders.length > 0 ? (
+                      activeOrders.map((order) => {
+                        const statusInfo = getStatus(order.status);
+                        const serviceStyle = getServiceStyle(order.serviceName);
+                        return (
+                          <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 font-bold text-sm text-slate-800">#{order.id}</td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2.5">
+                                <div
+                                  className="h-9 w-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm"
+                                  style={{ backgroundColor: serviceStyle.color }}
+                                >
+                                  <serviceStyle.IconComponent size={18} />
+                                </div>
+                                <span className="text-sm text-slate-600 whitespace-nowrap">{order.serviceName}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-slate-600">{order.customerName}</td>
+                            <td className="px-6 py-4">
+                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border ${statusInfo.bg} ${statusInfo.text} ${statusInfo.border || ''}`}>
+                                <statusInfo.icon size={12} className={statusInfo.value === 'InProgress' ? 'animate-spin' : ''} />
+                                {statusInfo.label}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-10 text-center text-slate-400 font-bold">لا توجد طلبات نشطة حالياً</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
+
 
         {/* Sidebar Content: Alerts & Recent Activity */}
         <div className="space-y-8">
@@ -183,7 +246,7 @@ const AdminHome = () => {
             <div className="space-y-4">
               {alerts.length > 0 ? (
                 alerts.map((alert) => (
-                  <AlertCard 
+                  <AlertCard
                     key={alert.id}
                     title={alert.title}
                     description={alert.description}
@@ -201,7 +264,7 @@ const AdminHome = () => {
           </div>
 
           <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100">
-            <h2 className="text-xl font-black text-slate-800 mb-6">نشاط الفنيين</h2>
+            <h2 className="text-xl font-black text-slate-800 mb-6">نشاط الورش</h2>
             <div className="space-y-6">
               {data?.techniciansActivity?.length > 0 ? (
                 data.techniciansActivity.map((activity, idx) => (
