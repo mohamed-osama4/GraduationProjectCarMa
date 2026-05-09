@@ -19,7 +19,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   const menuItems = [
     { name: 'الرئيسية', icon: Home, path: '/admin', end: true, color: 'text-blue-400' },
     { name: 'الطلبات', icon: FileText, path: '/admin/orders', color: 'text-emerald-400' },
-    { name: 'الفنيون', icon: Users, path: '/admin/technicians', color: 'text-orange-400' },
+    { name: 'الورش', icon: Users, path: '/admin/technicians', color: 'text-orange-400' },
     { name: 'الإشعارات', icon: Bell, path: '/admin/notifications', color: 'text-rose-400' },
     { name: 'التقارير', icon: BarChart2, path: '/admin/reports', color: 'text-purple-400' },
     { name: 'الملف الشخصي', icon: User, path: '/admin/profile', color: 'text-cyan-400' },

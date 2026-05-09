@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alyamama:wght@300..900&display=swap');
 
 @theme {
   /* الألوان الأساسية - Navy Blue */
@@ -28,6 +29,7 @@
 
   /* Fonts */
   --font-tajawal: "Tajawal", sans-serif;
+  --font-alyamama: "Alyamama", serif;
 
   /* الألوان الدلالية */
   --color-in-progress: #06b6d4;
@@ -61,7 +63,7 @@
 
 .noise-gradient-bg {
   background: 
-    linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #172554 100%),
+    linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #000000 100%),
     url("https://www.transparenttextures.com/patterns/fabric-1-light.png");
   background-blend-mode: soft-light;
   position: relative;
@@ -86,8 +88,8 @@
 }
 
 .glass3d { 
-  
-  --color-glass3d: rgb(30 58 138 / 0.45); 
+  --color-glass3d: rgba(0, 8, 20, 0.45); 
+  --filter-glass3d: blur(20px) saturate(180%);
   --noise-glass3d: none; 
 
   position: relative; 
@@ -142,8 +144,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px #f8fafc inset !important;
-    -webkit-text-fill-color: #1e293b !important;
+    -webkit-box-shadow: 0 0 0 30px rgba(0, 8, 20, 0.95) inset !important;
+    -webkit-text-fill-color: #ffffff !important;
     transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -185,4 +187,21 @@ input::-ms-clear {
 .custom-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(50%); }
+}
+
+.animate-ticker {
+  animation: ticker 40s linear infinite;
+}
+
+@keyframes flow-rtl {
+  0% { background-position: 0% 0%; }
+  100% { background-position: -20px 0%; }
+}
+
+.animate-flow-rtl {
+  animation: flow-rtl 0.8s linear infinite;
 }

@@ -34,7 +34,7 @@ export default function HowItWorks() {
     <section id="how-it-works" className="landing-section premium-dark-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <div data-aos="fade-up" className="mb-12">
-          <h2 className="section-title">كيف يعمل CarMA</h2>
+          <h2 className="section-title">كيف يعمل CarMa</h2>
           <p className="section-subtitle mx-auto">
             خطوات بسيطة تفصلك عن صيانة سيارتك
           </p>
@@ -44,7 +44,7 @@ export default function HowItWorks() {
           {/* Continuous Connection Line (Desktop only) */}
           <div className="hidden lg:block absolute top-12 left-[10%] right-[10%] h-[2px] animate-dash opacity-30 z-0" />
 
-          <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-4 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8 lg:gap-4 relative z-10">
             {STEPS.map((step, index) => (
               <div
                 key={index}

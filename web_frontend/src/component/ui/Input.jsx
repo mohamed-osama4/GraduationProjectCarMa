@@ -8,11 +8,11 @@ const Input = ({ label, icon, type = "text", placeholder, labelClassName = "text
         <input
           type={type}
           placeholder={placeholder}
-          className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none pr-10 transition-all placeholder:text-slate-300 bg-slate-50"
+          className="w-full px-4 py-3.5 rounded-xl border border-white/10 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/30 outline-none pr-10 transition-all placeholder:text-white/20 bg-white/5 text-white"
           {...props}
         />
         {icon && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40">
             {icon}
           </span>
         )}
