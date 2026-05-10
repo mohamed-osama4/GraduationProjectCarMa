@@ -47,6 +47,16 @@ export const searchOrders = () => {
 };
 
 /**
+ * Fetch Order details by ID.
+ * GET /api/orders/{id}
+ * @param {string|number} id
+ * @returns {Promise<import("axios").AxiosResponse>}
+ */
+export const getOrderById = (id) => {
+  return api.get(`/api/orders/${id}`);
+};
+
+/**
  * Update Order Status.
  * PUT /api/orders/{id}
  * @param {string} id

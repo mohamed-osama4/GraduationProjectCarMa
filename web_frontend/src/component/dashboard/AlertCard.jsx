@@ -3,32 +3,32 @@ import React from 'react';
 const AlertCard = ({ title, description, time, icon: Icon, type }) => {
   const styles = {
     emergency: {
-      bg: 'bg-red-50',
-      border: 'border-red-100',
-      iconBg: 'bg-red-100',
-      iconColor: 'text-red-500',
-      titleColor: 'text-red-800',
+      bg: 'bg-red-500/5',
+      border: 'border-red-500/20',
+      iconBg: 'bg-red-500/10',
+      iconColor: 'text-red-400',
+      titleColor: 'text-red-400',
     },
     warning: {
-      bg: 'bg-orange-50',
-      border: 'border-orange-100',
-      iconBg: 'bg-orange-100',
-      iconColor: 'text-orange-500',
-      titleColor: 'text-orange-800',
+      bg: 'bg-orange-500/5',
+      border: 'border-orange-500/20',
+      iconBg: 'bg-orange-500/10',
+      iconColor: 'text-orange-400',
+      titleColor: 'text-orange-400',
     },
     info: {
-      bg: 'bg-green-50',
-      border: 'border-green-100',
-      iconBg: 'bg-green-100',
-      iconColor: 'text-green-500',
-      titleColor: 'text-green-800',
+      bg: 'bg-[#D9B07C]/5',
+      border: 'border-[#D9B07C]/10',
+      iconBg: 'bg-[#D9B07C]/10',
+      iconColor: 'text-[#D9B07C]',
+      titleColor: 'text-white',
     }
   };
 
   const style = styles[type] || styles.info;
 
   return (
-    <div className={`${style.bg} ${style.border} border p-5 rounded-[2rem] flex items-start gap-4 font-tajawal mb-4 hover:shadow-sm transition-all cursor-pointer`}>
+    <div className={`${style.bg} ${style.border} border p-5 rounded-[2rem] flex items-start gap-4 font-tajawal mb-4 hover:border-white/10 transition-all cursor-pointer shadow-lg shadow-black/20`}>
       <div className="flex-1 text-right">
         <h4 className={`${style.titleColor} font-black text-base mb-1`}>{title}</h4>
         <p className="text-slate-500 text-xs font-medium leading-relaxed mb-2">{description}</p>

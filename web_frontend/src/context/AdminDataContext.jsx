@@ -55,12 +55,12 @@ export const AdminDataProvider = ({ children }) => {
   }, [fetchOrders, fetchDashboard]);
 
   const statusConfig = {
-    'Pending': { label: 'قيد المراجعة', bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', dot: 'bg-amber-500', icon: FiClock },
-    'Accepted': { label: 'تمت الموافقة', bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200', dot: 'bg-teal-500', icon: FiCheckCircle },
-    'InProgress': { label: 'جاري التنفيذ', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', dot: 'bg-blue-500', icon: FiRefreshCw },
-    'Completed': { label: 'مكتمل', bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200', dot: 'bg-green-500', icon: FiCheckSquare },
-    'Rejected': { label: 'مرفوض', bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', dot: 'bg-red-500', icon: FiXCircle },
-    'Cancelled': { label: 'ملغي', bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-200', dot: 'bg-gray-500', icon: FiXCircle },
+    'Pending': { label: 'قيد المراجعة', bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20', dot: 'bg-amber-500', icon: FiClock },
+    'Accepted': { label: 'تمت الموافقة', bg: 'bg-teal-500/10', text: 'text-teal-400', border: 'border-teal-500/20', dot: 'bg-teal-500', icon: FiCheckCircle },
+    'InProgress': { label: 'جاري التنفيذ', bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20', dot: 'bg-blue-500', icon: FiRefreshCw },
+    'Completed': { label: 'مكتمل', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', dot: 'bg-emerald-500', icon: FiCheckSquare },
+    'Rejected': { label: 'مرفوض', bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/20', dot: 'bg-red-500', icon: FiXCircle },
+    'Cancelled': { label: 'ملغي', bg: 'bg-white/5', text: 'text-slate-400', border: 'border-white/10', dot: 'bg-slate-500', icon: FiXCircle },
   };
 
   const getStatus = useCallback((status) => {
@@ -88,33 +88,33 @@ export const AdminDataProvider = ({ children }) => {
   const getServiceStyle = useCallback((service) => {
     const serviceName = typeof service === 'string' ? service : service?.name;
     const serviceIcon = typeof service === 'object' ? service?.icon : '';
-    const serviceColor = typeof service === 'object' ? service?.color : null;
-
+    
     const name = (serviceName || '').toLowerCase();
     const iconKey = (serviceIcon || '').toLowerCase();
 
     let IconComponent = GiAutoRepair;
-    let color = '#1E88E5'; // Default blue
+    let bgClass = 'bg-blue-500/10';
+    let textColorClass = 'text-blue-400';
 
-    // Prioritize our defined brand colors for known services to ensure consistency
     if (name.includes('battery') || name.includes('بطارية') || iconKey.includes('battery')) {
       IconComponent = GiBattery;
-      color = '#F59E0B'; // Amber
+      bgClass = 'bg-amber-500/10';
+      textColorClass = 'text-amber-400';
     } else if (name.includes('oil') || name.includes('زيت') || iconKey.includes('oil')) {
       IconComponent = GiOilDrum;
-      color = '#3B82F6'; // Blue
+      bgClass = 'bg-blue-500/10';
+      textColorClass = 'text-blue-400';
     } else if (name.includes('tire') || name.includes('إطار') || iconKey.includes('tire')) {
       IconComponent = GiCarWheel;
-      color = '#10B981'; // Emerald
+      bgClass = 'bg-emerald-500/10';
+      textColorClass = 'text-emerald-400';
     } else if (name.includes('wash') || name.includes('غسيل') || iconKey.includes('wash')) {
       IconComponent = MdLocalCarWash;
-      color = '#6366F1'; // Indigo
-    } else if (serviceColor) {
-      // Fallback to API color if it's a service we don't recognize
-      color = serviceColor;
+      bgClass = 'bg-indigo-500/10';
+      textColorClass = 'text-indigo-400';
     }
 
-    return { color, IconComponent };
+    return { IconComponent, bgClass, textColorClass };
   }, []);
 
   const value = {

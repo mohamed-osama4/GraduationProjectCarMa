@@ -49,14 +49,16 @@ const AdminHome = () => {
       trend: '+0%',
       trendUp: true,
       icon: DollarSign,
-      iconBg: 'bg-green-100',
+      iconBg: 'bg-emerald-500/10',
+      iconColor: 'text-emerald-400',
     },
     {
       title: 'الورش المتاحة',
       value: data?.stats?.totalTechs || '0',
       subValue: `إجمالي الورش`,
       icon: Users,
-      iconBg: 'bg-purple-100',
+      iconBg: 'bg-cyan-500/10',
+      iconColor: 'text-cyan-400',
     },
     {
       title: 'مكتملة اليوم',
@@ -64,7 +66,8 @@ const AdminHome = () => {
       trend: '+0%',
       trendUp: true,
       icon: FiCheckSquare,
-      iconBg: 'bg-green-100',
+      iconBg: 'bg-[#D9B07C]/10',
+      iconColor: 'text-[#D9B07C]',
     },
     {
       title: 'جاري التنفيذ',
@@ -72,7 +75,8 @@ const AdminHome = () => {
       trend: '+0',
       trendUp: true,
       icon: FiRefreshCw,
-      iconBg: 'bg-blue-100',
+      iconBg: 'bg-blue-500/10',
+      iconColor: 'text-blue-400',
     },
     {
       title: 'قيد المراجعة',
@@ -80,7 +84,8 @@ const AdminHome = () => {
       trend: '+0',
       trendUp: true,
       icon: FiClock,
-      iconBg: 'bg-amber-100',
+      iconBg: 'bg-amber-500/10',
+      iconColor: 'text-amber-400',
     },
     {
       title: 'إجمالي الطلبات',
@@ -88,7 +93,8 @@ const AdminHome = () => {
       trend: '+0%',
       trendUp: true,
       icon: TrendingUp,
-      iconBg: 'bg-blue-100',
+      iconBg: 'bg-indigo-500/10',
+      iconColor: 'text-indigo-400',
     },
   ];
 
@@ -127,7 +133,7 @@ const AdminHome = () => {
   };
 
   return (
-    <div className="font-tajawal">
+    <div className="font-tajawal min-h-screen">
       <DashboardHeader
         title="لوحة التحكم"
         subtitle="مرحباً بك مجدداً، إليك ملخص العمليات اليوم"
@@ -144,8 +150,8 @@ const AdminHome = () => {
         {/* Main Content: Pending Approvals */}
         <div className="lg:col-span-2">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-black text-slate-800">طلبات بانتظار الموافقة</h2>
-            <button className="text-primary font-bold hover:underline">عرض الكل</button>
+            <h2 className="text-2xl font-black text-white">طلبات بانتظار الموافقة</h2>
+            <button className="text-[#D9B07C] font-black hover:underline text-sm uppercase tracking-widest">عرض الكل</button>
           </div>
 
           <div className="space-y-4">
@@ -165,60 +171,59 @@ const AdminHome = () => {
                     rating={order.customerRate || "5.0"}
                     prevOrders={order.customerPrevOrders || "0"}
                     icon={serviceStyle.IconComponent}
-                    colorClass="shadow-sm"
-                    style={{ backgroundColor: serviceStyle.color }}
+                    iconBgClass={serviceStyle.bgClass}
+                    iconColorClass={serviceStyle.textColorClass}
                     onApprove={handleApprove}
                     onReject={handleReject}
                   />
                 );
               })
             ) : (
-              <div className="bg-white p-8 rounded-[2.5rem] text-center border border-dashed border-gray-200">
-                <p className="text-slate-400 font-bold">لا توجد طلبات جديدة حالياً</p>
+              <div className="bg-[#121212] p-12 rounded-[2.5rem] text-center border border-dashed border-white/5 shadow-xl">
+                <p className="text-slate-500 font-bold">لا توجد طلبات جديدة حالياً</p>
               </div>
             )}
           </div>
 
           {/* Active Orders Section */}
-          <div className="mt-12">
+          <div className="mt-16">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-black text-slate-800">الطلبات النشطة</h2>
-              <button className="text-primary font-bold hover:underline">عرض الكل</button>
+              <h2 className="text-2xl font-black text-white">الطلبات النشطة</h2>
+              <button className="text-[#D9B07C] font-black hover:underline text-sm uppercase tracking-widest">عرض الكل</button>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-[#121212] rounded-[2.5rem] shadow-2xl border border-white/5 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-right">
                   <thead>
-                    <tr className="bg-gray-50/50">
-                      <th className="px-6 py-4 text-sm font-black text-slate-800">رقم الطلب</th>
-                      <th className="px-6 py-4 text-sm font-black text-slate-800">الخدمة</th>
-                      <th className="px-6 py-4 text-sm font-black text-slate-800">العميل</th>
-                      <th className="px-6 py-4 text-sm font-black text-slate-800">الحالة</th>
+                    <tr className="bg-white/5">
+                      <th className="px-8 py-5 text-xs font-black text-[#D9B07C] uppercase tracking-widest">رقم الطلب</th>
+                      <th className="px-8 py-5 text-xs font-black text-[#D9B07C] uppercase tracking-widest">الخدمة</th>
+                      <th className="px-8 py-5 text-xs font-black text-[#D9B07C] uppercase tracking-widest">العميل</th>
+                      <th className="px-8 py-5 text-xs font-black text-[#D9B07C] uppercase tracking-widest">الحالة</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50">
+                  <tbody className="divide-y divide-white/5">
                     {activeOrders.length > 0 ? (
                       activeOrders.map((order) => {
                         const statusInfo = getStatus(order.status);
                         const serviceStyle = getServiceStyle(order.serviceName);
                         return (
-                          <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-4 font-bold text-sm text-slate-800">#{order.id}</td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-2.5">
+                          <tr key={order.id} className="hover:bg-white/5 transition-all duration-300 group">
+                            <td className="px-8 py-5 font-black text-sm text-white">#{order.id}</td>
+                            <td className="px-8 py-5">
+                              <div className="flex items-center gap-4">
                                 <div
-                                  className="h-9 w-9 rounded-xl flex items-center justify-center text-white shrink-0 shadow-sm"
-                                  style={{ backgroundColor: serviceStyle.color }}
+                                  className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-black/20 ${serviceStyle.bgClass} ${serviceStyle.textColorClass}`}
                                 >
-                                  <serviceStyle.IconComponent size={18} />
+                                  <serviceStyle.IconComponent size={20} />
                                 </div>
-                                <span className="text-sm text-slate-600 whitespace-nowrap">{order.serviceName}</span>
+                                <span className="text-sm font-bold text-slate-300 whitespace-nowrap">{order.serviceName}</span>
                               </div>
                             </td>
-                            <td className="px-6 py-4 text-sm text-slate-600">{order.customerName}</td>
-                            <td className="px-6 py-4">
-                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black border ${statusInfo.bg} ${statusInfo.text} ${statusInfo.border || ''}`}>
+                            <td className="px-8 py-5 text-sm font-bold text-slate-400">{order.customerName}</td>
+                            <td className="px-8 py-5">
+                              <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black border transition-all ${statusInfo.bg} ${statusInfo.text} border-white/5`}>
                                 <statusInfo.icon size={12} className={statusInfo.value === 'InProgress' ? 'animate-spin' : ''} />
                                 {statusInfo.label}
                               </span>
@@ -228,7 +233,7 @@ const AdminHome = () => {
                       })
                     ) : (
                       <tr>
-                        <td colSpan="4" className="px-6 py-10 text-center text-slate-400 font-bold">لا توجد طلبات نشطة حالياً</td>
+                        <td colSpan="4" className="px-8 py-16 text-center text-slate-500 font-bold">لا توجد طلبات نشطة حالياً</td>
                       </tr>
                     )}
                   </tbody>
@@ -242,7 +247,7 @@ const AdminHome = () => {
         {/* Sidebar Content: Alerts & Recent Activity */}
         <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-black text-slate-800 mb-6">تنبيهات هامة</h2>
+            <h2 className="text-2xl font-black text-white mb-6">تنبيهات هامة</h2>
             <div className="space-y-4">
               {alerts.length > 0 ? (
                 alerts.map((alert) => (
@@ -252,35 +257,36 @@ const AdminHome = () => {
                     description={alert.description}
                     time={alert.time}
                     type={alert.type === 'urgent' ? 'emergency' : alert.type || 'info'}
-                    icon={alert.type === 'urgent' ? AlertTriangle : Info}
+                    icon={alert.type === 'urgent' ? AlertTriangle : CheckCircle}
                   />
                 ))
               ) : (
-                <div className="bg-white p-6 rounded-[2.5rem] text-center border border-dashed border-gray-200">
-                  <p className="text-slate-400 font-bold text-sm">لا توجد تنبيهات جديدة</p>
+                <div className="bg-[#121212] p-8 rounded-[2.5rem] text-center border border-dashed border-white/5 shadow-xl">
+                  <p className="text-slate-500 font-bold text-sm">لا توجد تنبيهات جديدة</p>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100">
-            <h2 className="text-xl font-black text-slate-800 mb-6">نشاط الورش</h2>
-            <div className="space-y-6">
+          <div className="bg-[#121212] p-8 rounded-[2.5rem] shadow-2xl border border-white/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#D9B07C]/5 blur-3xl rounded-full -mr-16 -mt-16"></div>
+            <h2 className="text-xl font-black text-white mb-8 relative z-10">نشاط الورش</h2>
+            <div className="space-y-8 relative z-10">
               {data?.techniciansActivity?.length > 0 ? (
                 data.techniciansActivity.map((activity, idx) => (
-                  <div key={idx} className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold shrink-0">
+                  <div key={idx} className="flex items-center gap-5 group/item transition-all">
+                    <div className="h-12 w-12 rounded-2xl bg-[#D9B07C]/10 border border-[#D9B07C]/20 flex items-center justify-center text-[#D9B07C] font-black shrink-0 shadow-lg transition-transform group-hover/item:scale-110">
                       {activity.technicianName?.[0] || 'ف'}
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-800">{activity.technicianName}</p>
-                      <p className="text-xs text-slate-500">{activity.description}</p>
+                    <div className="flex-1">
+                      <p className="text-sm font-black text-white">{activity.technicianName}</p>
+                      <p className="text-xs text-slate-500 font-bold mt-0.5">{activity.description}</p>
                     </div>
-                    <span className="text-[10px] text-slate-400 mr-auto">{activity.timeAgo}</span>
+                    <span className="text-[10px] font-black text-slate-600 bg-white/5 px-2 py-1 rounded-lg mr-auto">{activity.timeAgo}</span>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-slate-400 text-center">لا يوجد نشاط مسجل مؤخراً</p>
+                <p className="text-xs text-slate-500 text-center font-bold">لا يوجد نشاط مسجل مؤخراً</p>
               )}
             </div>
           </div>
