@@ -7,14 +7,14 @@ import { useSignalREvent } from '../../context/SignalRContext';
 // Notification type icon/color mapping (matches Notifications.jsx)
 const getNotifTypeStyle = (typeVal) => {
   const t = (typeVal || '').toString().toLowerCase();
-  if (t === '1' || t.includes('servicecompleted')) return { bg: 'bg-emerald-100 text-emerald-600', icon: CheckCircle };
-  if (t === '2' || t.includes('technicianonway')) return { bg: 'bg-blue-100 text-blue-600', icon: Users };
-  if (t === '3' || t.includes('requestaccepted')) return { bg: 'bg-indigo-100 text-indigo-600', icon: Check };
-  if (t === '4' || t.includes('walletcredit')) return { bg: 'bg-teal-100 text-teal-600', icon: Wallet };
-  if (t === '5' || t.includes('appointment')) return { bg: 'bg-orange-100 text-orange-600', icon: Clock };
-  if (t === '6' || t.includes('specialoffer')) return { bg: 'bg-fuchsia-100 text-fuchsia-600', icon: Tag };
-  if (t === '7' || t.includes('system')) return { bg: 'bg-slate-100 text-slate-600', icon: AlertCircle };
-  return { bg: 'bg-gray-100 text-slate-500', icon: Bell };
+  if (t === '1' || t.includes('servicecompleted')) return { bg: 'bg-emerald-500/10', text: 'text-emerald-400', icon: CheckCircle };
+  if (t === '2' || t.includes('technicianonway')) return { bg: 'bg-blue-500/10', text: 'text-blue-400', icon: Users };
+  if (t === '3' || t.includes('requestaccepted')) return { bg: 'bg-indigo-500/10', text: 'text-indigo-400', icon: Check };
+  if (t === '4' || t.includes('walletcredit')) return { bg: 'bg-teal-500/10', text: 'text-teal-400', icon: Wallet };
+  if (t === '5' || t.includes('appointment')) return { bg: 'bg-orange-500/10', text: 'text-orange-400', icon: Clock };
+  if (t === '6' || t.includes('specialoffer')) return { bg: 'bg-fuchsia-500/10', text: 'text-fuchsia-400', icon: Tag };
+  if (t === '7' || t.includes('system')) return { bg: 'bg-white/5', text: 'text-slate-400', icon: AlertCircle };
+  return { bg: 'bg-white/5', text: 'text-slate-500', icon: Bell };
 };
 
 const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
@@ -193,21 +193,21 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
   };
 
   return (
-    <div className="flex flex-col font-tajawal relative z-50">
+    <div className="flex flex-col font-tajawal relative z-50 mb-8">
       {/* Toast Notification */}
       {toast && (
         <div className="fixed top-4 left-4 z-[100] animate-slide-in-left">
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 max-w-sm flex gap-3 items-start">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+          <div className="bg-[#121212] rounded-2xl shadow-2xl border border-white/5 p-4 max-w-sm flex gap-3 items-start backdrop-blur-xl">
+            <div className="h-10 w-10 rounded-xl bg-[#D9B07C]/10 text-[#D9B07C] flex items-center justify-center shrink-0">
               <Zap size={20} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-black text-slate-800 truncate">{toast.title}</p>
-              <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{toast.message}</p>
+              <p className="text-sm font-black text-white truncate">{toast.title}</p>
+              <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{toast.message}</p>
             </div>
             <button 
               onClick={() => setToast(null)} 
-              className="text-slate-400 hover:text-slate-600 transition-colors shrink-0"
+              className="text-slate-500 hover:text-white transition-colors shrink-0"
             >
               <X size={16} />
             </button>
@@ -221,14 +221,14 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
         <div className="flex items-center gap-4">
           <button 
             onClick={onMenuClick}
-            className="md:hidden p-2 hover:bg-slate-50 rounded-lg transition-colors text-slate-600"
+            className="md:hidden p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-400"
           >
             <Menu size={24} />
           </button>
           
           <div className="flex flex-col text-right">
-            <h1 className="text-xl sm:text-2xl font-black text-slate-800">{title}</h1>
-            {subtitle && <p className="hidden sm:block text-slate-500 text-[10px] font-medium">{subtitle}</p>}
+            <h1 className="text-xl sm:text-2xl font-black text-white">{title}</h1>
+            {subtitle && <p className="hidden sm:block text-[#D9B07C] text-[10px] font-bold uppercase tracking-wider opacity-80">{subtitle}</p>}
           </div>
         </div>
 
@@ -241,14 +241,14 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => query.length >= 3 && setShowResults(true)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-12 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-12 text-right"
+              className="w-full bg-[#121212] border border-white/5 rounded-2xl py-3 px-12 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#D9B07C]/20 focus:border-[#D9B07C]/30 transition-all pr-12 text-right shadow-xl"
             />
-            <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            {loading && <Loader2 size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary animate-spin" />}
+            <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" />
+            {loading && <Loader2 size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#D9B07C] animate-spin" />}
             {query && !loading && (
               <X 
                 size={18} 
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer hover:text-slate-600" 
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 cursor-pointer hover:text-white" 
                 onClick={() => setQuery('')}
               />
             )}
@@ -256,23 +256,23 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
 
           {/* Search Results Dropdown */}
           {showResults && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-[2rem] shadow-2xl border border-gray-100 max-h-[400px] overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-right">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-[#121212] rounded-[2rem] shadow-2xl border border-white/5 max-h-[400px] overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-right backdrop-blur-xl">
               <div className="p-4">
                 {/* Orders Section */}
                 {results.orders?.length > 0 && (
                   <div className="mb-4">
-                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2 px-2">الطلبات</h3>
+                    <h3 className="text-[10px] font-black text-[#D9B07C] uppercase tracking-wider mb-2 px-2">الطلبات</h3>
                     {results.orders.map((order) => (
                       <div 
                         key={order.id} 
                         onClick={() => handleResultClick('order', order.id)}
-                        className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-2xl cursor-pointer transition-colors group justify-end"
+                        className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-2xl cursor-pointer transition-colors group justify-end"
                       >
                         <div className="flex flex-col items-end">
-                          <p className="text-sm font-bold text-slate-800">طلب #{order.id}</p>
+                          <p className="text-sm font-bold text-white">طلب #{order.id}</p>
                           <p className="text-xs text-slate-500">{order.serviceName || "خدمة غير محددة"}</p>
                         </div>
-                        <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-[#D9B07C] group-hover:bg-[#D9B07C] group-hover:text-black transition-colors">
                           <FileText size={20} />
                         </div>
                       </div>
@@ -283,21 +283,21 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
                 {/* Users Section */}
                 {results.users?.length > 0 && (
                   <div>
-                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2 px-2">المستخدمين</h3>
+                    <h3 className="text-[10px] font-black text-[#D9B07C] uppercase tracking-wider mb-2 px-2">المستخدمين</h3>
                     {results.users.map((user) => (
                       <div 
                         key={user.id} 
                         onClick={() => handleResultClick('user', user.id)}
-                        className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-2xl cursor-pointer transition-colors group justify-end"
+                        className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-2xl cursor-pointer transition-colors group justify-end"
                       >
-                        <span className="text-[10px] font-black px-2 py-1 bg-gray-100 text-slate-500 rounded-lg uppercase mr-auto">
+                        <span className="text-[10px] font-black px-2 py-1 bg-white/5 text-slate-400 rounded-lg uppercase mr-auto">
                           {user.type === 'technician' ? 'فني' : 'عميل'}
                         </span>
                         <div className="flex flex-col items-end">
-                          <p className="text-sm font-bold text-slate-800">{user.name}</p>
+                          <p className="text-sm font-bold text-white">{user.name}</p>
                           <p className="text-xs text-slate-500">{user.email}</p>
                         </div>
-                        <div className="h-10 w-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                        <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-[#D9B07C] group-hover:bg-[#D9B07C] group-hover:text-black transition-colors">
                           <User size={20} />
                         </div>
                       </div>
@@ -307,8 +307,8 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
 
                 {results.users?.length === 0 && results.orders?.length === 0 && (
                   <div className="py-8 text-center">
-                    <Search size={32} className="mx-auto text-slate-200 mb-2" />
-                    <p className="text-slate-400 font-bold">لا توجد نتائج تطابق بحثك</p>
+                    <Search size={32} className="mx-auto text-white/10 mb-2" />
+                    <p className="text-slate-500 font-bold">لا توجد نتائج تطابق بحثك</p>
                   </div>
                 )}
               </div>
@@ -322,30 +322,30 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
           <div className="relative" ref={notificationRef}>
             <div 
               onClick={() => setShowNotifications(!showNotifications)}
-              className={`relative cursor-pointer p-2 rounded-full transition-all ${showNotifications ? 'bg-primary/10 text-primary' : 'hover:bg-gray-100 text-slate-600'}`}
+              className={`relative cursor-pointer p-2 rounded-full transition-all ${showNotifications ? 'bg-[#D9B07C]/10 text-[#D9B07C]' : 'hover:bg-white/5 text-slate-400'}`}
             >
               <Bell size={22} />
               {unreadCount > 0 && (
-                <span className="absolute top-0 right-0 h-5 w-5 bg-red-500 rounded-full border-2 border-white text-[9px] font-black text-white flex items-center justify-center animate-pulse">
+                <span className="absolute top-0 right-0 h-5 w-5 bg-[#D9B07C] rounded-full border-2 border-[#0A0A0A] text-[9px] font-black text-black flex items-center justify-center">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
             </div>
 
             {showNotifications && (
-              <div className="absolute top-full left-0 mt-3 w-[380px] bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-right">
-                <div className="p-6 border-b border-gray-50 flex justify-between items-center">
+              <div className="absolute top-full left-0 mt-3 w-[380px] bg-[#121212] rounded-[2.5rem] shadow-2xl border border-white/5 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-right backdrop-blur-xl">
+                <div className="p-6 border-b border-white/5 flex justify-between items-center">
                   <button 
                     onClick={handleMarkAllRead}
                     disabled={unreadCount === 0}
-                    className={`text-xs font-bold transition-colors ${unreadCount > 0 ? 'text-primary hover:underline' : 'text-slate-300 cursor-not-allowed'}`}
+                    className={`text-xs font-bold transition-colors ${unreadCount > 0 ? 'text-[#D9B07C] hover:underline' : 'text-slate-600 cursor-not-allowed'}`}
                   >
                     تحديد الكل كمقروء
                   </button>
-                  <h3 className="text-lg font-black text-slate-800">التنبيهات</h3>
+                  <h3 className="text-lg font-black text-white">التنبيهات</h3>
                 </div>
 
-                <div className="max-h-[400px] overflow-y-auto">
+                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                   {notifications.length > 0 ? (
                     notifications.map((notif) => {
                       const typeStyle = getNotifTypeStyle(notif.type);
@@ -353,19 +353,19 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
                       return (
                         <div 
                           key={notif.id}
-                          className={`p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer flex gap-3 ${!notif.isRead ? 'bg-blue-50/30' : ''}`}
+                          className={`p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer flex gap-3 ${!notif.isRead ? 'bg-[#D9B07C]/5' : ''}`}
                         >
                           <div className="flex-1 min-w-0">
                             <div className="flex justify-between items-center mb-1 gap-2">
-                              <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1 shrink-0">
+                              <span className="text-[10px] text-slate-500 font-bold flex items-center gap-1 shrink-0">
                                 {formatNotificationTime(notif.createdAt)}
                                 <Clock size={10} />
                               </span>
-                              <h4 className="text-sm font-black text-slate-800 truncate">{notif.title}</h4>
+                              <h4 className="text-sm font-black text-white truncate">{notif.title}</h4>
                             </div>
-                            <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{notif.message}</p>
+                            <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">{notif.message}</p>
                           </div>
-                          <div className={`h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 ${typeStyle.bg}`}>
+                          <div className={`h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 ${typeStyle.bg} ${typeStyle.text}`}>
                             <TypeIcon size={18} />
                           </div>
                         </div>
@@ -373,19 +373,19 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
                     })
                   ) : (
                     <div className="py-12 text-center">
-                      <Bell size={48} className="mx-auto text-slate-100 mb-4" />
-                      <p className="text-slate-400 font-bold">لا توجد تنبيهات جديدة</p>
+                      <Bell size={48} className="mx-auto text-white/5 mb-4" />
+                      <p className="text-slate-500 font-bold">لا توجد تنبيهات جديدة</p>
                     </div>
                   )}
                 </div>
 
-                <div className="p-4 bg-gray-50 text-center border-t border-gray-100">
+                <div className="p-4 bg-white/5 text-center border-t border-white/5">
                   <button 
                     onClick={() => {
                       setShowNotifications(false);
                       navigate('/admin/notifications');
                     }}
-                    className="text-xs font-black text-primary hover:underline transition-colors"
+                    className="text-xs font-black text-[#D9B07C] hover:underline transition-colors"
                   >
                     عرض جميع الإشعارات
                   </button>
@@ -396,16 +396,16 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
 
           {/* User Profile */}
           <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-            <ChevronDown size={18} className="text-slate-400" />
+            <ChevronDown size={18} className="text-slate-500" />
             <div className="flex flex-col items-end text-right">
-              <span className="text-sm font-bold text-slate-900">
+              <span className="text-sm font-bold text-white">
                 {profile?.name && profile.name !== 'string' ? profile.name : 'مدير النظام'}
               </span>
-              <span className="text-xs text-slate-500 capitalize">
+              <span className="text-[10px] text-[#D9B07C] font-black uppercase tracking-wider">
                 {profile?.role === 'admin' ? 'مدير العمليات' : profile?.role || 'مشرف'}
               </span>
             </div>
-            <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-200">
+            <div className="h-10 w-10 rounded-full bg-[#D9B07C] flex items-center justify-center text-black font-black text-sm shadow-xl shadow-[#D9B07C]/10">
               {getInitials(profile?.name)}
             </div>
           </div>

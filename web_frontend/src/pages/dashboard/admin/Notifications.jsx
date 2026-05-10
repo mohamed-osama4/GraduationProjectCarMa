@@ -276,25 +276,29 @@ const Notifications = () => {
       title: 'إجمالي الإشعارات',
       value: totalCount.toString(),
       icon: Bell,
-      iconBg: 'bg-blue-100 text-blue-600',
+      iconBg: 'bg-indigo-500/10',
+      iconColor: 'text-indigo-400',
     },
     {
       title: 'غير مقروءة',
       value: unreadCount.toString(),
       icon: AlertCircle,
-      iconBg: 'bg-red-100 text-red-600',
+      iconBg: 'bg-red-500/10',
+      iconColor: 'text-red-400',
     },
     {
       title: 'عاجلة',
       value: '-', // Needs API support to get specific count
       icon: Clock,
-      iconBg: 'bg-orange-100 text-orange-600',
+      iconBg: 'bg-amber-500/10',
+      iconColor: 'text-amber-400',
     },
     {
       title: 'مقروءة',
       value: (totalCount > 0 && unreadCount >= 0) ? (totalCount - unreadCount).toString() : '-',
       icon: CheckCircle,
-      iconBg: 'bg-green-100 text-green-600',
+      iconBg: 'bg-emerald-500/10',
+      iconColor: 'text-emerald-400',
     }
   ];
 
@@ -304,39 +308,39 @@ const Notifications = () => {
     
     // Check by exact backend Enum ID or String
     if (t === '1' || t.includes('servicecompleted')) {
-      return { badgeBg: 'bg-emerald-100 text-emerald-600', iconBg: 'bg-emerald-50 text-emerald-500', icon: CheckCircle, label: 'مكتملة' };
+      return { badgeBg: 'bg-emerald-500/10 text-emerald-400', iconBg: 'bg-emerald-500/10 text-emerald-400', icon: CheckCircle, label: 'مكتملة' };
     }
     if (t === '2' || t.includes('technicianonway')) {
-      return { badgeBg: 'bg-blue-100 text-blue-600', iconBg: 'bg-blue-50 text-blue-500', icon: Users, label: 'فني' };
+      return { badgeBg: 'bg-blue-500/10 text-blue-400', iconBg: 'bg-blue-500/10 text-blue-400', icon: Users, label: 'فني' };
     }
     if (t === '3' || t.includes('requestaccepted')) {
-      return { badgeBg: 'bg-indigo-100 text-indigo-600', iconBg: 'bg-indigo-50 text-indigo-500', icon: Check, label: 'مقبول' };
+      return { badgeBg: 'bg-indigo-500/10 text-indigo-400', iconBg: 'bg-indigo-500/10 text-indigo-400', icon: Check, label: 'مقبول' };
     }
     if (t === '4' || t.includes('walletcredit')) {
-      return { badgeBg: 'bg-teal-100 text-teal-600', iconBg: 'bg-teal-50 text-teal-500', icon: Wallet, label: 'رصيد' };
+      return { badgeBg: 'bg-teal-500/10 text-teal-400', iconBg: 'bg-teal-500/10 text-teal-400', icon: Wallet, label: 'رصيد' };
     }
     if (t === '5' || t.includes('appointment')) {
-      return { badgeBg: 'bg-orange-100 text-orange-600', iconBg: 'bg-orange-50 text-orange-500', icon: Clock, label: 'موعد' };
+      return { badgeBg: 'bg-orange-500/10 text-orange-400', iconBg: 'bg-orange-500/10 text-orange-400', icon: Clock, label: 'موعد' };
     }
     if (t === '6' || t.includes('specialoffer')) {
-      return { badgeBg: 'bg-fuchsia-100 text-fuchsia-600', iconBg: 'bg-fuchsia-50 text-fuchsia-500', icon: Tag, label: 'عرض' };
+      return { badgeBg: 'bg-fuchsia-500/10 text-fuchsia-400', iconBg: 'bg-fuchsia-500/10 text-fuchsia-400', icon: Tag, label: 'عرض' };
     }
     if (t === '7' || t.includes('system')) {
-      return { badgeBg: 'bg-slate-100 text-slate-600', iconBg: 'bg-slate-50 text-slate-500', icon: AlertCircle, label: 'نظام' };
+      return { badgeBg: 'bg-white/5 text-slate-400', iconBg: 'bg-white/5 text-slate-400', icon: AlertCircle, label: 'نظام' };
     }
     
     // Fallback using severity if type doesn't match
     if (s === '4' || s.includes('error')) {
-      return { badgeBg: 'bg-red-100 text-red-600', iconBg: 'bg-red-50 text-red-500', icon: AlertCircle, label: 'عاجل' };
+      return { badgeBg: 'bg-red-500/10 text-red-400', iconBg: 'bg-red-500/10 text-red-400', icon: AlertCircle, label: 'عاجل' };
     }
     if (s === '1' || s.includes('success')) {
-      return { badgeBg: 'bg-green-100 text-green-600', iconBg: 'bg-green-50 text-green-500', icon: Check, label: 'نجاح' };
+      return { badgeBg: 'bg-emerald-500/10 text-emerald-400', iconBg: 'bg-emerald-500/10 text-emerald-400', icon: Check, label: 'نجاح' };
     }
     if (s === '3' || s.includes('warning')) {
-      return { badgeBg: 'bg-orange-100 text-orange-600', iconBg: 'bg-orange-50 text-orange-500', icon: AlertCircle, label: 'تحذير' };
+      return { badgeBg: 'bg-amber-500/10 text-amber-400', iconBg: 'bg-amber-500/10 text-amber-400', icon: AlertCircle, label: 'تحذير' };
     }
 
-    return { badgeBg: 'bg-gray-100 text-gray-600', iconBg: 'bg-gray-50 text-gray-500', icon: Bell, label: 'إشعار' };
+    return { badgeBg: 'bg-white/5 text-slate-400', iconBg: 'bg-white/5 text-slate-400', icon: Bell, label: 'إشعار' };
   };
 
   const formatDate = (dateString) => {
@@ -376,38 +380,39 @@ const Notifications = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 relative">
+      <div className="bg-[#121212] rounded-[2.5rem] shadow-2xl border border-white/5 p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#D9B07C]/5 blur-[100px] rounded-full -mr-32 -mt-32"></div>
         
         {/* Loading Overlay */}
         {loading && (
-          <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center rounded-3xl backdrop-blur-[1px]">
-            <Loader2 className="animate-spin text-primary" size={32} />
+          <div className="absolute inset-0 bg-[#121212]/60 z-10 flex items-center justify-center rounded-3xl backdrop-blur-[2px]">
+            <Loader2 className="animate-spin text-[#D9B07C]" size={48} />
           </div>
         )}
 
         {/* Search */}
-        <div className="relative mb-6">
+        <div className="relative mb-8 group z-10">
           <input 
             type="text" 
             placeholder="ابحث في الإشعارات (محلياً)..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-xl py-3 px-12 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-right"
+            className="w-full bg-[#121212] border border-white/10 rounded-2xl py-4 pr-14 pl-6 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-[#D9B07C]/10 focus:border-[#D9B07C]/30 transition-all text-white placeholder-slate-500 focus:bg-[#1a1a1a]"
           />
-          <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search size={22} className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#D9B07C] transition-colors" />
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col gap-6 mb-6 text-sm">
+        <div className="flex flex-col gap-8 mb-8 text-sm relative z-10">
           
-          <div className="flex flex-col gap-2">
-            <span className="text-slate-500 font-bold mb-1">النوع</span>
+          <div className="flex flex-col gap-3">
+            <span className="text-[#D9B07C] font-black uppercase tracking-widest text-[10px]">نوع الإشعار</span>
             <div className="flex flex-wrap items-center gap-2">
               {typeFiltersList.map(filter => (
                 <button 
                   key={filter.id}
                   onClick={() => handleTypeChange(filter.id)}
-                  className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors ${typeFilter === filter.id ? 'bg-primary text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
+                  className={`px-5 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${typeFilter === filter.id ? 'bg-[#D9B07C] text-black shadow-lg shadow-[#D9B07C]/20 scale-105' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
                 >
                   {filter.label}
                 </button>
@@ -415,48 +420,47 @@ const Notifications = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <span className="text-slate-500 font-bold mb-1">الحالة</span>
+          <div className="flex flex-col gap-3">
+            <span className="text-[#D9B07C] font-black uppercase tracking-widest text-[10px]">الحالة</span>
             <div className="flex flex-wrap items-center gap-2">
               <button 
                 onClick={() => handleStatusChange('all')}
-                className={`px-6 py-2 rounded-xl font-bold transition-colors ${statusFilter === 'all' ? 'bg-[#1e40af] text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
+                className={`px-6 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${statusFilter === 'all' ? 'bg-white/10 text-white border border-white/20' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
               >
                 الكل
               </button>
               <button 
                 onClick={() => handleStatusChange('unread')}
-                className={`px-6 py-2 rounded-xl font-bold transition-colors ${statusFilter === 'unread' ? 'bg-[#1e40af] text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
+                className={`px-6 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${statusFilter === 'unread' ? 'bg-[#D9B07C] text-black shadow-lg shadow-[#D9B07C]/20 scale-105' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
               >
                 غير مقروءة
               </button>
               <button 
                 onClick={() => handleStatusChange('read')}
-                className={`px-6 py-2 rounded-xl font-bold transition-colors ${statusFilter === 'read' ? 'bg-[#1e40af] text-white shadow-md' : 'bg-gray-50 text-slate-600 hover:bg-gray-100'}`}
+                className={`px-6 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${statusFilter === 'read' ? 'bg-white/10 text-white border border-white/20' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
               >
                 مقروءة
               </button>
             </div>
           </div>
-
         </div>
 
         {/* List Header */}
-        <div className="flex items-center justify-between py-4 border-b border-gray-100 mb-2">
-          <label className="flex items-center gap-3 cursor-pointer">
+        <div className="flex items-center justify-between py-5 border-b border-white/5 mb-4 relative z-10">
+          <label className="flex items-center gap-3 cursor-pointer group/label">
             <input 
               type="checkbox" 
-              className="w-4 h-4 rounded text-primary border-gray-300 focus:ring-primary focus:ring-offset-0 bg-gray-100 cursor-pointer"
+              className="w-5 h-5 rounded-lg text-[#D9B07C] border-white/10 focus:ring-[#D9B07C] focus:ring-offset-0 bg-white/5 cursor-pointer transition-all group-hover/label:border-[#D9B07C]/50"
               checked={selectedItems.length === filteredNotifications.length && filteredNotifications.length > 0}
               onChange={handleSelectAll}
             />
-            <span className="font-bold text-slate-600 text-sm bg-gray-50 px-3 py-1.5 rounded-lg">تحديد الكل</span>
+            <span className="font-black text-slate-400 text-xs uppercase tracking-widest group-hover/label:text-white transition-colors">تحديد الكل</span>
           </label>
           
           <button 
             onClick={handleMarkAsRead}
             disabled={actionLoading || (selectedItems.length === 0 && unreadCount === 0)}
-            className={`text-sm font-bold transition-colors flex items-center gap-2 ${!actionLoading && (selectedItems.length > 0 || unreadCount > 0) ? 'text-primary hover:text-primary-dark' : 'text-slate-300 cursor-not-allowed'}`}
+            className={`text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${!actionLoading && (selectedItems.length > 0 || unreadCount > 0) ? 'text-[#D9B07C] hover:scale-105 active:scale-95' : 'text-slate-600 cursor-not-allowed'}`}
           >
             {actionLoading && <Loader2 size={14} className="animate-spin" />}
             {selectedItems.length > 0 ? "تحديد كمقروءة" : "تحديد الكل كمقروءة"}
@@ -464,7 +468,7 @@ const Notifications = () => {
         </div>
 
         {/* Notifications List */}
-        <div className="space-y-1">
+        <div className="space-y-3 relative z-10">
           {filteredNotifications.length > 0 ? (
             filteredNotifications.map((notif) => {
               const styles = getTypeStyles(notif.type, notif.severity);
@@ -474,48 +478,48 @@ const Notifications = () => {
               return (
                 <div 
                   key={notif.id} 
-                  className={`flex flex-col md:flex-row gap-4 p-4 rounded-2xl transition-all border border-transparent hover:border-gray-100 hover:bg-gray-50 ${!notif.isRead ? 'bg-slate-50/50' : ''} ${isFlashing ? 'animate-notification-flash ring-2 ring-primary/30 bg-primary/5' : ''}`}
+                  className={`flex flex-col md:flex-row gap-6 p-6 rounded-[2rem] transition-all border border-white/5 hover:border-white/10 hover:bg-white/[0.04] ${!notif.isRead ? 'bg-white/[0.02]' : ''} ${isFlashing ? 'animate-notification-flash ring-2 ring-[#D9B07C]/30 bg-[#D9B07C]/5' : ''}`}
                 >
                   {/* Right side: Checkbox, Icon, Content */}
-                  <div className="flex items-start gap-4 flex-1">
+                  <div className="flex items-start gap-5 flex-1">
                     <input 
                       type="checkbox" 
-                      className="w-4 h-4 rounded text-primary border-gray-300 focus:ring-primary focus:ring-offset-0 mt-3 cursor-pointer"
+                      className="w-5 h-5 rounded-lg text-[#D9B07C] border-white/10 focus:ring-[#D9B07C] focus:ring-offset-0 mt-3 cursor-pointer bg-white/5"
                       checked={isSelected}
                       onChange={() => handleSelectItem(notif.id)}
                     />
                     
-                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${styles.iconBg}`}>
-                      <styles.icon size={22} />
+                    <div className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${styles.iconBg}`}>
+                      <styles.icon size={24} />
                     </div>
-
-                    <div className="flex flex-col gap-1.5">
+ 
+                    <div className="flex flex-col gap-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs text-slate-400 font-medium ml-2">{formatDate(notif.createdAt)}</span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${styles.badgeBg}`}>
+                        <span className="text-[10px] text-slate-500 font-black uppercase tracking-widest ml-3">{formatDate(notif.createdAt)}</span>
+                        <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest ${styles.badgeBg}`}>
                           {styles.label}
                         </span>
                         {!notif.isRead && (
-                          <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                          <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></span>
                         )}
                         {isFlashing && (
-                          <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-black bg-primary/10 text-primary">
-                            <Zap size={10} />
+                          <span className="flex items-center gap-1 text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest bg-[#D9B07C]/10 text-[#D9B07C]">
+                            <Zap size={12} />
                             جديد
                           </span>
                         )}
                       </div>
-                      <h4 className="text-base font-black text-slate-800">{notif.title}</h4>
-                      <p className="text-sm text-slate-500 leading-relaxed max-w-3xl">{notif.message}</p>
+                      <h4 className="text-lg font-black text-white">{notif.title}</h4>
+                      <p className="text-sm text-slate-400 font-medium leading-relaxed max-w-4xl">{notif.message}</p>
                     </div>
                   </div>
-
+ 
                   {/* Left side: Action Button */}
                   {notif.primaryAction && (
-                    <div className="flex items-center justify-start md:justify-end mt-2 md:mt-0 pr-14 md:pr-0">
+                    <div className="flex items-center justify-start md:justify-end mt-4 md:mt-0 pr-16 md:pr-0">
                       <a 
                         href={notif.primaryAction.url} 
-                        className="text-sm font-bold text-primary hover:underline"
+                        className="text-sm font-black text-[#D9B07C] hover:underline uppercase tracking-widest"
                         onClick={(e) => {
                           if(notif.primaryAction.url === 'string' || !notif.primaryAction.url) {
                             e.preventDefault();
@@ -530,62 +534,61 @@ const Notifications = () => {
               );
             })
           ) : (
-            <div className="py-12 text-center border-2 border-dashed border-gray-100 rounded-3xl mt-4">
-              <Bell size={48} className="mx-auto text-slate-200 mb-4" />
-              <p className="text-slate-500 font-bold">لا توجد إشعارات تطابق بحثك</p>
+            <div className="py-24 text-center border-2 border-dashed border-white/5 rounded-[2.5rem] mt-4">
+              <Bell size={64} className="mx-auto text-white/5 mb-4" />
+              <p className="text-slate-500 font-black">لا توجد إشعارات تطابق بحثك</p>
             </div>
           )}
         </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-gray-100 gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between px-8 py-6 border-t border-white/5 gap-4 relative z-10">
             {/* Next */}
             <button
               onClick={() => setPage(p => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="flex items-center gap-1 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-gray-50 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-5 py-2.5 text-sm font-black text-slate-400 hover:bg-white/5 hover:text-white rounded-2xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
             >
-              <ChevronLeft size={16} />
-              <span>التالي</span>
+              <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
+              <span className="uppercase tracking-widest">التالي</span>
             </button>
-
+ 
             {/* Page Numbers */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`h-10 w-10 rounded-xl text-sm font-black transition-all duration-200
+                  className={`h-11 w-11 rounded-2xl text-sm font-black transition-all duration-300
                     ${page === p
-                      ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-110'
-                      : 'text-slate-600 hover:bg-gray-100'
+                      ? 'bg-[#D9B07C] text-black shadow-lg shadow-[#D9B07C]/20 scale-110'
+                      : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-white/5'
                     }`}
                 >
                   {p}
                 </button>
               ))}
             </div>
-
+ 
             {/* Previous */}
             <button
               onClick={() => setPage(p => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="flex items-center gap-1 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-gray-50 rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-5 py-2.5 text-sm font-black text-slate-400 hover:bg-white/5 hover:text-white rounded-2xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
             >
-              <span>السابق</span>
-              <ChevronRight size={16} />
+              <span className="uppercase tracking-widest">السابق</span>
+              <ChevronRight size={20} className="transition-transform group-hover:translate-x-1" />
             </button>
           </div>
         )}
-
+ 
         {/* Results Count */}
-        <div className="px-6 py-4 bg-gray-50/50 text-center border-t border-gray-100 rounded-b-3xl -mx-6 -mb-6 mt-2">
-          <p className="text-xs text-slate-400 font-bold">
+        <div className="px-8 py-4 bg-white/[0.02] text-center border-t border-white/5 rounded-b-[2.5rem] -mx-8 -mb-8 mt-2 relative z-10">
+          <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">
             عرض {totalCount > 0 ? ((page - 1) * pageSize) + 1 : 0} - {Math.min(page * pageSize, totalCount)} من أصل {totalCount} إشعار
           </p>
         </div>
-
       </div>
     </div>
   );

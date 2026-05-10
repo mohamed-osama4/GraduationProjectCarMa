@@ -35,11 +35,11 @@ const Sidebar = ({ isOpen, onClose }) => {
   useSignalREvent('notifications.read_all', handleAllRead, []);
 
   const menuItems = [
-    { name: 'الرئيسية', icon: Home, path: '/admin', end: true, color: 'text-blue-400' },
+    { name: 'الرئيسية', icon: Home, path: '/admin', end: true, color: 'text-[#D9B07C]' },
     { name: 'الطلبات', icon: FileText, path: '/admin/orders', color: 'text-emerald-400' },
-    { name: 'الفنيون', icon: Users, path: '/admin/technicians', color: 'text-orange-400' },
+    { name: 'الورش', icon: Users, path: '/admin/technicians', color: 'text-amber-400' },
     { name: 'الإشعارات', icon: Bell, path: '/admin/notifications', color: 'text-rose-400', badge: liveNotifCount > 0 ? liveNotifCount : undefined },
-    { name: 'التقارير', icon: BarChart2, path: '/admin/reports', color: 'text-purple-400' },
+    { name: 'التقارير', icon: BarChart2, path: '/admin/reports', color: 'text-indigo-400' },
     { name: 'الملف الشخصي', icon: User, path: '/admin/profile', color: 'text-cyan-400' },
     { name: 'الإعدادات', icon: Settings, path: '/admin/settings', color: 'text-slate-400' },
   ];
@@ -58,16 +58,16 @@ const Sidebar = ({ isOpen, onClose }) => {
   };
 
   return (
-    <aside className={`fixed inset-y-0 right-0 z-50 w-72 bg-primary-dark text-white transition-transform duration-300 transform font-tajawal 
+    <aside className={`fixed inset-y-0 right-0 z-50 w-72 bg-[#121212] text-white transition-transform duration-300 transform font-tajawal border-l border-white/5
       ${isOpen ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0 md:static md:inset-auto h-screen flex flex-col`}>
       
       {/* Sidebar Header */}
       <div className="p-8 flex items-center justify-between">
         <div className="flex flex-col">
           <Link to="/" className="hover:opacity-80 transition-opacity">
-            <h1 className="text-3xl font-black tracking-tight">CarMa</h1>
+            <h1 className="text-3xl font-black tracking-tight alyamama-premium text-[#D9B07C]">CarMa</h1>
           </Link>
-          <p className="text-sm text-blue-300/80 font-medium mt-1">لوحة التحكم الإدارية</p>
+          <p className="text-xs text-slate-500 font-medium mt-1">لوحة التحكم الإدارية</p>
         </div>
         <button onClick={onClose} className="md:hidden p-2 hover:bg-white/10 rounded-xl transition-colors">
           <X size={28} />
@@ -75,7 +75,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 px-4 py-6 space-y-3 overflow-y-auto custom-scrollbar">
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
         {menuItems.map((item) => (
           <NavLink
             key={item.name}
@@ -83,24 +83,24 @@ const Sidebar = ({ isOpen, onClose }) => {
             end={item.end}
             onClick={() => handleNavClick(item)}
             className={({ isActive }) => `
-              flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-300
+              flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 group
               ${isActive 
-                ? 'bg-white text-primary-dark shadow-md' 
-                : 'text-white/60 hover:bg-white/10 hover:text-white'}
+                ? 'bg-[#D9B07C]/10 text-[#D9B07C] shadow-lg shadow-black/20 border border-[#D9B07C]/20' 
+                : 'text-slate-400 hover:bg-white/5 hover:text-white'}
             `}
           >
             {({ isActive }) => (
               <>
                 <div className="flex items-center gap-4">
                   <item.icon 
-                    size={22} 
+                    size={20} 
                     strokeWidth={isActive ? 2.5 : 2} 
-                    className={isActive ? 'text-[#172554]' : item.color}
+                    className={isActive ? 'text-[#D9B07C]' : `${item.color} opacity-80 group-hover:opacity-100 group-hover:text-white transition-all`}
                   />
-                  <span className={`text-lg transition-all duration-300 ${isActive ? 'font-bold' : 'font-medium opacity-90'}`}>{item.name}</span>
+                  <span className={`text-base transition-all duration-300 ${isActive ? 'font-bold' : 'font-medium'}`}>{item.name}</span>
                 </div>
                 {item.badge && (
-                  <span className="bg-[#ef4444] text-white text-[11px] font-black h-6 min-w-[24px] px-1 flex items-center justify-center rounded-full shadow-lg ring-2 ring-white/10 animate-bounce-gentle">
+                  <span className="bg-[#D9B07C] text-black text-[10px] font-black h-5 min-w-[20px] px-1 flex items-center justify-center rounded-full shadow-lg">
                     {item.badge > 99 ? '99+' : item.badge}
                   </span>
                 )}
@@ -114,10 +114,10 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className="p-6 border-t border-white/5">
         <button 
           onClick={handleLogout}
-          className="flex items-center gap-4 w-full px-6 py-3 text-[#ff987d] hover:bg-white/5 rounded-full transition-all duration-300 group"
+          className="flex items-center gap-4 w-full px-6 py-3 text-red-400/80 hover:bg-red-500/10 hover:text-red-400 rounded-xl transition-all duration-300 group"
         >
-          <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="text-lg font-bold">تسجيل الخروج</span>
+          <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="text-base font-bold">تسجيل الخروج</span>
         </button>
       </div>
     </aside>
