@@ -53,7 +53,7 @@ const Notifications = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
-  const pageSize = 3;
+  const pageSize = 10;
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
