@@ -32,8 +32,10 @@ builder.Services.AddCors(options =>
 // ======================
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<INewNotificationService, NewNotificationService>();
+builder.Services.AddScoped<IReportsService, ReportsService>();
 builder.Services.AddScoped<GeminiAiService>();
 builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
