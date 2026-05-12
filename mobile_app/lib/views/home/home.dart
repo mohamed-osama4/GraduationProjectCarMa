@@ -4,6 +4,7 @@ import 'package:graduation_project/core/comeponents/app_image.dart';
 import 'package:graduation_project/core/localization/app_strings.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
 import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:graduation_project/views/ai_chat/ai_chat_page.dart';
 import 'package:graduation_project/views/home/widgets/gradients.dart';
 import 'package:graduation_project/views/home/widgets/active_order_card.dart';
 import 'package:graduation_project/views/home/widgets/emergency_action_card.dart';
@@ -21,6 +22,7 @@ import 'package:graduation_project/views/services/towing_services.dart';
 import 'package:provider/provider.dart';
 import 'package:graduation_project/logic/providers/orders_provider.dart';
 import 'package:graduation_project/logic/providers/auth_provider.dart';
+import 'package:graduation_project/logic/providers/notification_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,10 +38,12 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final auth   = Provider.of<AuthProvider>(context, listen: false);
+      final auth = Provider.of<AuthProvider>(context, listen: false);
       final orders = Provider.of<OrdersProvider>(context, listen: false);
       final userId = auth.currentUser?.id;
       orders.fetchOrders(userId: userId);
+      // Initialize real-time notifications (REST + SignalR)
+      Provider.of<NotificationProvider>(context, listen: false).init();
     });
   }
 
@@ -124,27 +128,28 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(width: 16),
                       Consumer<AuthProvider>(
-                        builder: (_, auth, __) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              auth.currentUser?.name ?? 'مستخدم',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                        builder:
+                            (_, auth, __) => Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  auth.currentUser?.name ?? 'مستخدم',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  auth.currentUser?.email ?? '',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              auth.currentUser?.email ?? '',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ),
@@ -172,7 +177,10 @@ class _HomePageState extends State<HomePage> {
                       child: _buildDrawerItem(
                         context: context,
                         title: s.profile,
-                        subtitle: s.isArabic ? 'عرض وتحرير معلوماتك' : 'View and edit your info',
+                        subtitle:
+                            s.isArabic
+                                ? 'عرض وتحرير معلوماتك'
+                                : 'View and edit your info',
                         svgAsset: 'assets/icons/person.svg',
                         backgroundColor: const Color(0xFFDBEAFE),
                         showArrow: true,
@@ -191,7 +199,10 @@ class _HomePageState extends State<HomePage> {
                     _buildDrawerItem(
                       context: context,
                       title: s.settings,
-                      subtitle: s.isArabic ? 'تغيير كلمة المرور وغيرها' : 'Change password and more',
+                      subtitle:
+                          s.isArabic
+                              ? 'تغيير كلمة المرور وغيرها'
+                              : 'Change password and more',
                       svgAsset: 'assets/icons/setting.svg',
                       backgroundColor: const Color(0xFFF1F5F9),
                       showArrow: true,
@@ -230,6 +241,35 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed:
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AiChatPage()),
+            ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              colors: [Color(0xFF7C3AED), Color(0xFFA78BFA)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF7C3AED).withValues(alpha: 0.5),
+                blurRadius: 16,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: const Icon(Icons.auto_awesome, color: Colors.white, size: 26),
         ),
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -272,24 +312,56 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                          CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Colors.white24,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => const NotificationsPage(),
+                          Consumer<NotificationProvider>(
+                            builder: (_, notifProvider, __) => Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: Colors.white24,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const NotificationsPage(),
+                                        ),
+                                      );
+                                    },
+                                    child: const Icon(
+                                      Icons.notifications_outlined,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
                                   ),
-                                );
-                              },
-                              child: Icon(
-                                Icons.notifications_outlined,
-                                color: Colors.white,
-                                size: 20,
-                              ),
+                                ),
+                                if (notifProvider.unreadCount > 0)
+                                  Positioned(
+                                    top: -4,
+                                    right: -4,
+                                    child: Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.redAccent,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          notifProvider.unreadCount > 9
+                                              ? '9+'
+                                              : '${notifProvider.unreadCount}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         ],
@@ -297,14 +369,15 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 16),
                       // النصوص الترحيبية
                       Consumer<AuthProvider>(
-                        builder: (_, auth, __) => Text(
-                          '${s.hello}، ${auth.currentUser?.name ?? ''} 👋',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        builder:
+                            (_, auth, __) => Text(
+                              '${s.hello}، ${auth.currentUser?.name ?? ''} 👋',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -523,7 +596,8 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: textColor ?? Theme.of(context).colorScheme.onSurface,
+                      color:
+                          textColor ?? Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   if (subtitle != null) ...[

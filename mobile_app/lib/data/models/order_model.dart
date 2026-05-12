@@ -11,17 +11,32 @@ enum OrderStatus {
   canceled,
 }
 
-OrderStatus _orderStatusFromString(String? status) {
-  switch (status?.toLowerCase()) {
+OrderStatus _orderStatusFromString(dynamic status) {
+  if (status == null) return OrderStatus.pending;
+
+  // Handle integer (C# enum default JSON serialization: 0=Pending, 1=Accepted...)
+  if (status is int) {
+    switch (status) {
+      case 0: return OrderStatus.pending;
+      case 1: return OrderStatus.accepted;
+      case 2: return OrderStatus.inProgress;
+      case 3: return OrderStatus.completed;
+      case 4: return OrderStatus.rejected;
+      default: return OrderStatus.pending;
+    }
+  }
+
+  // Handle string (e.g. "Pending", "Accepted")
+  switch (status.toString().toLowerCase()) {
     case 'pending':      return OrderStatus.pending;
-    case 'new':          return OrderStatus.pending;  // legacy
+    case 'new':          return OrderStatus.pending;
     case 'accepted':     return OrderStatus.accepted;
-    case 'ontheway':     return OrderStatus.accepted; // legacy
+    case 'ontheway':     return OrderStatus.accepted;
     case 'inprogress':   return OrderStatus.inProgress;
-    case 'underprocess': return OrderStatus.inProgress; // legacy
+    case 'underprocess': return OrderStatus.inProgress;
     case 'completed':    return OrderStatus.completed;
     case 'rejected':     return OrderStatus.rejected;
-    case 'canceled':     return OrderStatus.rejected;  // legacy
+    case 'canceled':     return OrderStatus.rejected;
     default:             return OrderStatus.pending;
   }
 }
@@ -74,7 +89,7 @@ class OrderModel {
       userId:          json['userId'] as int? ?? 0,
       vehicleId:       json['vehicleId'] as int? ?? 0,
       serviceId:       json['serviceId'] as int? ?? 0,
-      orderStatus:     _orderStatusFromString(json['orderStatus'] as String?),
+      orderStatus:     _orderStatusFromString(json['orderStatus']),
       address:         json['address'] as String? ?? '',
       phoneNumber:     json['phoneNumber'] as String? ?? '',
       price:           (json['price'] as num?)?.toDouble() ?? 0.0,

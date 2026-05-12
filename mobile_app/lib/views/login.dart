@@ -77,9 +77,12 @@ class _LoginPageState extends State<LoginPage> {
       final error = authProvider.errorMessage ?? '';
 
       // Map backend error messages to the right field
-      if (error.contains('غير مسجل') || error.contains('USER_NOT_FOUND')) {
+      // Handles both English (new backend) and Arabic (legacy) messages
+      if (error.contains('غير مسجل') || error.contains('USER_NOT_FOUND') ||
+          error.contains('User not found') || error.contains('not found')) {
         setState(() => _emailError = 'هذا البريد الإلكتروني غير مسجّل لدينا');
-      } else if (error.contains('المرور') || error.contains('WRONG_PASSWORD')) {
+      } else if (error.contains('المرور') || error.contains('WRONG_PASSWORD') ||
+          error.contains('Wrong password') || error.contains('Wrong pass')) {
         setState(() => _passwordError = 'كلمة المرور غير صحيحة');
       } else if (error.contains('Connection') || error.contains('SocketException') || error.contains('Failed host')) {
         setState(() => _generalError = 'لا يمكن الاتصال بالخادم، تأكد من اتصالك بالإنترنت');

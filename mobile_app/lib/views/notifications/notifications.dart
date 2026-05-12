@@ -3,6 +3,8 @@ import 'package:graduation_project/core/comeponents/app_image.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
 import 'package:graduation_project/core/localization/app_strings.dart';
 import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:graduation_project/logic/providers/notification_provider.dart';
+import 'package:graduation_project/data/models/notification_model.dart';
 import 'package:provider/provider.dart';
 
 class NotificationsPage extends StatefulWidget {
@@ -13,99 +15,28 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  List<NotificationModel> notifications = [];
-  bool _initialized = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_initialized) {
-      final s = appStrings(context.watch<LocaleProvider>().isArabic);
-      loadNotifications(s);
-      _initialized = true;
-    }
-  }
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NotificationProvider>().fetchNotifications(refresh: true);
+    });
 
-  void loadNotifications(AppStrings s) {
-    notifications = [
-      NotificationModel(
-        id: '1',
-        iconAsset: 'time.svg',
-        iconBackgroundColor: const Color(0xffFEF3C6),
-        title: s.isArabic ? 'طلبك قيد المراجعة' : 'Order Under Review',
-        message: s.isArabic ? 'جاري مراجعة الطلب من قبل الإدارة' : 'Your order is being reviewed by management',
-        timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-        isRead: false,
-      ),
-      NotificationModel(
-        id: '2',
-        iconAsset: 'accept.svg',
-        iconBackgroundColor: const Color(0xffDCFCE7),
-        title: s.isArabic ? 'تمت الموافقة على الطلب' : 'Order Approved',
-        message: s.isArabic ? 'يمكنك الآن متابعة حالة الطلب' : 'You can now track your order status',
-        timestamp: DateTime.now().subtract(const Duration(hours: 1)),
-        isRead: false,
-      ),
-      NotificationModel(
-        id: '3',
-        iconAsset: 'done.svg',
-        iconBackgroundColor: const Color(0xffDBEAFE),
-        title: s.isArabic ? 'تم تعيين فني' : 'Technician Assigned',
-        message: s.isArabic ? 'جارٍ تجهيز التتبع' : 'Tracking is being prepared',
-        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-        isRead: false,
-      ),
-      NotificationModel(
-        id: '4',
-        iconAsset: 'trucks.svg',
-        iconBackgroundColor: const Color(0xffF3E8FF),
-        title: s.isArabic ? 'الفني في الطريق' : 'Technician On The Way',
-        message: s.isArabic ? 'الرجاء الانتظار، الفني في طريقه إليك' : 'Please wait, the technician is on the way',
-        timestamp: DateTime.now().subtract(const Duration(days: 1)),
-        isRead: false,
-      ),
-      NotificationModel(
-        id: '5',
-        iconAsset: 'star.svg',
-        iconBackgroundColor: const Color(0xffFEF9C2),
-        title: s.isArabic ? 'اكتملت الخدمة' : 'Service Completed',
-        message: s.isArabic ? 'شكراً لاستخدامك خدماتنا، نأمل تقييم الخدمة' : 'Thank you for using our services. Please rate the service.',
-        timestamp: DateTime.now().subtract(const Duration(days: 2)),
-        isRead: true,
-      ),
-      NotificationModel(
-        id: '6',
-        iconAsset: 'fales.svg',
-        iconBackgroundColor: const Color(0xffFFE2E2),
-        title: s.isArabic ? 'تم رفض الطلب' : 'Order Rejected',
-        message: s.isArabic ? 'يمكنك تعديل الطلب واعادة الارسال' : 'You can edit the order and resubmit',
-        timestamp: DateTime.now().subtract(const Duration(days: 3)),
-        isRead: true,
-      ),
-    ];
-  }
-
-  void markAllAsRead() {
-    setState(() {
-      for (var notification in notifications) {
-        notification.isRead = true;
+    // Load more on scroll
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        context.read<NotificationProvider>().fetchNotifications();
       }
     });
   }
 
-  void markAsRead(String id) {
-    setState(() {
-      final index = notifications.indexWhere((n) => n.id == id);
-      if (index != -1) {
-        notifications[index].isRead = true;
-      }
-    });
-  }
-
-  void deleteNotification(String id) {
-    setState(() {
-      notifications.removeWhere((n) => n.id == id);
-    });
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   String getTimeAgo(DateTime timestamp, bool isArabic) {
@@ -122,11 +53,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
       final weeks = (difference.inDays / 7).floor();
       return isArabic ? 'منذ $weeks أسبوع' : '$weeks weeks ago';
     } else if (difference.inDays >= 1) {
-      return isArabic ? 'منذ ${difference.inDays} يوم' : '${difference.inDays} days ago';
+      return isArabic
+          ? 'منذ ${difference.inDays} يوم'
+          : '${difference.inDays} days ago';
     } else if (difference.inHours >= 1) {
-      return isArabic ? 'منذ ${difference.inHours} ساعة' : '${difference.inHours} hours ago';
+      return isArabic
+          ? 'منذ ${difference.inHours} ساعة'
+          : '${difference.inHours} hours ago';
     } else if (difference.inMinutes >= 1) {
-      return isArabic ? 'منذ ${difference.inMinutes} دقيقة' : '${difference.inMinutes} minutes ago';
+      return isArabic
+          ? 'منذ ${difference.inMinutes} دقيقة'
+          : '${difference.inMinutes} minutes ago';
     } else {
       return isArabic ? 'الآن' : 'Just now';
     }
@@ -135,32 +72,58 @@ class _NotificationsPageState extends State<NotificationsPage> {
   @override
   Widget build(BuildContext context) {
     final s = appStrings(context.watch<LocaleProvider>().isArabic);
+    final provider = context.watch<NotificationProvider>();
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          s.notifications,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              s.notifications,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            if (provider.unreadCount > 0)
+              Text(
+                s.isArabic
+                    ? '${provider.unreadCount} إشعار جديد'
+                    : '${provider.unreadCount} new',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.85),
+                  fontSize: 12,
+                ),
+              ),
+          ],
         ),
         centerTitle: false,
         titleSpacing: 0,
         actions: [
+          if (provider.notifications.isNotEmpty)
+            TextButton(
+              onPressed: () => provider.markAllAsRead(),
+              child: Text(
+                s.isArabic ? 'قراءة الكل' : 'Read All',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
           TextButton(
-            onPressed: () {
-              setState(() {
-                notifications.clear();
-              });
-            },
+            onPressed: () => provider.clearAll(),
             child: Text(
               s.isArabic ? 'مسح الكل' : 'Clear All',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
           ),
@@ -182,188 +145,201 @@ class _NotificationsPageState extends State<NotificationsPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body:
-          notifications.isEmpty
-              ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      body: _buildBody(context, s, provider),
+    );
+  }
+
+  Widget _buildBody(
+      BuildContext context, AppStrings s, NotificationProvider provider) {
+    if (provider.isLoading && provider.notifications.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppTheme.primaryColor),
+      );
+    }
+
+    if (provider.notifications.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.notifications_off_outlined,
+              size: 100,
+              color: AppTheme.subtleTextColor.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              s.isArabic ? 'لا توجد إشعارات' : 'No notifications',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              s.isArabic
+                  ? 'ستظهر الإشعارات الجديدة هنا'
+                  : 'New notifications will appear here',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      color: AppTheme.primaryColor,
+      onRefresh: () =>
+          context.read<NotificationProvider>().fetchNotifications(refresh: true),
+      child: ListView.separated(
+        controller: _scrollController,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        physics: const BouncingScrollPhysics(),
+        itemCount:
+            provider.notifications.length + (provider.isLoading ? 1 : 0),
+        separatorBuilder: (context, index) => const SizedBox(height: 16),
+        itemBuilder: (context, index) {
+          if (index == provider.notifications.length) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(color: AppTheme.primaryColor),
+              ),
+            );
+          }
+
+          final AppNotification notification = provider.notifications[index];
+
+          return GestureDetector(
+            onTap: () =>
+                context.read<NotificationProvider>().markAsRead(notification.id),
+            child: Container(
+              decoration: BoxDecoration(
+                color: !notification.isRead
+                    ? const Color(0xff155DFC)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Container(
+                margin: !notification.isRead
+                    ? const EdgeInsets.only(right: 4.5)
+                    : EdgeInsets.zero,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline,
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.notifications_off_outlined,
-                      size: 100,
-                      color: AppTheme.subtleTextColor.withValues(alpha: 0.5),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      s.isArabic ? 'لا توجد إشعارات' : 'No notifications',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: notification.iconBackgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: AppImage(
+                          image: notification.iconAsset,
+                          width: 24,
+                          height: 24,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      s.isArabic ? 'ستظهر الإشعارات الجديدة هنا' : 'New notifications will appear here',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 14,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  notification.title,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              if (!notification.isRead) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  margin: const EdgeInsets.only(top: 6),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xff155DFC),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            notification.message,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontSize: 13,
+                              height: 1.4,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                onTap: () => context
+                                    .read<NotificationProvider>()
+                                    .deleteNotification(notification.id),
+                                child: AppImage(
+                                  image: 'trush.svg',
+                                  width: 18,
+                                  height: 18,
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              Text(
+                                getTimeAgo(notification.createdAt, s.isArabic),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              )
-              : ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 24,
-                ),
-                physics: const BouncingScrollPhysics(),
-                itemCount: notifications.length,
-                separatorBuilder:
-                    (context, index) => const SizedBox(height: 16),
-                itemBuilder: (context, index) {
-                  final notification = notifications[index];
-
-                  return GestureDetector(
-                    onTap: () => markAsRead(notification.id),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color:
-                            !notification.isRead
-                                ? const Color(0xff155DFC)
-                                : Colors
-                                    .transparent, // Blue edge ONLY for unread items
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04), // soft shadow
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Container(
-                        margin:
-                            !notification.isRead
-                                ? const EdgeInsets.only(
-                                  right: 4.5,
-                                ) // Stack effect on the right side
-                                : EdgeInsets.zero,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.outline, // Very light border
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Custom icon with colored background
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: notification.iconBackgroundColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: AppImage(
-                                  image: notification.iconAsset,
-                                  width: 24,
-                                  height: 24,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          notification.title,
-                                          style: TextStyle(
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        getTimeAgo(notification.timestamp, s.isArabic),
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      GestureDetector(
-                                        onTap:
-                                            () => deleteNotification(
-                                              notification.id,
-                                            ),
-                                        child: AppImage(
-                                          image: 'trush.svg',
-                                          width: 18,
-                                          height: 18,
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant, // Trash icon added here
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    notification.message,
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                      fontSize: 13,
-                                      height: 1.4,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
               ),
+            ),
+          );
+        },
+      ),
     );
   }
-}
-
-// Notification Model
-class NotificationModel {
-  final String id;
-  final String iconAsset;
-  final Color iconBackgroundColor;
-  final String title;
-  final String message;
-  final DateTime timestamp;
-  bool isRead;
-
-  NotificationModel({
-    required this.id,
-    required this.iconAsset,
-    required this.iconBackgroundColor,
-    required this.title,
-    required this.message,
-    required this.timestamp,
-    required this.isRead,
-  });
 }

@@ -24,6 +24,8 @@ dependencies:
   shared_preferences: ^2.5.3
   provider: ^6.1.5+1
   image_picker: ^1.1.2
+  pretty_dio_logger: ^1.4.0
+  signalr_netcore: ^1.4.4
 
 dev_dependencies:
   flutter_test:
