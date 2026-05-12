@@ -9,6 +9,7 @@ import 'package:graduation_project/logic/providers/auth_provider.dart';
 import 'package:graduation_project/logic/providers/locale_provider.dart';
 import 'package:graduation_project/logic/providers/orders_provider.dart';
 import 'package:graduation_project/views/home/widgets/technician_accepted_dialog.dart';
+import 'package:graduation_project/views/map/aws_map_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -40,12 +41,27 @@ class _RequestServicePageState extends State<RequestServicePage> {
   final _picker = ImagePicker();
   File? _carImage;
   bool _submitted = false;
+  bool _locationPicked = false;
 
   @override
   void dispose() {
     _addressController.dispose();
     _phoneController.dispose();
     super.dispose();
+  }
+
+  // ── Open Map Picker ─────────────────────────────────────────────
+  Future<void> _openMapPicker() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => const AwsMapPicker()),
+    );
+    if (result != null && mounted) {
+      setState(() {
+        _addressController.text = result;
+        _locationPicked = true;
+      });
+    }
   }
 
   // ── Pick image ─────────────────────────────────────────────────
@@ -267,13 +283,88 @@ class _RequestServicePageState extends State<RequestServicePage> {
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 14),
 
-                    TextField(
-                      controller: _addressController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: s.isArabic ? 'العنوان بالتفصيل' : 'Detailed address',
-                        prefixIcon: const Icon(Icons.location_on_outlined),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    // Map picker button
+                    GestureDetector(
+                      onTap: _openMapPicker,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: _locationPicked
+                              ? widget.serviceColor.withValues(alpha: 0.06)
+                              : Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: _locationPicked
+                                ? widget.serviceColor
+                                : Theme.of(context).dividerColor,
+                            width: _locationPicked ? 1.5 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: (_locationPicked
+                                        ? widget.serviceColor
+                                        : const Color(0xFF2563EB))
+                                    .withValues(alpha: 0.12),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                _locationPicked
+                                    ? Icons.location_on_rounded
+                                    : Icons.add_location_alt_rounded,
+                                color: _locationPicked
+                                    ? widget.serviceColor
+                                    : const Color(0xFF2563EB),
+                                size: 22,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _locationPicked
+                                        ? (s.isArabic ? 'الموقع المحدد' : 'Selected Location')
+                                        : (s.isArabic ? 'حدد موقعك على الخريطة' : 'Pick your location on map'),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      color: _locationPicked
+                                          ? widget.serviceColor
+                                          : const Color(0xFF2563EB),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    _locationPicked
+                                        ? _addressController.text
+                                        : (s.isArabic
+                                            ? 'اضغط لفتح خريطة AWS'
+                                            : 'Tap to open AWS map'),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: _locationPicked
+                                          ? Theme.of(context).colorScheme.onSurface
+                                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 14),
