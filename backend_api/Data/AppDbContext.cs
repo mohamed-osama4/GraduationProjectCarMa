@@ -47,6 +47,12 @@ namespace CarMaintenance.Data
                       .WithOne(n => n.Order)
                       .HasForeignKey(n => n.OrderId)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                // Reporting Indexes
+                entity.HasIndex(o => o.CreatedAt);
+                entity.HasIndex(o => o.OrderStatus);
+                entity.HasIndex(o => o.ServiceId);
+                entity.HasIndex(o => new { o.OrderStatus, o.IsPaid, o.CreatedAt });
             });
 
             // ================= SERVICE SEED DATA (The 6 Services) =================
