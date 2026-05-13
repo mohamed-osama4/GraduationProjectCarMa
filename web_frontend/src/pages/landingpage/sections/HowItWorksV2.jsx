@@ -32,13 +32,17 @@ const STEPS = [
 export default function HowItWorksV2() {
   return (
     <section id="how-it-works" className="bg-[#121212] py-32 relative overflow-hidden border-t border-white/5">
+      {/* Background Shadow Text */}
+      <div className="absolute top-28 left-4 text-[12rem] font-black text-white/[0.02] pointer-events-none select-none hidden lg:block uppercase tracking-tighter">
+          Process
+      </div>
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div data-aos="fade-up" className="mb-24 flex flex-col items-start text-right">
           <div className="flex items-center gap-3 mb-6">
             <span className="text-[#D9B07C] text-[15px] font-bold uppercase tracking-[0.3em]">ببساطة</span>
             <div className="w-12 h-[1px] bg-[#D9B07C]"></div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">كيف يعمل <span className="text-[#D9B07C]">CarMa</span></h2>
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">كيف يعمل Car<span className="text-[#D9B07C]">Ma</span></h2>
           <p className="text-gray-500 max-w-2xl">
             خطوات بسيطة تفصلك عن صيانة سيارتك بأعلى معايير الجودة والاحترافية
           </p>

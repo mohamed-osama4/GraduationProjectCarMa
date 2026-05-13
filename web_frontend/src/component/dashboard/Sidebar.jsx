@@ -65,7 +65,9 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className="p-8 flex items-center justify-between">
         <div className="flex flex-col">
           <Link to="/" className="hover:opacity-80 transition-opacity">
-            <h1 className="text-3xl font-black tracking-tight alyamama-premium text-[#D9B07C]">CarMa</h1>
+            <h1 className="text-3xl font-black tracking-tighter italic text-white">
+              Car<span className="text-[#D9B07C]">Ma</span>
+            </h1>
           </Link>
           <p className="text-xs text-slate-500 font-medium mt-1">لوحة التحكم الإدارية</p>
         </div>

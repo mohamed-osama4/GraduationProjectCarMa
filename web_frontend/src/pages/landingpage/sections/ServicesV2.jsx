@@ -45,8 +45,12 @@ const SERVICES = [
 
 export default function ServicesV2() {
   return (
-    <section id="services" className="bg-[#050505] py-32 border-t border-white/5">
-      <div className="max-w-[1400px] mx-auto px-6">
+    <section id="services" className="bg-[#050505] py-32 border-t border-white/5 relative overflow-hidden">
+      {/* Background Shadow Text */}
+      <div className="absolute top-28 left-4 text-[12rem] font-black text-white/[0.02] pointer-events-none select-none hidden lg:block uppercase tracking-tighter">
+        Services
+      </div>
+      <div className="max-w-[1400px] mx-auto px-6 relative z-10">
         
         {/* Section Header - Unified Alignment */}
         <div className="flex flex-col items-start mb-24 text-right" data-aos="fade-up">

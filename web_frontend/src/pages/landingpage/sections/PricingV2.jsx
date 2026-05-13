@@ -53,6 +53,10 @@ export default function PricingV2() {
 
   return (
     <section id="pricing" className="relative bg-[#050505] py-32 overflow-hidden selection:bg-[#D9B07C] selection:text-black">
+      {/* Background Shadow Text */}
+      <div className="absolute top-28 left-4 text-[12rem] font-black text-white/[0.02] pointer-events-none select-none hidden lg:block uppercase tracking-tighter">
+        OFFERS
+      </div>
       {/* Decorative Background */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D9B07C]/20 to-transparent"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#D9B07C]/5 blur-[150px] rounded-full pointer-events-none"></div>
@@ -60,18 +64,19 @@ export default function PricingV2() {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center mb-24 text-center" data-aos="fade-up">
+        <div className="flex flex-col items-start mb-16 text-right" data-aos="fade-up">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-px bg-[#D9B07C]/30"></div>
             <span className="text-[#D9B07C] text-[13px] font-bold uppercase tracking-[0.4em]">باقات الصيانة</span>
-            <div className="w-12 h-px bg-[#D9B07C]/30"></div>
+            <div className="w-12 h-px bg-[#D9B07C]"></div>
           </div>
-          <h2 className="text-4xl md:text-7xl font-black text-white leading-tight mb-10 tracking-tighter">
+          <h2 className="text-4xl md:text-7xl font-black text-white leading-tight mb-4 tracking-tighter">
             استثمر في سلامة <br />
             سيارتك مع <span className="text-[#D9B07C]">باقاتنا</span>
           </h2>
+        </div>
 
-          {/* Pricing Toggle */}
+        {/* Pricing Toggle - Centered */}
+        <div className="flex justify-center mb-20" data-aos="fade-up" data-aos-delay="100">
           <div className="flex items-center gap-4 bg-white/[0.03] border border-white/5 p-1.5 rounded-2xl backdrop-blur-md">
             <button 
               onClick={() => setIsYearly(false)}

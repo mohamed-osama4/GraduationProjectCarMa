@@ -53,6 +53,10 @@ export default function WhyChooseUsV2() {
 
   return (
     <section id="why-us" className="bg-[#050505] py-32 relative overflow-hidden border-t border-white/5">
+      {/* Background Shadow Text */}
+      <div className="absolute top-28 left-4 text-[12rem] font-black text-white/[0.02] pointer-events-none select-none hidden lg:block uppercase tracking-tighter">
+        Quality
+      </div>
       <div className="max-w-7xl mx-auto px-6 relative z-10">
 
         {/* Section Header */}
