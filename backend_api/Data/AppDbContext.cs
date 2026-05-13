@@ -17,6 +17,7 @@ namespace CarMaintenance.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NewNotification> NewNotifications { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserSettings> UserSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
