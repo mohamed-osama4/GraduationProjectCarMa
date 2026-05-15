@@ -124,3 +124,49 @@ export const markNotificationAsRead = (id) => {
 export const markAllNotificationsAsRead = () => {
   return api.patch(`/api/new-notifications/read-all`);
 };
+
+/**
+ * Fetch Report Summary.
+ * GET /api/admin/reports/summary
+ * @param {number} period (1, 2, 3, 4)
+ * @returns {Promise<import("axios").AxiosResponse>}
+ */
+export const getReportSummary = (period) => {
+  return api.get("/api/admin/reports/summary", { params: { period } });
+};
+
+export const getRevenueChart = (period) => {
+  return api.get("/api/admin/reports/revenue-chart", { params: { period } });
+};
+
+export const getOrdersChart = (period) => {
+  return api.get("/api/admin/reports/orders-chart", { params: { period } });
+};
+
+export const getServicesDistribution = (period) => {
+  return api.get("/api/admin/reports/services-distribution", { params: { period } });
+};
+
+export const getTechniciansPerformance = (period) => {
+  return api.get("/api/admin/reports/technicians-performance", { params: { period } });
+};
+
+export const getTopTechnicians = (period, limit = 5) => {
+  return api.get("/api/admin/reports/top-technicians", { params: { period, limit } });
+};
+
+export const getTopServices = (period, limit = 6) => {
+  return api.get("/api/admin/reports/top-services", { params: { period, limit } });
+};
+
+export const exportReport = (Period, Type) => {
+  return api.get("/api/admin/reports/export", { params: { Period, Type }, responseType: 'blob' });
+};
+
+export const getMySettings = () => {
+  return api.get("/api/Settings/MySettings");
+};
+
+export const updateSettings = (data) => {
+  return api.put("/api/Settings/Update-Settings", data);
+};
