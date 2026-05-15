@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { 
-  Bell, 
-  Shield, 
-  Globe, 
-  CreditCard, 
+import React, { useState, useEffect } from 'react';
+import {
   AlertTriangle,
+  Bell,
+  CreditCard,
   Eye,
   EyeOff,
-  Moon
+  Globe,
+  Moon,
+  Shield
 } from 'lucide-react';
 import DashboardHeader from '../../../component/dashboard/DashboardHeader';
+import { getMySettings, updateSettings } from '../../../services/adminService';
 
 // Custom Toggle Component
 const Toggle = ({ enabled, onChange }) => (
@@ -36,6 +37,53 @@ const Settings = () => {
   const [showNewPass, setShowNewPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await getMySettings();
+        if (response.data) {
+          setEmailNotif(response.data.emailNotifications);
+          setSmsNotif(response.data.smsNotifications);
+          setPromoNotif(response.data.promotionalOffers);
+          setTwoFactor(response.data.twoFactorEnabled);
+          setBiometric(response.data.biometricsEnabled);
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          console.warn("لم يتم العثور على إعدادات لهذا المستخدم. سيتم استخدام الإعدادات الافتراضية.");
+        } else {
+          console.error("Error fetching settings:", error);
+        }
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleSettingChange = async (key, newValue) => {
+    if (key === 'appNotif') setAppNotif(newValue);
+    if (key === 'emailNotifications') setEmailNotif(newValue);
+    if (key === 'smsNotifications') setSmsNotif(newValue);
+    if (key === 'promotionalOffers') setPromoNotif(newValue);
+    if (key === 'twoFactorEnabled') setTwoFactor(newValue);
+    if (key === 'biometricsEnabled') setBiometric(newValue);
+
+    if (key !== 'appNotif') {
+      const payload = {
+        emailNotifications: key === 'emailNotifications' ? newValue : emailNotif,
+        smsNotifications: key === 'smsNotifications' ? newValue : smsNotif,
+        promotionalOffers: key === 'promotionalOffers' ? newValue : promoNotif,
+        twoFactorEnabled: key === 'twoFactorEnabled' ? newValue : twoFactor,
+        biometricsEnabled: key === 'biometricsEnabled' ? newValue : biometric,
+      };
+
+      try {
+        await updateSettings(payload);
+      } catch (error) {
+        console.error("Error updating settings:", error);
+      }
+    }
+  };
+
   return (
     <div className="font-tajawal min-h-screen pb-10">
       <DashboardHeader
@@ -60,7 +108,7 @@ const Settings = () => {
                 <h4 className="text-sm font-black text-white mb-1">إشعارات التطبيق</h4>
                 <p className="text-xs text-slate-500 font-bold">تلقي إشعارات داخل التطبيق</p>
               </div>
-              <Toggle enabled={appNotif} onChange={setAppNotif} />
+              <Toggle enabled={appNotif} onChange={(v) => handleSettingChange('appNotif', v)} />
             </div>
 
             <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
@@ -68,7 +116,7 @@ const Settings = () => {
                 <h4 className="text-sm font-black text-white mb-1">إشعارات البريد الإلكتروني</h4>
                 <p className="text-xs text-slate-500 font-bold">تلقي تحديثات عبر البريد</p>
               </div>
-              <Toggle enabled={emailNotif} onChange={setEmailNotif} />
+              <Toggle enabled={emailNotif} onChange={(v) => handleSettingChange('emailNotifications', v)} />
             </div>
 
             <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
@@ -76,7 +124,7 @@ const Settings = () => {
                 <h4 className="text-sm font-black text-white mb-1">رسائل SMS</h4>
                 <p className="text-xs text-slate-500 font-bold">تلقي تحديثات عبر الرسائل النصية</p>
               </div>
-              <Toggle enabled={smsNotif} onChange={setSmsNotif} />
+              <Toggle enabled={smsNotif} onChange={(v) => handleSettingChange('smsNotifications', v)} />
             </div>
 
             <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors opacity-80">
@@ -84,7 +132,7 @@ const Settings = () => {
                 <h4 className="text-sm font-black text-white mb-1">العروض الترويجية</h4>
                 <p className="text-xs text-slate-500 font-bold">تلقي إشعارات حول العروض الخاصة</p>
               </div>
-              <Toggle enabled={promoNotif} onChange={setPromoNotif} />
+              <Toggle enabled={promoNotif} onChange={(v) => handleSettingChange('promotionalOffers', v)} />
             </div>
           </div>
         </div>
@@ -150,7 +198,7 @@ const Settings = () => {
                   <h4 className="text-sm font-black text-white mb-1">المصادقة الثنائية</h4>
                   <p className="text-xs text-slate-500 font-bold">طبقة أمان إضافية لحسابك</p>
                 </div>
-                <Toggle enabled={twoFactor} onChange={setTwoFactor} />
+                <Toggle enabled={twoFactor} onChange={(v) => handleSettingChange('twoFactorEnabled', v)} />
               </div>
 
               <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors opacity-80">
@@ -158,7 +206,7 @@ const Settings = () => {
                   <h4 className="text-sm font-black text-white mb-1">بصمة الوجه / البصمة</h4>
                   <p className="text-xs text-slate-500 font-bold">تسجيل الدخول السريع</p>
                 </div>
-                <Toggle enabled={biometric} onChange={setBiometric} />
+                <Toggle enabled={biometric} onChange={(v) => handleSettingChange('biometricsEnabled', v)} />
               </div>
             </div>
           </div>

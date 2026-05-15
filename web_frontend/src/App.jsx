@@ -21,6 +21,7 @@ import LandingPageV2 from "./pages/landingpage/LandingPageV2.jsx";
 
 
 import { AdminDataProvider } from "./context/AdminDataContext.jsx";
+import Workshops from "./pages/dashboard/admin/Workshops.jsx";
 
 export default function App() {
   useEffect(() => {
@@ -59,6 +60,7 @@ export default function App() {
             <Route path="/admin" element={<AdminHome />} />
             <Route path="/admin/orders" element={<AdminOrders />} />
             <Route path="/admin/technicians" element={<Technicians />} />
+            <Route path="/admin/workshops" element={<Workshops />} />
             <Route path="/admin/reports" element={<Reports />} />
             <Route path="/admin/notifications" element={<Notifications />} />
             <Route path="/admin/profile" element={<Profile />} />

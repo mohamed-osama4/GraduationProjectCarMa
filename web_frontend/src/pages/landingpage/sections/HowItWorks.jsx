@@ -31,7 +31,11 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="landing-section premium-dark-section">
+    <section id="how-it-works" className="landing-section premium-dark-section relative overflow-hidden">
+      {/* Background Shadow Text */}
+      <div className="absolute top-24 left-4 text-[12rem] font-black text-white/[0.03] pointer-events-none select-none hidden lg:block uppercase tracking-tighter">
+        Process
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <div data-aos="fade-up" className="mb-12">
           <h2 className="section-title">كيف يعمل CarMa</h2>

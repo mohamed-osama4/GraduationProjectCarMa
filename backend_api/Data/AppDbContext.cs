@@ -19,6 +19,7 @@ namespace CarMaintenance.Data
         public DbSet<NewNotification> NewNotifications { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserSettings> UserSettings { get; set; }
+        public DbSet<Workshop> Workshops { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -141,6 +142,38 @@ namespace CarMaintenance.Data
                 entity.HasIndex(x => new { x.UserId, x.IsDeleted, x.CreatedAt });
                 entity.HasIndex(x => new { x.UserId, x.IsRead });
                 entity.HasIndex(x => x.Type);
+            });
+
+            // ================= WORKSHOP CONFIG =================
+            modelBuilder.Entity<Workshop>(entity =>
+            {
+                entity.HasKey(w => w.Id);
+
+                entity.Property(w => w.Name)
+                      .IsRequired()
+                      .HasMaxLength(200);
+
+                entity.Property(w => w.OwnerName)
+                      .IsRequired()
+                      .HasMaxLength(200);
+
+                entity.Property(w => w.PhoneNumber)
+                      .IsRequired()
+                      .HasMaxLength(20);
+
+                entity.Property(w => w.Email)
+                      .IsRequired()
+                      .HasMaxLength(200);
+
+                entity.HasIndex(w => w.Email)
+                      .IsUnique();
+
+                entity.Property(w => w.Address)
+                      .IsRequired()
+                      .HasMaxLength(500);
+
+                entity.HasIndex(w => w.IsActive);
+                entity.HasIndex(w => w.IsOpen);
             });
         }
     }

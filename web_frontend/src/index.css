@@ -306,4 +306,9 @@ input::-ms-clear {
 
 .animate-preloader-bar {
   animation: preloader-bar 1.5s cubic-bezier(0.65, 0.05, 0.36, 1) infinite;
-}
+}
+
+
+input[type="time"]::-webkit-calendar-picker-indicator{
+  filter: invert(1) brightness(5);
+}

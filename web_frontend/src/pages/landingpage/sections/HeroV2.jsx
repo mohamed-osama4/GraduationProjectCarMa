@@ -31,7 +31,7 @@ export default function HeroV2({ isLoaded }) {
           </div>
 
 
-          <div className="hidden lg:flex items-center gap-8 text-[13px] font-bold text-white">
+          <div className="hidden lg:flex items-center gap-8 text-[16px] font-bold text-white">
             <a href="#hero" className="hover:text-[#D9B07C] transition-colors">الرئيسية</a>
             <a href="#services" className="hover:text-[#D9B07C] transition-colors">خدماتنا</a>
             <a href="#how-it-works" className="hover:text-[#D9B07C] transition-colors">كيف يعمل</a>
@@ -83,9 +83,6 @@ export default function HeroV2({ isLoaded }) {
                 احجز موعدك الآن
                 <HiOutlineArrowLeft className="group-hover:translate-x-[-8px] transition-transform" size={20} />
               </button>
-              <a href="#services" className="text-white font-bold text-sm tracking-widest hover:text-[#D9B07C] transition-colors border-b border-white/10 pb-1 uppercase">
-                اكتشف خدماتنا
-              </a>
             </div>
           </div>
 

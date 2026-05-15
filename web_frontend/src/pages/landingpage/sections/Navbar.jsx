@@ -35,7 +35,7 @@ export default function Navbar() {
               <span className={`text-3xl font-black italic tracking-tighter transition-colors duration-500 ${
                 scrolled || mobileOpen ? "text-premium-gold" : "text-white"
               }`}>
-                CarMa
+                Car<span className={scrolled || mobileOpen ? "text-white" : "text-[#D9B07C]"}>Ma</span>
               </span>
             </a>
           </div>
