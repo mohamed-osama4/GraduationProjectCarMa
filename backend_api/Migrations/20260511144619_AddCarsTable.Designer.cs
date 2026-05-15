@@ -3,6 +3,7 @@ using System;
 using CarMaintenance.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CarMaintenance.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260511144619_AddCarsTable")]
+    partial class AddCarsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -471,21 +474,6 @@ namespace CarMaintenance.Migrations
                     b.Navigation("Service");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ServiceWorkshop", b =>
-                {
-                    b.HasOne("CarMaintenance.Models.Service", null)
-                        .WithMany()
-                        .HasForeignKey("ServicesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CarMaintenance.Models.Workshop", null)
-                        .WithMany()
-                        .HasForeignKey("WorkshopsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.Order", b =>

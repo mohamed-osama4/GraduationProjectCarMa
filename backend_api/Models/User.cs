@@ -11,6 +11,7 @@ namespace CarMaintenance.Models
 
         [Required]
         public string Email { get; set; }
+        public string? ProfileImageUrl { get; set; }
 
         [Required]
         public string PasswordHash { get; set; }
@@ -18,6 +19,6 @@ namespace CarMaintenance.Models
         public string PhoneNumber { get; set; }
 
         [Required]
-        public string Role { get; set; } // Admin / User / Technician
+        public string Role { get; set; } // Admin / User 
     }
 }
