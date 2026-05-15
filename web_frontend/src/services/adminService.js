@@ -162,3 +162,11 @@ export const getTopServices = (period, limit = 6) => {
 export const exportReport = (Period, Type) => {
   return api.get("/api/admin/reports/export", { params: { Period, Type }, responseType: 'blob' });
 };
+
+export const getMySettings = () => {
+  return api.get("/api/Settings/MySettings");
+};
+
+export const updateSettings = (data) => {
+  return api.put("/api/Settings/Update-Settings", data);
+};
