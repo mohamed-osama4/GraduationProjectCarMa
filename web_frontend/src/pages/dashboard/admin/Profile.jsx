@@ -11,19 +11,16 @@ import {
   Edit3,
   Camera,
   Activity,
-  DollarSign,
-  Users,
-  ShoppingBag,
   Bell,
   Settings,
   FileText,
   Lock,
   Smartphone,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react';
 import DashboardHeader from '../../../component/dashboard/DashboardHeader';
-import StatCard from '../../../component/dashboard/StatCard';
 import { getProfile, uploadProfileImage } from '../../../services/authService';
 
 const Profile = () => {
@@ -31,7 +28,26 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [showImagePopup, setShowImagePopup] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setShowImagePopup(false);
+      }
+    };
+    if (showImagePopup) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showImagePopup]);
 
   const fetchProfileData = async () => {
     try {
@@ -78,46 +94,6 @@ const Profile = () => {
       setUploading(false);
     }
   };
-
-  // Mock Stats - these could also be fetched from an admin dashboard API
-  const stats = [
-    {
-      title: 'إجمالي الإيرادات',
-      value: '295,000 جنيه',
-      trend: '+18.2%',
-      trendUp: true,
-      icon: DollarSign,
-      iconBg: 'bg-emerald-500/10',
-      iconColor: 'text-emerald-400',
-    },
-    {
-      title: 'إجمالي الطلبات',
-      value: '1,760',
-      trend: '+12.5%',
-      trendUp: true,
-      icon: ShoppingBag,
-      iconBg: 'bg-blue-500/10',
-      iconColor: 'text-blue-400',
-    },
-    {
-      title: 'عدد الفنيين',
-      value: '47',
-      trend: '+5%',
-      trendUp: true,
-      icon: Briefcase,
-      iconBg: 'bg-purple-500/10',
-      iconColor: 'text-purple-400',
-    },
-    {
-      title: 'عدد العملاء',
-      value: '847',
-      trend: '+23.1%',
-      trendUp: true,
-      icon: Users,
-      iconBg: 'bg-[#D9B07C]/10',
-      iconColor: 'text-[#D9B07C]',
-    },
-  ];
 
   const recentActivities = [
     {
@@ -227,7 +203,8 @@ const Profile = () => {
                   <img 
                     src={profileData.profileImageUrl} 
                     alt={profileData.name}
-                    className="h-full w-full rounded-full object-cover border border-purple-500/30"
+                    className="h-full w-full rounded-full object-cover border border-[#D9B07C]/30 hover:border-[#D9B07C] cursor-pointer transition-all duration-300 hover:scale-105"
+                    onClick={() => setShowImagePopup(true)}
                   />
                 ) : (
                   <div className="h-full w-full rounded-full bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
@@ -279,13 +256,6 @@ const Profile = () => {
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <StatCard key={index} {...stat} />
-        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
@@ -452,6 +422,42 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {/* Premium Glassmorphic Image Preview Modal */}
+      {showImagePopup && profileData?.profileImageUrl && (
+        <div 
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md transition-all duration-300 animate-in fade-in"
+          onClick={() => setShowImagePopup(false)}
+        >
+          {/* Close button outside/on top */}
+          <button 
+            className="absolute top-6 right-6 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all duration-300 backdrop-blur-sm z-50 border border-white/10 shadow-lg"
+            onClick={() => setShowImagePopup(false)}
+          >
+            <X size={24} />
+          </button>
+
+          {/* Modal Container */}
+          <div 
+            className="relative max-w-4xl max-h-[85vh] w-auto h-auto rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl bg-[#121212]/50 p-2 backdrop-blur-xl animate-in zoom-in-95 duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              src={profileData.profileImageUrl} 
+              alt={profileData.name}
+              className="max-w-full max-h-[80vh] rounded-[2rem] object-contain shadow-2xl mx-auto border border-white/5"
+            />
+            {/* Image Details overlay */}
+            <div className="absolute bottom-6 left-6 right-6 bg-[#0a0a0a]/80 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/5 flex items-center justify-between gap-4 text-right" dir="rtl">
+              <div>
+                <p className="text-sm font-black text-white">{profileData.name}</p>
+                <p className="text-xs text-[#D9B07C] font-bold mt-1">صورة الملف الشخصي</p>
+              </div>
+              <span className="text-[10px] text-slate-500 font-bold bg-white/5 px-2 py-1 rounded-md">انقر في أي مكان للإغلاق</span>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
