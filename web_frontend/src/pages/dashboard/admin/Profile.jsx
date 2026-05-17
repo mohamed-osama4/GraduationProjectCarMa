@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   User, 
   Mail, 
@@ -18,13 +18,68 @@ import {
   Settings,
   FileText,
   Lock,
-  Smartphone
+  Smartphone,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import DashboardHeader from '../../../component/dashboard/DashboardHeader';
 import StatCard from '../../../component/dashboard/StatCard';
+import { getProfile, uploadProfileImage } from '../../../services/authService';
 
 const Profile = () => {
-  // Mock Data
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const fetchProfileData = async () => {
+    try {
+      setLoading(true);
+      const response = await getProfile();
+      setProfileData(response.data);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setError("فشل تحميل بيانات الملف الشخصي");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('يرجى اختيار ملف صورة صحيح');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      await uploadProfileImage(file);
+      // Refresh profile data to show the new image
+      const response = await getProfile();
+      setProfileData(response.data);
+      // Optional: Show success message
+    } catch (err) {
+      console.error("Error uploading image:", err);
+      alert('فشل رفع الصورة. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Mock Stats - these could also be fetched from an admin dashboard API
   const stats = [
     {
       title: 'إجمالي الإيرادات',
@@ -114,6 +169,35 @@ const Profile = () => {
     'إدارة الصلاحيات'
   ];
 
+  if (loading && !profileData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-12 h-12 text-[#D9B07C] animate-spin" />
+          <p className="text-slate-400 font-bold animate-pulse">جاري تحميل الملف الشخصي...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !profileData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] p-4">
+        <div className="bg-[#121212] border border-red-500/20 p-8 rounded-[2.5rem] text-center max-w-md w-full">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-black text-white mb-2">عذراً، حدث خطأ</h2>
+          <p className="text-slate-400 font-bold mb-6">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="w-full bg-[#D9B07C] text-black py-4 rounded-2xl font-black hover:brightness-110 transition-all"
+          >
+            إعادة المحاولة
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="font-tajawal min-h-screen pb-10">
       <DashboardHeader
@@ -133,27 +217,55 @@ const Profile = () => {
           <div className="flex items-center gap-6 w-full md:w-auto mt-[-4rem] relative z-10">
             {/* Avatar */}
             <div className="relative group shrink-0">
-              <div className="h-28 w-28 md:h-32 md:w-32 rounded-full bg-[#121212] p-2 flex items-center justify-center shadow-xl">
-                <div className="h-full w-full rounded-full bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                  <User size={64} strokeWidth={1.5} />
-                </div>
+              <div className="h-28 w-28 md:h-32 md:w-32 rounded-full bg-[#121212] p-2 flex items-center justify-center shadow-xl relative">
+                {uploading && (
+                  <div className="absolute inset-0 z-20 bg-black/60 rounded-full flex items-center justify-center">
+                    <Loader2 className="w-10 h-10 text-[#D9B07C] animate-spin" />
+                  </div>
+                )}
+                {profileData?.profileImageUrl ? (
+                  <img 
+                    src={profileData.profileImageUrl} 
+                    alt={profileData.name}
+                    className="h-full w-full rounded-full object-cover border border-purple-500/30"
+                  />
+                ) : (
+                  <div className="h-full w-full rounded-full bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                    <User size={64} strokeWidth={1.5} />
+                  </div>
+                )}
               </div>
-              <button className="absolute bottom-2 left-2 bg-[#D9B07C] text-black p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0">
+              
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange} 
+                accept="image/*" 
+                className="hidden" 
+              />
+              
+              <button 
+                onClick={handleCameraClick}
+                disabled={uploading}
+                className="absolute bottom-2 left-2 bg-[#D9B07C] text-black p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 z-30"
+              >
                 <Camera size={16} />
               </button>
             </div>
 
             {/* User Details */}
             <div className="text-right pt-16 md:pt-12">
-              <h2 className="text-2xl md:text-3xl font-black text-white mb-3">محمد عبد الرحمن</h2>
+              <h2 className="text-2xl md:text-3xl font-black text-white mb-3">{profileData?.name || 'مستخدم CarMa'}</h2>
               <div className="flex flex-wrap items-center gap-3">
-                <span className="text-slate-400 font-bold text-sm">مدير المنصة • الإدارة العليا</span>
+                <span className="text-slate-400 font-bold text-sm">
+                  {profileData?.role === 'admin' ? 'مدير المنصة • الإدارة العليا' : profileData?.role || 'عضو المنصة'}
+                </span>
                 <span className="h-1.5 w-1.5 rounded-full bg-slate-600"></span>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-black rounded-lg border border-emerald-500/20">
                   <CheckCircle2 size={12} /> نشط
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-500/10 text-purple-400 text-xs font-black rounded-lg border border-purple-500/20">
-                  <Shield size={12} /> مدير النظام
+                  <Shield size={12} /> {profileData?.role === 'admin' ? 'مدير النظام' : 'مستخدم'}
                 </span>
               </div>
             </div>
@@ -194,7 +306,7 @@ const Profile = () => {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 font-bold mb-1">الاسم الكامل</p>
-                  <p className="text-sm font-black text-white">محمد عبد الرحمن</p>
+                  <p className="text-sm font-black text-white">{profileData?.name || 'غير متوفر'}</p>
                 </div>
               </div>
 
@@ -204,7 +316,7 @@ const Profile = () => {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 font-bold mb-1">المسمى الوظيفي</p>
-                  <p className="text-sm font-black text-white">مدير المنصة</p>
+                  <p className="text-sm font-black text-white">{profileData?.role === 'admin' ? 'مدير المنصة' : 'موظف'}</p>
                 </div>
               </div>
 
@@ -214,7 +326,7 @@ const Profile = () => {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 font-bold mb-1">البريد الإلكتروني</p>
-                  <p className="text-sm font-black text-white">admin@carservice.com</p>
+                  <p className="text-sm font-black text-white">{profileData?.email || 'غير متوفر'}</p>
                 </div>
               </div>
 
@@ -224,7 +336,7 @@ const Profile = () => {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 font-bold mb-1">رقم الهاتف</p>
-                  <p className="text-sm font-black text-white" dir="ltr">+20 100 123 4567</p>
+                  <p className="text-sm font-black text-white" dir="ltr">{profileData?.phoneNumber || 'غير متوفر'}</p>
                 </div>
               </div>
             </div>
@@ -277,7 +389,7 @@ const Profile = () => {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 font-bold mb-1">آخر تسجيل دخول</p>
-                  <p className="text-sm font-black text-white" dir="ltr">2026-05-11 09:30 AM</p>
+                  <p className="text-sm font-black text-white" dir="ltr">2026-05-15 09:30 PM</p>
                 </div>
               </div>
             </div>

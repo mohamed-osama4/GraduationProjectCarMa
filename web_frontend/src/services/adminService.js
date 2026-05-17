@@ -30,11 +30,11 @@ export const getAdminNotifications = () => {
 
 /**
  * Fetch current admin account info.
- * GET /api/admin/me
+ * GET /api/profile/me
  * @returns {Promise<import("axios").AxiosResponse>}
  */
 export const getAccountInfo = () => {
-  return api.get("/api/admin/me");
+  return api.get("/api/profile/me");
 };
 
 /**

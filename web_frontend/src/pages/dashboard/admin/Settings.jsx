@@ -7,10 +7,14 @@ import {
   EyeOff,
   Globe,
   Moon,
-  Shield
+  Shield,
+  Loader2,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import DashboardHeader from '../../../component/dashboard/DashboardHeader';
 import { getMySettings, updateSettings } from '../../../services/adminService';
+import { changePassword } from '../../../services/authService';
 
 // Custom Toggle Component
 const Toggle = ({ enabled, onChange }) => (
@@ -32,6 +36,15 @@ const Settings = () => {
   const [twoFactor, setTwoFactor] = useState(true);
   const [biometric, setBiometric] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+
+  // Password change state
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordFeedback, setPasswordFeedback] = useState({ type: '', message: '' });
 
   const [showCurrentPass, setShowCurrentPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
@@ -81,6 +94,34 @@ const Settings = () => {
       } catch (error) {
         console.error("Error updating settings:", error);
       }
+    }
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setPasswordFeedback({ type: '', message: '' });
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordFeedback({ type: 'error', message: 'كلمات المرور الجديدة غير متطابقة' });
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 2) { // Based on the curl example using "11"
+        setPasswordFeedback({ type: 'error', message: 'كلمة المرور قصيرة جداً' });
+        return;
+    }
+
+    try {
+      setPasswordLoading(true);
+      await changePassword(passwordForm);
+      setPasswordFeedback({ type: 'success', message: 'تم تحديث كلمة المرور بنجاح' });
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      console.error("Change password error:", error);
+      const msg = error.response?.data?.message || 'حدث خطأ أثناء تحديث كلمة المرور. تأكد من كلمة المرور الحالية.';
+      setPasswordFeedback({ type: 'error', message: msg });
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -148,16 +189,30 @@ const Settings = () => {
 
           <div className="space-y-8">
             {/* Password Change */}
-            <div className="space-y-4">
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <h4 className="text-sm font-black text-white">تغيير كلمة المرور</h4>
               
+              {passwordFeedback.message && (
+                <div className={`p-4 rounded-xl flex items-center gap-3 text-xs font-bold border ${
+                  passwordFeedback.type === 'success' 
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                    : 'bg-red-500/10 text-red-400 border-red-500/20'
+                }`}>
+                  {passwordFeedback.type === 'success' ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                  {passwordFeedback.message}
+                </div>
+              )}
+
               <div className="relative">
                 <input 
                   type={showCurrentPass ? "text" : "password"} 
                   placeholder="كلمة المرور الحالية" 
-                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  required
+                  value={passwordForm.currentPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors text-right"
                 />
-                <button onClick={() => setShowCurrentPass(!showCurrentPass)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                <button type="button" onClick={() => setShowCurrentPass(!showCurrentPass)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
                   {showCurrentPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
@@ -166,9 +221,12 @@ const Settings = () => {
                 <input 
                   type={showNewPass ? "text" : "password"} 
                   placeholder="كلمة المرور الجديدة" 
-                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  required
+                  value={passwordForm.newPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors text-right"
                 />
-                <button onClick={() => setShowNewPass(!showNewPass)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                <button type="button" onClick={() => setShowNewPass(!showNewPass)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
                   {showNewPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
@@ -177,17 +235,25 @@ const Settings = () => {
                 <input 
                   type={showConfirmPass ? "text" : "password"} 
                   placeholder="تأكيد كلمة المرور" 
-                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                  required
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                  className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors text-right"
                 />
-                <button onClick={() => setShowConfirmPass(!showConfirmPass)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+                <button type="button" onClick={() => setShowConfirmPass(!showConfirmPass)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
                   {showConfirmPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
 
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-lg shadow-blue-900/20">
-                تحديث كلمة المرور
+              <button 
+                type="submit"
+                disabled={passwordLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors text-sm shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2"
+              >
+                {passwordLoading && <Loader2 size={16} className="animate-spin" />}
+                {passwordLoading ? 'جاري التحديث...' : 'تحديث كلمة المرور'}
               </button>
-            </div>
+            </form>
 
             <div className="h-px bg-white/5 w-full"></div>
 
