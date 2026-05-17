@@ -159,6 +159,7 @@ app.UseSwaggerUI();
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
+app.UseStaticFiles();
 app.UseAuthorization();
 
 app.MapControllers();
