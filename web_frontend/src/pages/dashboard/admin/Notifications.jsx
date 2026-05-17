@@ -33,16 +33,6 @@ const TYPE_MAP = {
   system: 7,
 };
 
-const typeFiltersList = [
-  { id: 'all', label: 'الكل' },
-  { id: 'serviceCompleted', label: 'اكتمال الخدمة' },
-  { id: 'technicianOnWay', label: 'فني في الطريق' },
-  { id: 'requestAccepted', label: 'مقبولة' },
-  { id: 'walletCreditAdded', label: 'رصيد محفظة' },
-  { id: 'appointmentReminder', label: 'تذكير موعد' },
-  { id: 'specialOffer', label: 'عروض' },
-  { id: 'system', label: 'نظام' },
-];
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -403,45 +393,27 @@ const Notifications = () => {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col gap-8 mb-8 text-sm relative z-10">
-          
-          <div className="flex flex-col gap-3">
-            <span className="text-[#D9B07C] font-black uppercase tracking-widest text-[10px]">نوع الإشعار</span>
-            <div className="flex flex-wrap items-center gap-2">
-              {typeFiltersList.map(filter => (
-                <button 
-                  key={filter.id}
-                  onClick={() => handleTypeChange(filter.id)}
-                  className={`px-5 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${typeFilter === filter.id ? 'bg-[#D9B07C] text-black shadow-lg shadow-[#D9B07C]/20 scale-105' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <span className="text-[#D9B07C] font-black uppercase tracking-widest text-[10px]">الحالة</span>
-            <div className="flex flex-wrap items-center gap-2">
-              <button 
-                onClick={() => handleStatusChange('all')}
-                className={`px-6 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${statusFilter === 'all' ? 'bg-white/10 text-white border border-white/20' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
-              >
-                الكل
-              </button>
-              <button 
-                onClick={() => handleStatusChange('unread')}
-                className={`px-6 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${statusFilter === 'unread' ? 'bg-[#D9B07C] text-black shadow-lg shadow-[#D9B07C]/20 scale-105' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
-              >
-                غير مقروءة
-              </button>
-              <button 
-                onClick={() => handleStatusChange('read')}
-                className={`px-6 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${statusFilter === 'read' ? 'bg-white/10 text-white border border-white/20' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
-              >
-                مقروءة
-              </button>
-            </div>
+        <div className="flex flex-col gap-3 mb-8 text-sm relative z-10">
+          <span className="text-[#D9B07C] font-black uppercase tracking-widest text-[10px]">الحالة</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <button 
+              onClick={() => handleStatusChange('all')}
+              className={`px-6 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${statusFilter === 'all' ? 'bg-white/10 text-white border border-white/20' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
+            >
+              الكل
+            </button>
+            <button 
+              onClick={() => handleStatusChange('unread')}
+              className={`px-6 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${statusFilter === 'unread' ? 'bg-[#D9B07C] text-black shadow-lg shadow-[#D9B07C]/20 scale-105' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
+            >
+              غير مقروءة
+            </button>
+            <button 
+              onClick={() => handleStatusChange('read')}
+              className={`px-6 py-2.5 rounded-full font-black text-xs transition-all duration-300 ${statusFilter === 'read' ? 'bg-white/10 text-white border border-white/20' : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'}`}
+            >
+              مقروءة
+            </button>
           </div>
         </div>
 
