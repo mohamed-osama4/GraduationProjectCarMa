@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Bell, ChevronDown, Menu, User, FileText, Loader2, X, AlertCircle, Clock, Zap, Check, Wallet, Tag, Users, CheckCircle } from 'lucide-react';
-import { globalSearch, getNewNotifications, getAccountInfo, markAllNotificationsAsRead } from '../../services/adminService';
+import { Search, Bell, ChevronDown, Menu, User, FileText, Loader2, X, AlertCircle, Clock, Zap, Check, Wallet, Tag, Users, CheckCircle, Settings } from 'lucide-react';
+import { globalSearch, getNewNotifications, getAccountInfo, markAllNotificationsAsRead, getMenu } from '../../services/adminService';
 import { useNavigate } from 'react-router-dom';
 import { useSignalREvent } from '../../context/SignalRContext';
 
@@ -26,12 +26,15 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
   const [showResults, setShowResults] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [menuItems, setMenuItems] = useState([]);
+  const [showMenu, setShowMenu] = useState(false);
   
   // Toast state for new real-time notifications
   const [toast, setToast] = useState(null);
   
   const searchRef = useRef(null);
   const notificationRef = useRef(null);
+  const menuRef = useRef(null);
   const navigate = useNavigate();
 
   // Close dropdowns when clicking outside
@@ -42,6 +45,9 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
       }
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
+      }
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -64,11 +70,13 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [, profileRes] = await Promise.all([
+        const [, profileRes, menuRes] = await Promise.all([
           fetchHeaderNotifications(),
-          getAccountInfo()
+          getAccountInfo(),
+          getMenu()
         ]);
         setProfile(profileRes.data);
+        setMenuItems(menuRes.data || []);
       } catch (err) {
         console.error("Error fetching header data:", err);
       }
@@ -395,19 +403,56 @@ const DashboardHeader = ({ title, subtitle, onMenuClick }) => {
           </div>
 
           {/* User Profile */}
-          <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-            <ChevronDown size={18} className="text-slate-500" />
-            <div className="flex flex-col items-end text-right">
-              <span className="text-sm font-bold text-white">
-                {profile?.name && profile.name !== 'string' ? profile.name : 'مدير النظام'}
-              </span>
-              <span className="text-[10px] text-[#D9B07C] font-black uppercase tracking-wider">
-                {profile?.role === 'admin' ? 'مدير العمليات' : profile?.role || 'مشرف'}
-              </span>
+          <div className="relative" ref={menuRef}>
+            <div 
+              onClick={() => setShowMenu(!showMenu)}
+              className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+            >
+              <ChevronDown size={18} className={`text-slate-500 transition-transform duration-300 ${showMenu ? 'rotate-180 text-[#D9B07C]' : ''}`} />
+              <div className="flex flex-col items-end text-right">
+                <span className="text-sm font-bold text-white">
+                  {profile?.name && profile.name !== 'string' ? profile.name : 'مدير النظام'}
+                </span>
+                <span className="text-[10px] text-[#D9B07C] font-black uppercase tracking-wider">
+                  {profile?.role === 'admin' ? 'مدير العمليات' : profile?.role || 'مشرف'}
+                </span>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-[#D9B07C] flex items-center justify-center text-black font-black text-sm shadow-xl shadow-[#D9B07C]/10 overflow-hidden border border-white/5 shrink-0">
+                {profile?.profileImageUrl ? (
+                  <img 
+                    src={profile.profileImageUrl} 
+                    alt={profile.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  getInitials(profile?.name)
+                )}
+              </div>
             </div>
-            <div className="h-10 w-10 rounded-full bg-[#D9B07C] flex items-center justify-center text-black font-black text-sm shadow-xl shadow-[#D9B07C]/10">
-              {getInitials(profile?.name)}
-            </div>
+
+            {showMenu && (
+              <div className="absolute top-full left-0 mt-3 w-56 bg-[#121212] rounded-2xl shadow-2xl border border-white/5 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-right backdrop-blur-xl py-2">
+                {menuItems.map((item, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setShowMenu(false);
+                      navigate(item.route);
+                    }}
+                    className="w-full px-4 py-3 text-sm font-bold text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-300 flex items-center justify-between gap-3 text-right group"
+                    dir="rtl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="p-1.5 rounded-lg bg-white/5 text-slate-400 group-hover:bg-[#D9B07C]/10 group-hover:text-[#D9B07C] transition-all">
+                        {item.route.includes('profile') ? <User size={16} /> : <Settings size={16} />}
+                      </span>
+                      <span>{item.title}</span>
+                    </div>
+                    <ChevronDown size={14} className="text-slate-600 group-hover:text-slate-300 -rotate-90" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

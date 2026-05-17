@@ -38,6 +38,15 @@ export const getAccountInfo = () => {
 };
 
 /**
+ * Fetch Profile Dropdown Menu items.
+ * GET /api/menu
+ * @returns {Promise<import("axios").AxiosResponse>}
+ */
+export const getMenu = () => {
+  return api.get("/api/menu");
+};
+
+/**
  * Fetch all orders.
  * GET /api/orders
  * @returns {Promise<import("axios").AxiosResponse>}
