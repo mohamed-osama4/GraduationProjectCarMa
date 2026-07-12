@@ -34,6 +34,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<INewNotificationService, NewNotificationService>();
 builder.Services.AddScoped<IReportsService, ReportsService>();
 builder.Services.AddScoped<IAdminActivityLogService, AdminActivityLogService>();
+builder.Services.AddScoped<ITwilioWhatsAppService, TwilioWhatsAppService>();
 builder.Services.AddScoped<GeminiAiService>();
 builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.AddMemoryCache();

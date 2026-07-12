@@ -22,17 +22,20 @@ namespace CarMaintenance.Controllers
         private readonly IHubContext<NotificationHub> _hub;
         private readonly INewNotificationService _newNotificationService;
         private readonly IAdminActivityLogService _activityLogService;
+        private readonly ITwilioWhatsAppService _twilioService;
 
         public OrdersController(
             AppDbContext context,
             IHubContext<NotificationHub> hub,
             INewNotificationService newNotificationService,
-            IAdminActivityLogService activityLogService)
+            IAdminActivityLogService activityLogService,
+            ITwilioWhatsAppService twilioService)
         {
             _context = context;
             _hub = hub;
             _newNotificationService = newNotificationService;
             _activityLogService = activityLogService;
+            _twilioService = twilioService;
         }
 
         // ================= GET ALL ORDERS =================
@@ -190,11 +193,35 @@ namespace CarMaintenance.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> AcceptOrder(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.Service)
+                .Include(o => o.SubService)
+                .FirstOrDefaultAsync(o => o.Id == id);
             if (order == null) return NotFound();
 
             order.OrderStatus = OrderStatus.Accepted;
             await _context.SaveChangesAsync();
+
+            // ── Send WhatsApp to workshop via Twilio ──
+            try
+            {
+                var serviceName = order.SubService != null
+                    ? $"{order.Service?.Name} - {order.SubService.Name}"
+                    : order.Service?.Name ?? "صيانة عامة";
+
+                await _twilioService.SendOrderToWorkshopAsync(
+                    orderId: order.Id,
+                    serviceName: serviceName,
+                    customerName: order.User?.Name ?? "عميل",
+                    customerPhone: order.PhoneNumber,
+                    address: order.Address,
+                    details: order.Notes ?? "لا توجد ملاحظات");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Warning: Failed to send WhatsApp for order {id}: {ex.Message}");
+            }
 
             try
             {
