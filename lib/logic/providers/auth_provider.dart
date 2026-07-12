@@ -72,6 +72,9 @@ class AuthProvider extends ChangeNotifier {
           final cacheMap = Map<String, dynamic>.from(userMap)..remove('token');
           await prefs.setString('user_data', jsonEncode(cacheMap));
 
+          // Fetch fresh profile data to get phone number and other missing details
+          await fetchProfile();
+
           _isLoading = false;
           notifyListeners();
           return true;
@@ -276,5 +279,55 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       // Ignore errors for silent background fetch
     }
+  }
+
+  // ─── CHANGE PASSWORD ──────────────────────────────────────────────────────
+  // Backend: POST /api/change-password/ChangePassword
+  // DTO: { currentPassword, newPassword, confirmPassword }
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiClient.dio.post(
+        '/change-password/ChangePassword',
+        data: {
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+          'confirmPassword': confirmPassword,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      }
+      _errorMessage = 'فشل تغيير كلمة المرور';
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 400) {
+        final data = e.response?.data;
+        if (data is String) {
+          _errorMessage = data;
+        } else if (data is Map<String, dynamic>) {
+          _errorMessage = data['message'] ?? 'فشل تغيير كلمة المرور';
+        } else {
+          _errorMessage = 'فشل تغيير كلمة المرور';
+        }
+      } else {
+        _errorMessage = e.message ?? 'فشل تغيير كلمة المرور';
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
 }

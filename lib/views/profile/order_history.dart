@@ -3,6 +3,7 @@ import 'package:graduation_project/core/theme/app_theme.dart';
 import 'package:graduation_project/core/localization/app_strings.dart';
 import 'package:graduation_project/data/models/order_model.dart';
 import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:graduation_project/logic/providers/auth_provider.dart';
 import 'package:graduation_project/logic/providers/orders_provider.dart';
 import 'package:graduation_project/views/home/order_details_page.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,8 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     super.initState();
     // Refresh orders when the page opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<OrdersProvider>().fetchOrders();
+      final userId = context.read<AuthProvider>().currentUser?.id;
+      context.read<OrdersProvider>().fetchOrders(userId: userId);
     });
   }
 

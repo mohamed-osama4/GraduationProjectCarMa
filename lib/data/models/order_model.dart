@@ -11,7 +11,7 @@ enum OrderStatus {
   canceled,
 }
 
-OrderStatus _orderStatusFromString(dynamic status) {
+OrderStatus orderStatusFromString(dynamic status) {
   if (status == null) return OrderStatus.pending;
 
   // Handle integer (C# enum default JSON serialization: 0=Pending, 1=Accepted...)
@@ -89,7 +89,7 @@ class OrderModel {
       userId:          json['userId'] as int? ?? 0,
       vehicleId:       json['vehicleId'] as int? ?? 0,
       serviceId:       json['serviceId'] as int? ?? 0,
-      orderStatus:     _orderStatusFromString(json['orderStatus']),
+      orderStatus:     orderStatusFromString(json['orderStatus']),
       address:         json['address'] as String? ?? '',
       phoneNumber:     json['phoneNumber'] as String? ?? '',
       price:           (json['price'] as num?)?.toDouble() ?? 0.0,

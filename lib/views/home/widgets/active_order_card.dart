@@ -198,12 +198,12 @@ class ActiveOrderCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppTheme.warningColor.withValues(alpha: 0.1),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.access_time_filled,
-                    color: AppTheme.warningColor,
+                  child: Icon(
+                    Icons.add_task_rounded,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -212,7 +212,7 @@ class ActiveOrderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        s.orderPending, // "Your order is being reviewed"
+                        s.isArabic ? 'أنشئ طلبك الآن' : 'Create your order now',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: Theme.of(context).colorScheme.onSurface,
@@ -220,7 +220,7 @@ class ActiveOrderCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        s.orderPendingSub, // "We will get back to you soon"
+                        s.isArabic ? 'اطلب الخدمة التي تحتاجها بسهولة' : 'Request the service you need easily',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 12,
@@ -232,8 +232,8 @@ class ActiveOrderCard extends StatelessWidget {
                 Container(
                   width: 10,
                   height: 10,
-                  decoration: const BoxDecoration(
-                    color: AppTheme.warningColor,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
                 ),

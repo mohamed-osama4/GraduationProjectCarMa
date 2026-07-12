@@ -137,33 +137,58 @@ class OrdersProvider extends ChangeNotifier {
     try {
       final response = await _apiClient.dio.get('/orders/$orderId');
       if (response.statusCode == 200) {
-        final apiResponse = ApiResponse<OrderModel>.fromJson(
-          response.data,
-          (json) => OrderModel.fromJson(json as Map<String, dynamic>),
-        );
+        final body = response.data as Map<String, dynamic>;
+        final success = body['success'] as bool? ?? false;
+        final data = body['data'] as Map<String, dynamic>?;
 
-        if (apiResponse.success && apiResponse.data != null) {
-          final updatedOrder = apiResponse.data!;
+        if (success && data != null) {
+          // Backend returns nested format: { id, status: "Pending", price, ... }
+          // Parse the status string from the response
+          final statusStr = data['status'] as String? ?? 'Pending';
+          final newStatus = orderStatusFromString(statusStr);
 
-          // Update the order in the local list
+          // Build a minimal updated order by merging new status into existing
           final idx = _orders.indexWhere((o) => o.id == orderId);
           if (idx != -1) {
-            _orders[idx] = updatedOrder;
+            final existing = _orders[idx];
+            // Create updated order with the new status
+            _orders[idx] = OrderModel(
+              id: existing.id,
+              userId: existing.userId,
+              vehicleId: existing.vehicleId,
+              serviceId: existing.serviceId,
+              orderStatus: newStatus,
+              address: existing.address,
+              phoneNumber: existing.phoneNumber,
+              price: (data['price'] as num?)?.toDouble() ?? existing.price,
+              isPaid: data['paymentStatus'] == 'مدفوع' || existing.isPaid,
+              paymentMethod: existing.paymentMethod,
+              technicianName: data['technician'] != 'غير معين'
+                  ? data['technician'] as String?
+                  : existing.technicianName,
+              technicianId: existing.technicianId,
+              technicianPhone: existing.technicianPhone,
+              technicianRating: existing.technicianRating,
+              estimatedArrival: existing.estimatedArrival,
+              createdAt: existing.createdAt,
+              updatedAt: DateTime.now(),
+            );
           }
 
           // If status just changed to Accepted — fire callback!
           if (_lastKnownStatus != OrderStatus.accepted &&
-              updatedOrder.orderStatus == OrderStatus.accepted) {
-            onOrderAccepted?.call(updatedOrder);
+              newStatus == OrderStatus.accepted) {
+            if (idx != -1) onOrderAccepted?.call(_orders[idx]);
             stopPolling(); // stop after accepted
           }
 
           // Stop polling if terminal status
-          if (updatedOrder.isCompleted || updatedOrder.isRejected) {
+          if (newStatus == OrderStatus.completed ||
+              newStatus == OrderStatus.rejected) {
             stopPolling();
           }
 
-          _lastKnownStatus = updatedOrder.orderStatus;
+          _lastKnownStatus = newStatus;
           notifyListeners();
         }
       }
