@@ -9,6 +9,8 @@ import 'package:graduation_project/logic/providers/orders_provider.dart';
 import 'package:graduation_project/logic/providers/ai_provider.dart';
 import 'package:graduation_project/logic/providers/notification_provider.dart';
 import 'package:graduation_project/logic/providers/services_provider.dart';
+import 'package:graduation_project/logic/providers/settings_provider.dart';
+import 'package:graduation_project/logic/providers/cars_provider.dart';
 
 import 'dart:io';
 
@@ -38,6 +40,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => ServicesProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => CarsProvider()),
       ],
       child: Consumer<LocaleProvider>(
         builder: (_, localeProvider, __) {

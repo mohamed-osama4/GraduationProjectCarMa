@@ -3,7 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:graduation_project/core/comeponents/app_image.dart';
 import 'package:graduation_project/core/localization/app_strings.dart';
 import 'package:graduation_project/core/theme/app_theme.dart';
+import 'package:graduation_project/logic/providers/auth_provider.dart';
 import 'package:graduation_project/logic/providers/locale_provider.dart';
+import 'package:graduation_project/logic/providers/settings_provider.dart';
 import 'package:graduation_project/core/comeponents/app_background.dart';
 import 'package:provider/provider.dart';
 
@@ -15,13 +17,16 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool isNotificationOn = true;
   late bool isDarkModeOn;
 
   @override
   void initState() {
     super.initState();
     isDarkModeOn = AppTheme.themeNotifier.value == ThemeMode.dark;
+    // Fetch settings from backend
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SettingsProvider>().fetchSettings();
+    });
   }
 
   @override
@@ -112,13 +117,18 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSwitchCategory(
-                title: s.notifications,
-                hint: s.notifHint,
-                iconPath: 'notification.svg',
-                iconBgColor: const Color(0xFFDBEAFE),
-                value: isNotificationOn,
-                onChanged: (val) => setState(() => isNotificationOn = val),
+              // Notifications toggle — synced with backend
+              Consumer<SettingsProvider>(
+                builder: (_, settings, __) => _buildSwitchCategory(
+                  title: s.notifications,
+                  hint: s.notifHint,
+                  iconPath: 'notification.svg',
+                  iconBgColor: const Color(0xFFDBEAFE),
+                  value: settings.notificationsEnabled,
+                  onChanged: (val) {
+                    settings.setNotificationsEnabled(val);
+                  },
+                ),
               ),
               _buildDivider(),
               _buildSwitchCategory(
@@ -182,6 +192,15 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Change Password — connected to backend
+              _buildArrowCategory(
+                title: s.isArabic ? 'تغيير كلمة المرور' : 'Change Password',
+                hint: null,
+                iconPath: 'privacy.svg',
+                iconBgColor: const Color(0xFFF3E8FF),
+                onTap: () => _showChangePasswordDialog(context, s),
+              ),
+              _buildDivider(),
               _buildArrowCategory(
                 title: s.privacyPolicy,
                 hint: null,
@@ -531,6 +550,117 @@ class _SettingsPageState extends State<SettingsPage> {
           ],
         ),
       ),
+    );
+  }
+
+  // ── Change Password Dialog ──────────────────────────────────────
+  void _showChangePasswordDialog(BuildContext context, AppStrings s) {
+    final currentCtrl = TextEditingController();
+    final newCtrl = TextEditingController();
+    final confirmCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            s.isArabic ? 'تغيير كلمة المرور' : 'Change Password',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: currentCtrl,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: s.isArabic ? 'كلمة المرور الحالية' : 'Current Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: newCtrl,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: s.isArabic ? 'كلمة المرور الجديدة' : 'New Password',
+                    prefixIcon: const Icon(Icons.lock),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: confirmCtrl,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: s.isArabic ? 'تأكيد كلمة المرور' : 'Confirm Password',
+                    prefixIcon: const Icon(Icons.lock),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: Text(s.isArabic ? 'إلغاء' : 'Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () async {
+                final current = currentCtrl.text.trim();
+                final newPass = newCtrl.text.trim();
+                final confirm = confirmCtrl.text.trim();
+
+                if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(s.isArabic ? 'يرجى ملء جميع الحقول' : 'Please fill all fields')),
+                  );
+                  return;
+                }
+
+                if (newPass != confirm) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(s.isArabic ? 'كلمة المرور غير متطابقة' : 'Passwords do not match')),
+                  );
+                  return;
+                }
+
+                final auth = context.read<AuthProvider>();
+                final success = await auth.changePassword(
+                  currentPassword: current,
+                  newPassword: newPass,
+                  confirmPassword: confirm,
+                );
+
+                if (!dialogCtx.mounted) return;
+                Navigator.pop(dialogCtx);
+
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? (s.isArabic ? 'تم تغيير كلمة المرور بنجاح ✅' : 'Password changed successfully ✅')
+                          : (auth.errorMessage ?? (s.isArabic ? 'فشل تغيير كلمة المرور' : 'Failed to change password')),
+                    ),
+                    backgroundColor: success ? const Color(0xFF00A63E) : Colors.red,
+                  ),
+                );
+              },
+              child: Text(s.isArabic ? 'تغيير' : 'Change'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
