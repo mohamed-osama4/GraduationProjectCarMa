@@ -8,7 +8,6 @@ import 'package:graduation_project/logic/providers/orders_provider.dart';
 import 'package:graduation_project/views/home/order_details_page.dart';
 import 'package:provider/provider.dart';
 
-
 class ActiveOrderCard extends StatelessWidget {
   const ActiveOrderCard({super.key});
 
@@ -31,18 +30,22 @@ class ActiveOrderCard extends StatelessWidget {
 
         // Only show card for active orders (not completed/rejected)
         if (activeOrder.isCompleted || activeOrder.isRejected) {
-          return _buildMockCard(context, s); // Show mock if the actual order is done
+          return _buildMockCard(
+            context,
+            s,
+          ); // Show mock if the actual order is done
         }
 
-        String title    = s.orderPending;
+        String title = s.orderPending;
         String subtitle = s.orderPendingSub;
         Color statusColor = AppTheme.warningColor;
 
         if (activeOrder.isAccepted || activeOrder.isInProgress) {
-          title    = s.orderOnTheWay;
-          subtitle = activeOrder.hasTechnician
-              ? '${activeOrder.technicianName} ${s.isArabic ? "في الطريق إليك" : "is on the way"}'
-              : s.orderOnTheWaySub;
+          title = s.orderOnTheWay;
+          subtitle =
+              activeOrder.hasTechnician
+                  ? '${activeOrder.technicianName} ${s.isArabic ? "في الطريق إليك" : "is on the way"}'
+                  : s.orderOnTheWaySub;
           statusColor = AppTheme.successColor;
         }
 
@@ -73,21 +76,32 @@ class ActiveOrderCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
-                        image: ordersProvider.imagePathForOrder(activeOrder.id) != null
-                            ? DecorationImage(
-                                image: FileImage(File(ordersProvider.imagePathForOrder(activeOrder.id)!)),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
+                        image:
+                            ordersProvider.imagePathForOrder(activeOrder.id) !=
+                                    null
+                                ? DecorationImage(
+                                  image: FileImage(
+                                    File(
+                                      ordersProvider.imagePathForOrder(
+                                        activeOrder.id,
+                                      )!,
+                                    ),
+                                  ),
+                                  fit: BoxFit.cover,
+                                )
+                                : null,
                       ),
-                      child: ordersProvider.imagePathForOrder(activeOrder.id) == null
-                          ? Icon(
-                              activeOrder.isAccepted || activeOrder.isInProgress
-                                  ? Icons.directions_car_rounded
-                                  : Icons.access_time_filled,
-                              color: statusColor,
-                            )
-                          : null,
+                      child:
+                          ordersProvider.imagePathForOrder(activeOrder.id) ==
+                                  null
+                              ? Icon(
+                                activeOrder.isAccepted ||
+                                        activeOrder.isInProgress
+                                    ? Icons.directions_car_rounded
+                                    : Icons.access_time_filled,
+                                color: statusColor,
+                              )
+                              : null,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -105,7 +119,10 @@ class ActiveOrderCard extends StatelessWidget {
                           Text(
                             subtitle,
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                               fontSize: 12,
                             ),
                           ),
@@ -116,7 +133,10 @@ class ActiveOrderCard extends StatelessWidget {
                     Container(
                       width: 10,
                       height: 10,
-                      decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ],
                 ),
@@ -125,19 +145,29 @@ class ActiveOrderCard extends StatelessWidget {
                 // ── View Details button ──────────────────────
                 GestureDetector(
                   onTap: () {
-                    final imgPath = ordersProvider.imagePathForOrder(activeOrder.id);
-                    final svcName = ordersProvider.serviceNameForOrder(activeOrder.id) ?? '';
-                    final notes   = ordersProvider.notesForOrder(activeOrder.id);
-                    OrderDetailsPage.show(context, activeOrder,
-                        serviceName: svcName, carImagePath: imgPath, notes: notes);
+                    final imgPath = ordersProvider.imagePathForOrder(
+                      activeOrder.id,
+                    );
+                    final svcName =
+                        ordersProvider.serviceNameForOrder(activeOrder.id) ??
+                        '';
+                    final notes = ordersProvider.notesForOrder(activeOrder.id);
+                    OrderDetailsPage.show(
+                      context,
+                      activeOrder,
+                      serviceName: svcName,
+                      carImagePath: imgPath,
+                      notes: notes,
+                    );
                   },
                   child: Container(
                     width: double.infinity,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? AppTheme.carmaGold
-                          : AppTheme.primaryColor,
+                      color:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? AppTheme.carmaGold
+                              : AppTheme.primaryColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     alignment: Alignment.center,
@@ -198,12 +228,12 @@ class ActiveOrderCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppTheme.warningColor.withValues(alpha: 0.1),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.access_time_filled,
-                    color: AppTheme.warningColor,
+                  child: Icon(
+                    Icons.add_task_rounded,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -212,7 +242,7 @@ class ActiveOrderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        s.orderPending, // "Your order is being reviewed"
+                        s.isArabic ? 'أنشئ طلبك الآن' : 'Create your order now',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: Theme.of(context).colorScheme.onSurface,
@@ -220,7 +250,9 @@ class ActiveOrderCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        s.orderPendingSub, // "We will get back to you soon"
+                        s.isArabic
+                            ? 'اطلب الخدمة التي تحتاجها بسهولة'
+                            : 'Request the service you need easily',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 12,
@@ -232,8 +264,8 @@ class ActiveOrderCard extends StatelessWidget {
                 Container(
                   width: 10,
                   height: 10,
-                  decoration: const BoxDecoration(
-                    color: AppTheme.warningColor,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
                 ),
