@@ -120,6 +120,16 @@ class _ProfilePageState extends State<ProfilePage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        user?.createdAt != null
+                            ? '${s.memberSince} ${user!.createdAt!.substring(0, 7)}'
+                            : s.memberSince,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 14,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -144,7 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       _buildInfoField(context, Icons.email_outlined, s.email, user?.email ?? '—'),
                       const SizedBox(height: 12),
                       _buildInfoField(context, Icons.phone_android, s.phone,
-                          (user?.phoneNumber != null && user!.phoneNumber.isNotEmpty) ? user.phoneNumber : '—',
+                          user?.phoneNumber.isNotEmpty == true ? user!.phoneNumber : '—',
                           isPhone: true),
                       const SizedBox(height: 32),
 

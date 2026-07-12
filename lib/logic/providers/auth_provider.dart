@@ -72,9 +72,6 @@ class AuthProvider extends ChangeNotifier {
           final cacheMap = Map<String, dynamic>.from(userMap)..remove('token');
           await prefs.setString('user_data', jsonEncode(cacheMap));
 
-          // Fetch fresh profile data to get phone number and other missing details
-          await fetchProfile();
-
           _isLoading = false;
           notifyListeners();
           return true;
